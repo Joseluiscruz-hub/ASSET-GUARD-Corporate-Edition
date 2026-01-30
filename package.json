@@ -22,8 +22,8 @@
     "dompurify": "^3.2.4",
     "exceljs": "^4.4.0",
     "firebase": "^12.8.0",
-    "jspdf": "^2.5.1",
-    "jspdf-autotable": "^3.8.2",
+    "jspdf": "^4.0.0",
+    "jspdf-autotable": "^5.0.7",
     "rxjs": "^7.8.2"
   },
   "devDependencies": {
