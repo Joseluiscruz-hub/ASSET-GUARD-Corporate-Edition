@@ -1,10 +1,9 @@
-
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DataService } from '../../services/data.service';
 import { GeminiService } from '../../services/gemini.service';
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 
 @Component({
   selector: 'app-admin',
@@ -244,26 +243,28 @@ export class AdminComponent {
 
   // --- Excel Import/Export ---
 
-  handleFileInput(event: any) {
+  async handleFileInput(event: any) {
     const file = event.target.files[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = (e: any) => {
-      const bstr = e.target.result;
-      const wb = XLSX.read(bstr, { type: 'binary' });
-      const wsname = wb.SheetNames[0];
-      const ws = wb.Sheets[wsname];
-      const data = XLSX.utils.sheet_to_json(ws);
-      
-      // Send to Service
-      this.dataService.updateAssetsFromExcel(data);
-      alert(`Se procesaron ${data.length} registros exitosamente.`);
-    };
-    reader.readAsBinaryString(file);
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(await file.arrayBuffer());
+    const worksheet = workbook.worksheets[0];
+    const data: any[] = [];
+    worksheet.eachRow((row, rowNumber) => {
+      if (rowNumber === 1) return; // skip header
+      const rowData: any = {};
+      worksheet.getRow(1).eachCell((cell, colNumber) => {
+        rowData[cell.value as string] = row.getCell(colNumber).value;
+      });
+      data.push(rowData);
+    });
+
+    this.dataService.updateAssetsFromExcel(data);
+    alert(`Se procesaron ${data.length} registros exitosamente.`);
   }
 
-  exportData() {
+  async exportData() {
     // 1. Prepare Data
     const failures = this.dataService.forkliftFailures().map(f => ({
       ID: f.id,
@@ -277,23 +278,40 @@ export class AdminComponent {
     }));
 
     const assets = this.dataService.assets().map(a => ({
-       Economico: a.id,
-       Marca: a.brand,
-       Modelo: a.model,
-       Serie: a.serial,
-       Estatus: a.status.name,
-       Desde: a.statusSince
+      Economico: a.id,
+      Marca: a.brand,
+      Modelo: a.model,
+      Serie: a.serial,
+      Estatus: a.status.name,
+      Desde: a.statusSince
     }));
 
     // 2. Create Workbook
-    const wb = XLSX.utils.book_new();
-    const wsFailures = XLSX.utils.json_to_sheet(failures);
-    const wsAssets = XLSX.utils.json_to_sheet(assets);
+    const workbook = new ExcelJS.Workbook();
+    const wsAssets = workbook.addWorksheet('Inventario');
+    const wsFailures = workbook.addWorksheet('Reporte de Fallas');
 
-    XLSX.utils.book_append_sheet(wb, wsAssets, 'Inventario');
-    XLSX.utils.book_append_sheet(wb, wsFailures, 'Reporte de Fallas');
+    // Add headers and rows for assets
+    if (assets.length > 0) {
+      wsAssets.addRow(Object.keys(assets[0]));
+      assets.forEach(row => wsAssets.addRow(Object.values(row)));
+    }
+    // Add headers and rows for failures
+    if (failures.length > 0) {
+      wsFailures.addRow(Object.keys(failures[0]));
+      failures.forEach(row => wsFailures.addRow(Object.values(row)));
+    }
 
     // 3. Save
-    XLSX.writeFile(wb, `AssetGuard_Reporte_${new Date().toISOString().slice(0,10)}.xlsx`);
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `AssetGuard_Reporte_${new Date().toISOString().slice(0,10)}.xlsx`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
   }
 }
