@@ -9,16 +9,16 @@ import { hydrateRealAssets, REAL_FLEET_DATA } from '../data/real-fleet';
   providedIn: 'root'
 })
 export class DataService {
-  
+
   // --- FIREBASE CONFIGURATION ---
   private firebaseConfig = {
-    apiKey: "AIzaSyBfdkTmTXNW7zP2Pbo_qktwevU12ff16Ng",
-    authDomain: "sample-firebase-ai-app-c84d2.firebaseapp.com",
-    databaseURL: "https://sample-firebase-ai-app-c84d2-default-rtdb.firebaseio.com",
-    projectId: "sample-firebase-ai-app-c84d2",
-    storageBucket: "sample-firebase-ai-app-c84d2.firebasestorage.app",
-    messagingSenderId: "572595334513",
-    appId: "1:572595334513:web:725d1fb5fbe9ed48dc9ad0"
+    apiKey: process.env['FIREBASE_API_KEY'],
+    authDomain: process.env['FIREBASE_AUTH_DOMAIN'],
+    databaseURL: process.env['FIREBASE_DATABASE_URL'],
+    projectId: process.env['FIREBASE_PROJECT_ID'],
+    storageBucket: process.env['FIREBASE_STORAGE_BUCKET'],
+    messagingSenderId: process.env['FIREBASE_MESSAGING_SENDER_ID'],
+    appId: process.env['FIREBASE_APP_ID']
   };
 
   private app: any;
@@ -36,11 +36,11 @@ export class DataService {
   // --- State Signals ---
   private assetsSignal = signal<Asset[]>(this.loadRealFleet());
   private reportsSignal = signal<FailureReport[]>(this.generateRealReports());
-  
+
   // UI State
   readonly plantMode = signal<boolean>(false);
   readonly isKioskMode = signal<boolean>(false);
-  readonly activeSlide = signal<number>(0); 
+  readonly activeSlide = signal<number>(0);
   private kioskInterval: any;
 
   // New Signal for Live Audit Log (Initialized with mock data)
@@ -54,7 +54,7 @@ export class DataService {
   readonly kpiData = computed<KPIData>(() => {
     const totalAssets = this.assetsSignal().length;
     const operativeAssets = this.assetsSignal().filter(a => a.status.name === 'Operativo').length;
-    
+
     const closedReports = this.reportsSignal().filter(r => r.exitDate);
     let totalRepairHours = 0;
     closedReports.forEach(r => {
@@ -83,7 +83,7 @@ export class DataService {
 
     const operativeUnits = allAssets.filter(m => m.status.name === 'Operativo').length;
     const percentage = (operativeUnits / allAssets.length) * 100;
-    
+
     return {
       percentage: Math.round(percentage),
       label: percentage >= 90 ? 'Excelente' : percentage >= 80 ? 'Regular' : 'Crítico',
@@ -119,7 +119,7 @@ export class DataService {
     this.initFirebase();
     // Ensure assets are synced with initial failures (Mock or Real)
     this.syncAssetsWithFailures(this.forkliftFailures());
-    
+
     effect(() => {
       if (this.isKioskMode()) this.startKioskRotation();
       else this.stopKioskRotation();
@@ -143,7 +143,7 @@ export class DataService {
 
   private setupListeners() {
     if (!this.dbConnected) return;
-    
+
     // Listen for Failures
     const failuresRef = ref(this.db, 'failures');
     onValue(failuresRef, (snapshot) => {
@@ -155,14 +155,14 @@ export class DataService {
         this.forkliftFailures.set(list);
         this.syncAssetsWithFailures(list);
       } else {
-        // DB is empty/null. 
+        // DB is empty/null.
         // If we have local mock data, let's SEED the database so it's not empty for other users.
         console.log("Database empty. Seeding with initial mock data...");
         this.seedDatabase();
       }
     }, (error) => {
       console.warn("⚠️ Firebase Permission Denied or Offline. Switching to Local Mode.", error);
-      this.dbConnected = false; 
+      this.dbConnected = false;
       // We keep existing local state (mock data) and will use local updates from now on.
     });
 
@@ -184,7 +184,7 @@ export class DataService {
     });
     // Also seed settings
     updates['settings/kioskMode'] = false;
-    
+
     update(ref(this.db), updates).catch(err => {
       console.error("Seeding failed (likely permissions):", err);
       this.dbConnected = false; // Fallback to local
@@ -220,7 +220,7 @@ export class DataService {
   }
 
   getAssetHistory(assetId: string): FailureReport[] {
-    return this.reportsSignal().filter(r => r.assetId === assetId).sort((a, b) => 
+    return this.reportsSignal().filter(r => r.assetId === assetId).sort((a, b) =>
       new Date(b.entryDate).getTime() - new Date(a.entryDate).getTime()
     );
   }
@@ -231,7 +231,7 @@ export class DataService {
     // Legacy method for Asset Detail
     const asset = this.getAsset(assetId);
     if (!asset) return;
-    
+
     // Also create a Live Failure Entry for consistency
     this.addLiveFailure({
       economico: asset.id,
@@ -284,7 +284,7 @@ export class DataService {
 
   updateToyotaLogistics(failureId: string, po: string, statusRef: ForkliftFailureEntry['estatusRefaccion'], promiseDate?: string) {
     const updates = { ordenCompra: po, estatusRefaccion: statusRef, fechaPromesa: promiseDate, estatus: 'En Proceso' };
-    
+
     // 1. Optimistic
     this.forkliftFailures.update(list => list.map(f => {
        if (f.id === failureId) return { ...f, ...updates, estatus: 'En Proceso' };
@@ -300,9 +300,9 @@ export class DataService {
   closeLiveFailure(id: string) {
     const failure = this.forkliftFailures().find(f => f.id === id);
     if (!failure) return;
-    
+
     const updatedFailure = { ...failure, estatus: 'Cerrada' as const, fechaSalida: new Date().toISOString() };
-    
+
     // 1. Optimistic
     this.forkliftFailures.update(list => list.map(f => f.id === id ? updatedFailure : f));
     this.syncAssetsWithFailures(this.forkliftFailures());
@@ -336,28 +336,28 @@ export class DataService {
     this.assetsSignal.update(assets => assets.map(a => {
       if (activeIds.has(a.id)) {
         if (a.status.name !== 'Taller') {
-          return { 
-            ...a, 
-            status: tallerStatus, 
-            statusSince: activeFailureMap.get(a.id)?.fechaIngreso || new Date().toISOString(), 
-            lastFailure: activeFailureMap.get(a.id)?.falla 
+          return {
+            ...a,
+            status: tallerStatus,
+            statusSince: activeFailureMap.get(a.id)?.fechaIngreso || new Date().toISOString(),
+            lastFailure: activeFailureMap.get(a.id)?.falla
           };
         }
       } else if (a.status.name === 'Taller' && !activeIds.has(a.id)) {
         // Only flip back to operative if it was in Taller and now has no active failure
-        // But respect "Preventivo" or other statuses if they weren't failure driven? 
+        // But respect "Preventivo" or other statuses if they weren't failure driven?
         // For simplicity, if it was Taller and no failure, it goes Operative.
-        return { 
-          ...a, 
-          status: opStatus, 
-          statusSince: new Date().toISOString(), 
-          lastFailure: undefined 
+        return {
+          ...a,
+          status: opStatus,
+          statusSince: new Date().toISOString(),
+          lastFailure: undefined
         };
       }
       return a;
     }));
   }
-  
+
   updateAssetsFromExcel(importedData: any[]) {
     // ... existing excel logic
   }
@@ -365,18 +365,18 @@ export class DataService {
   // --- LOADER FOR REAL FLEET DATA (Updated) ---
   private loadRealFleet(): Asset[] {
     const realAssets = hydrateRealAssets(this.statuses);
-    
+
     // Generate tasks for each
     realAssets.forEach((a, index) => {
        a.maintenanceTasks = this.generateMockMaintenance(index);
     });
-    
+
     return realAssets;
   }
 
   private generateMockMaintenance(index: number): MaintenanceTask[] {
     const tasks: MaintenanceTask[] = [];
-    const daysFromNow = Math.floor(Math.random() * 45) - 5; 
+    const daysFromNow = Math.floor(Math.random() * 45) - 5;
     const date = new Date();
     date.setDate(date.getDate() + daysFromNow);
     const taskType = ['Cambio de Aceite', 'Revisión de Frenos', 'Ajuste de Cadenas', 'Servicio General', 'Inspección de Batería'][index % 5];
@@ -426,7 +426,7 @@ export class DataService {
       estatus: 'Abierta',
       seguimiento: []
     };
-    
+
     return [demoFailure];
   }
 }

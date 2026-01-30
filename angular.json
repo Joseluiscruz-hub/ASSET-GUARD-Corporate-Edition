@@ -23,6 +23,10 @@
             "production": {
               "outputHashing": "all"
             },
+            "github-pages": {
+              "outputHashing": "all",
+              "baseHref": "/ASSET-GUARD-Corporate-Edition/"
+            },
             "development": {
               "optimization": false,
               "extractLicenses": false,
@@ -48,5 +52,8 @@
         }
       }
     }
+  },
+  "cli": {
+    "analytics": "5e366e97-9c91-43d0-bc0d-233c18069c06"
   }
 }

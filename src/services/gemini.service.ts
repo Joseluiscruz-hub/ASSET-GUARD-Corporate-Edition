@@ -7,15 +7,15 @@ import { FailureReport, Asset, KPIData, AIInspectionResponse } from '../types';
   providedIn: 'root'
 })
 export class GeminiService {
-  
-  private ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+
+  private ai = new GoogleGenAI({ apiKey: process.env['GEMINI_API_KEY'] });
 
   // --- BONUS 1: PREDICCIÓN DE FALLAS (MANTENIMIENTO PREDICTIVO) ---
   async analyzeMaintenanceHistory(asset: Asset, history: FailureReport[]): Promise<string> {
     try {
       const prompt = `
         Actúa como Analista de Mantenimiento Predictivo con especialización en Machine Learning aplicado a activos industriales.
-        
+
         ENTRADA DE DATOS:
         Activo: ${asset.brand} ${asset.model} (ID: ${asset.id})
         Historial de Fallas:
@@ -32,8 +32,8 @@ export class GeminiService {
         3. ⚙️ RECOMENDACIONES: Sugiere inspecciones o reemplazos preventivos.
 
         FORMATO DE SALIDA:
-        HTML limpio (sin markdown \`\`\`html). Usa iconos y negritas. 
-        Estructura: 
+        HTML limpio (sin markdown \`\`\`html). Usa iconos y negritas.
+        Estructura:
         <div class="space-y-4">
           <div><h4 class="font-bold text-red-400">🔮 Patrones Detectados</h4>...</div>
           <div><h4 class="font-bold text-orange-400">⚠️ Riesgo Inminente</h4>...</div>
@@ -66,7 +66,7 @@ export class GeminiService {
         - Equipos Detenidos (Top 3): ${JSON.stringify(activeFailures.slice(0,3).map(f => `${f.economico} (${f.falla})`))}
 
         ESTRUCTURA DEL REPORTE (HTML simple para renderizar):
-        
+
         <h3>📊 1. KPIs DE DISPONIBILIDAD</h3>
         <p>Resumen de estado vs meta.</p>
 
@@ -110,7 +110,7 @@ export class GeminiService {
         <div class="loto-card">
           <h3 class="text-red-600 font-bold mb-2">🚨 IDENTIFICACIÓN DE PELIGROS</h3>
           [Lista de energías peligrosas: Eléctrica, Hidráulica, etc.]
-          
+
           <h3 class="text-blue-600 font-bold mt-4 mb-2">🔒 SECUENCIA DE BLOQUEO</h3>
           <ol class="list-decimal pl-4 space-y-2">
             <li>Paso 1...</li>
@@ -140,7 +140,7 @@ export class GeminiService {
     try {
       const prompt = `
         Analiza esta imagen capturada por un operador en planta industrial. Actúa como Inspector de Mantenimiento Certificado.
-        
+
         IDENTIFICA CON PRECISIÓN:
         1. Componente afectado
         2. Tipo de daño visible

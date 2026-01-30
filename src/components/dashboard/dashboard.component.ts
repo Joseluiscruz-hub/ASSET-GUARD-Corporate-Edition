@@ -9,11 +9,11 @@ declare var Chart: any;
 
 @Component({
   selector: 'app-dashboard',
-  standalone: true, 
-  imports: [CommonModule, CurrencyPipe, PercentPipe],
+  standalone: true,
+  imports: [CommonModule, CurrencyPipe],
   template: `
     <div class="min-h-full transition-colors duration-500 ease-in-out font-sans relative"
-         [class.bg-[#0a0e14]]="plantMode()" 
+         [class.bg-[#0a0e14]]="plantMode()"
          [class.bg-[#f1f5f9]]="!plantMode()"
          [class.p-4]="plantMode()"
          [class.p-6]="!plantMode()">
@@ -26,16 +26,16 @@ declare var Chart: any;
                <i class="fas fa-network-wired"></i> NOC - CENTER
             </h2>
             <div class="flex gap-2">
-              <button (click)="togglePlantMode()" 
+              <button (click)="togglePlantMode()"
                       class="px-4 py-1.5 text-xs rounded-full font-bold transition-all border uppercase tracking-wide flex items-center gap-2"
                       [class.bg-[#ce1126]]="plantMode()" [class.text-white]="plantMode()" [class.border-[#ce1126]]="plantMode()"
                       [class.bg-white]="!plantMode()" [class.text-slate-600]="!plantMode()" [class.border-slate-300]="!plantMode()">
                 <i class="fas" [class.fa-tv]="plantMode()" [class.fa-desktop]="!plantMode()"></i>
                 {{ plantMode() ? 'Modo Planta' : 'Modo Gestión' }}
               </button>
-              
+
               <!-- Kiosk Toggle -->
-              <button (click)="toggleKiosk()" 
+              <button (click)="toggleKiosk()"
                       class="px-4 py-1.5 text-xs rounded-full font-bold transition-all border uppercase tracking-wide flex items-center gap-2 bg-black text-white hover:bg-gray-800">
                 <i class="fas fa-play"></i> Quiosco TV
               </button>
@@ -48,7 +48,7 @@ declare var Chart: any;
 
       <!-- BENTO GRID CONTAINER -->
       <div class="bento-grid">
-        
+
         <!-- === NIVEL 1: SEGURIDAD (Priority 1) === -->
         <div class="col-span-12 lg:col-span-6 card-kpi priority-1 group"
              [class.text-white]="plantMode()" [class.text-slate-800]="!plantMode()">
@@ -126,7 +126,7 @@ declare var Chart: any;
         <!-- === NIVEL 4: COSTO (Priority 4) === -->
         <div class="col-span-12 card-kpi priority-4 group flex flex-col md:flex-row items-start md:items-center justify-between gap-6"
              [class.text-white]="plantMode()" [class.text-slate-800]="!plantMode()">
-            
+
             <div class="flex-1">
                 <h3 class="text-xs font-bold uppercase tracking-widest text-red-500 mb-2 flex items-center gap-2">
                     <i class="fas fa-chart-line"></i> Eficiencia de Costos
@@ -139,7 +139,7 @@ declare var Chart: any;
                 </div>
                 <p class="text-xs opacity-50 mt-1">Presupuesto asignado: {{ kpi().budgetMonth | currency }}</p>
             </div>
-            
+
             <!-- Gemini Analysis Box -->
             <div class="flex-[2] w-full md:border-l pl-0 md:pl-6 border-slate-500/20">
                  <p class="text-[10px] font-bold text-red-500 uppercase mb-2 flex items-center gap-1">
@@ -156,7 +156,7 @@ declare var Chart: any;
         <!-- 2. TOYOTA LIVE FEED (Horizontal Scroll) -->
         <div class="col-span-12 lg:col-span-8 card-kpi p-0 relative overflow-hidden flex flex-col min-h-[300px]"
              [class.text-white]="plantMode()" [class.text-slate-800]="!plantMode()">
-             
+
              <div class="p-6 pb-2">
                <div class="flex justify-between items-center mb-4">
                  <h3 class="font-bold flex items-center gap-3 uppercase tracking-wide text-sm">
@@ -183,7 +183,7 @@ declare var Chart: any;
                    <div class="min-w-[280px] max-w-[280px] p-4 rounded-xl border flex flex-col justify-between snap-center transition-all hover:translate-y-[-2px]"
                         [class.bg-[#0f172a]]="plantMode()" [class.border-slate-700]="plantMode()"
                         [class.bg-white]="!plantMode()" [class.border-slate-200]="!plantMode()" [class.shadow-md]="!plantMode()">
-                      
+
                       <div>
                         <div class="flex justify-between items-start mb-2">
                            <span class="font-black text-xl text-[#ce1126]">{{ f.economico }}</span>
@@ -196,7 +196,7 @@ declare var Chart: any;
                         <p class="text-xs font-medium leading-snug mb-3 line-clamp-2 opacity-80">
                            {{ f.falla }}
                         </p>
-                        
+
                         <div class="text-[10px] p-2 rounded bg-slate-500/10 mb-2">
                            <i class="fas fa-clock mr-1"></i> Ingreso: {{ f.fechaIngreso | date:'HH:mm' }}
                         </div>
@@ -216,7 +216,7 @@ declare var Chart: any;
              <div class="p-4 border-b border-slate-500/20 bg-slate-500/5">
                 <h3 class="text-xs font-bold uppercase tracking-wide opacity-80">Inventario Flota</h3>
              </div>
-             
+
              <div class="overflow-y-auto custom-scroll p-2 flex-1">
                 <div class="grid grid-cols-1 gap-2">
                    @for (m of assets(); track m.id) {
@@ -225,7 +225,7 @@ declare var Chart: any;
                            [class.border-l-2]="true"
                            [class.border-l-green-500]="m.status.name === 'Operativo'"
                            [class.border-l-red-500]="m.status.name === 'Taller'">
-                         
+
                          <div class="flex items-center gap-3">
                             <span class="font-black font-mono">{{ m.id }}</span>
                             <span class="opacity-60">{{ m.model }}</span>
@@ -261,12 +261,12 @@ declare var Chart: any;
            <button (click)="toggleKiosk()" class="absolute top-8 right-8 text-white/20 hover:text-white transition-colors">
               <i class="fas fa-times text-2xl"></i>
            </button>
-           
+
            <!-- SLIDE 0: AVAILABILITY -->
            @if (activeSlide() === 0) {
              <div class="animate-fade-in flex flex-col items-center justify-center w-full h-full text-center">
                 <h2 class="text-4xl font-bold text-slate-400 uppercase tracking-[0.2em] mb-8">Estatus de Flota en Tiempo Real</h2>
-                
+
                 <div class="flex items-center justify-center gap-12 scale-150 transform">
                    <div class="text-[12rem] font-black leading-none" [style.color]="fleetAvailability().color">
                       {{ fleetAvailability().percentage }}%
@@ -285,7 +285,7 @@ declare var Chart: any;
                 <h2 class="text-5xl font-black text-center mb-16 uppercase tracking-wider text-orange-500">
                    <i class="fas fa-trophy text-yellow-400 mr-4"></i> Líderes de Productividad
                 </h2>
-                
+
                 <div class="grid grid-cols-1 gap-6">
                    <!-- 1st Place -->
                    <div class="bg-gradient-to-r from-orange-600 to-orange-500 p-12 rounded-[3rem] shadow-2xl flex justify-between items-center transform hover:scale-105 transition-transform duration-500">
@@ -321,17 +321,17 @@ declare var Chart: any;
            <!-- SLIDE 2: SAFETY -->
            @if (activeSlide() === 2) {
              <div class="animate-fade-in flex flex-col items-center justify-center w-full h-full">
-                
+
                 <!-- Counter Circle -->
                 <div class="w-[30rem] h-[30rem] rounded-full border-[1.5rem] flex flex-col items-center justify-center relative bg-green-900/20"
                      [class.border-green-500]="safetyStats().daysWithoutAccident > 0"
                      [class.border-red-500]="safetyStats().daysWithoutAccident === 0">
-                   
+
                    <span class="text-[12rem] font-black leading-none text-white">
                      {{ safetyStats().daysWithoutAccident }}
                    </span>
                    <span class="text-3xl font-bold uppercase tracking-widest text-green-400 mt-4">Días sin Accidentes</span>
-                   
+
                    <!-- Record Badge -->
                    <div class="absolute -bottom-12 bg-slate-800 px-8 py-3 rounded-full border border-slate-600">
                       <span class="text-xl text-slate-400 font-bold">Récord Planta: <span class="text-white">{{ safetyStats().record }}</span></span>
@@ -367,7 +367,7 @@ declare var Chart: any;
     }
 
     .col-span-12 { grid-column: span 12; }
-    
+
     @media (min-width: 1024px) {
       .lg\\:col-span-3 { grid-column: span 3; }
       .lg\\:col-span-4 { grid-column: span 4; }
@@ -389,7 +389,7 @@ declare var Chart: any;
       display: flex;
       flex-direction: column;
     }
-    
+
     .card-kpi:hover {
       transform: translateY(-4px);
       box-shadow: 0 10px 30px -10px rgba(0,0,0,0.1);
@@ -402,7 +402,7 @@ declare var Chart: any;
       border: 1px solid rgba(255, 255, 255, 0.05);
       box-shadow: none;
     }
-    
+
     .bg-\\[\\#0a0e14\\] .card-kpi:hover {
        background: rgba(30, 41, 59, 0.6);
        border-color: rgba(255, 255, 255, 0.1);
@@ -426,7 +426,7 @@ declare var Chart: any;
 })
 export class DashboardComponent {
   private dataService = inject(DataService);
-  
+
   // Signals
   kpi = this.dataService.kpiData;
   fleetAvailability = this.dataService.fleetAvailability;
@@ -434,7 +434,7 @@ export class DashboardComponent {
   forkliftFailures = this.dataService.forkliftFailures;
   plantMode = this.dataService.plantMode;
   topOperators = this.dataService.topOperators;
-  
+
   // KIOSK Signals
   isKioskMode = this.dataService.isKioskMode;
   activeSlide = this.dataService.activeSlide;
@@ -444,12 +444,12 @@ export class DashboardComponent {
   now = new Date();
 
   // Computed
-  activeFailures = computed(() => 
+  activeFailures = computed(() =>
     this.forkliftFailures().filter(f => f.estatus !== 'Cerrada')
   );
 
   operativeCount = computed(() => this.assets().filter(a => a.status.name === 'Operativo').length);
-  
+
   // Mock Gemini Analysis for Cost Card
   geminiCostAnalysis = computed(() => {
      const kpi = this.kpi();
@@ -464,13 +464,13 @@ export class DashboardComponent {
 
   constructor() {
     setInterval(() => { this.now = new Date(); }, 60000);
-    
+
     effect(() => {
       // Re-render charts on data change
-      const reports = this.dataService.reports(); 
+      const reports = this.dataService.reports();
       const isDark = this.plantMode();
       const availability = this.fleetAvailability();
-      
+
       if (!this.isKioskMode()) {
         setTimeout(() => {
              this.initParetoChart(reports, isDark);
@@ -487,7 +487,7 @@ export class DashboardComponent {
   toggleKiosk() {
     this.dataService.toggleKioskMode();
   }
-  
+
   closeFailure(id: string) {
      this.dataService.closeLiveFailure(id);
   }
@@ -498,11 +498,11 @@ export class DashboardComponent {
 
   initQualityChart(availability: any, isDark: boolean) {
       if (!this.qualityCanvas) return;
-      
+
       if (Chart.getChart(this.qualityCanvas.nativeElement)) {
           Chart.getChart(this.qualityCanvas.nativeElement).destroy();
       }
-      
+
       const empty = 100 - availability.percentage;
       const color = availability.percentage >= 90 ? '#10b981' : (availability.percentage >= 80 ? '#eab308' : '#ef4444');
       const trackColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
@@ -529,7 +529,7 @@ export class DashboardComponent {
 
   initParetoChart(reports: any[], isDark: boolean) {
     if (!this.paretoCanvas) return;
-    
+
     const failureCounts: {[key: string]: number} = {};
     reports.forEach((r: any) => {
       failureCounts[r.type] = (failureCounts[r.type] || 0) + 1;
@@ -565,12 +565,12 @@ export class DashboardComponent {
         maintainAspectRatio: false,
         plugins: { legend: { display: false } },
         scales: {
-          y: { 
-            beginAtZero: true, 
+          y: {
+            beginAtZero: true,
             grid: { color: gridColor, drawBorder: false },
             ticks: { color: textColor, font: { size: 10 } }
           },
-          x: { 
+          x: {
             grid: { display: false },
             ticks: { color: textColor, font: { size: 10 } }
           }
