@@ -1,0 +1,5 @@
+{
+  "name": "AssetGuard CMMS",
+  "description": "Sistema de Gestión de Activos Empresarial (EAM) para monitoreo de flota, mantenimiento predictivo con IA y control de costos.",
+  "requestFramePermissions": []
+}
