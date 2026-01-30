@@ -3,6 +3,7 @@ import '@angular/compiler';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { AppComponent } from './src/app.component';
+import './src/styles.css';
 
 bootstrapApplication(AppComponent, {
   providers: [
