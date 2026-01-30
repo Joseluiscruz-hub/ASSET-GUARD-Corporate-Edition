@@ -1,4 +1,3 @@
-
 import { Injectable } from '@angular/core';
 import { GoogleGenAI } from "@google/genai";
 import { FailureReport, Asset, KPIData, AIInspectionResponse } from '../types';
