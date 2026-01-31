@@ -24,4 +24,7 @@ dist-ssr
 *.sln
 *.sw?
 
+# Angular cache
+.angular/
+
 !/dist/404.html

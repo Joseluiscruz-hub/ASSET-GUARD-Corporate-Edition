@@ -1,7 +1,55 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta http-equiv="refresh" content="0; url=/ASSET-GUARD-Corporate-Edition/" />
+    <meta charset="utf-8">
+    <title>Asset Guard Corporate Edition</title>
+    <script type="text/javascript">
+      // Single Page Apps for GitHub Pages
+      // MIT License
+      // https://github.com/rafgraph/spa-github-pages
+      // This script takes the current url and converts the path and query
+      // string into just a query string, and then redirects the browser
+      // to the new url with only a query string and hash fragment,
+      // e.g., https://www.foo.tld/one/two?a=b&c=d#qwe, becomes
+      // https://www.foo.tld/?/one/two&a=b~and~c=d#qwe
+      // Note: this 404.html file must be at least 512 bytes for it to work
+      // with Internet Explorer (it is currently > 512 bytes)
+
+      // If you're creating a Project Pages site and NOT using a custom domain,
+      // then set pathSegmentsToKeep to 1 (enterprise users may need to set it to > 1).
+      // This way the code will only replace the route part and not the real directory.
+      // This script will be served when a file that doesn't exist is requested.
+      // We do a little URL replacement to serve the correct file.
+      // create a new script element
+      var el = document.createElement('script');
+
+      // find the current path
+      var path = window.location.pathname;
+      var pathSegmentsToKeep = 1;
+
+      // remove the leading slash
+      path = path.substring(1);
+
+      // if there are no path segments, redirect to root
+      if (path.length === 0) {
+        window.location.href = '/ASSET-GUARD-Corporate-Edition/';
+      } else {
+        // find the number of path segments
+        var pathSegments = path.split('/');
+
+        // if the first path segment is the repo name, remove it
+        if (pathSegments[0] === 'ASSET-GUARD-Corporate-Edition') {
+          pathSegments.shift();
+        }
+
+        // reconstruct the path
+        path = pathSegments.join('/');
+
+        // redirect to the root with the path as a query parameter
+        window.location.href = '/ASSET-GUARD-Corporate-Edition/' + '?/' + path + window.location.search + window.location.hash;
+      }
+    </script>
   </head>
-  <body></body>
+  <body>
+  </body>
 </html>
