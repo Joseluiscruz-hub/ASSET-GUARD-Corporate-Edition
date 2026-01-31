@@ -1,23 +1,33 @@
 import { Injectable, signal, computed, effect } from '@angular/core';
-import { Asset, FailureReport, Status, KPIData, ForkliftFailureEntry, MaintenanceTask } from '../types';
+import {
+  Asset,
+  FailureReport,
+  Status,
+  KPIData,
+  ForkliftFailureEntry,
+  MaintenanceTask,
+} from '../types';
 import { initializeApp } from 'firebase/app';
 import { getDatabase, ref, onValue, set, update } from '@firebase/database';
 import { hydrateRealAssets } from '../data/real-fleet';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class DataService {
-
   // --- FIREBASE CONFIGURATION ---
   private firebaseConfig = {
     apiKey: (import.meta as any).env?.VITE_FIREBASE_API_KEY || 'demo-key',
-    authDomain: (import.meta as any).env?.VITE_FIREBASE_AUTH_DOMAIN || 'demo-project.firebaseapp.com',
-    databaseURL: (import.meta as any).env?.VITE_FIREBASE_DATABASE_URL || 'https://demo-project-default-rtdb.firebaseio.com',
+    authDomain:
+      (import.meta as any).env?.VITE_FIREBASE_AUTH_DOMAIN || 'demo-project.firebaseapp.com',
+    databaseURL:
+      (import.meta as any).env?.VITE_FIREBASE_DATABASE_URL ||
+      'https://demo-project-default-rtdb.firebaseio.com',
     projectId: (import.meta as any).env?.VITE_FIREBASE_PROJECT_ID || 'demo-project',
-    storageBucket: (import.meta as any).env?.VITE_FIREBASE_STORAGE_BUCKET || 'demo-project.appspot.com',
+    storageBucket:
+      (import.meta as any).env?.VITE_FIREBASE_STORAGE_BUCKET || 'demo-project.appspot.com',
     messagingSenderId: (import.meta as any).env?.VITE_FIREBASE_MESSAGING_SENDER_ID || '123456789',
-    appId: (import.meta as any).env?.VITE_FIREBASE_APP_ID || '1:123456789:web:abcdef123456'
+    appId: (import.meta as any).env?.VITE_FIREBASE_APP_ID || '1:123456789:web:abcdef123456',
   };
 
   private app: any;
@@ -52,11 +62,11 @@ export class DataService {
   // --- Computed KPIs ---
   readonly kpiData = computed<KPIData>(() => {
     const totalAssets = this.assetsSignal().length;
-    const operativeAssets = this.assetsSignal().filter(a => a.status.name === 'Operativo').length;
+    const operativeAssets = this.assetsSignal().filter((a) => a.status.name === 'Operativo').length;
 
-    const closedReports = this.reportsSignal().filter(r => r.exitDate);
+    const closedReports = this.reportsSignal().filter((r) => r.exitDate);
     let totalRepairHours = 0;
-    closedReports.forEach(r => {
+    closedReports.forEach((r) => {
       const start = new Date(r.entryDate).getTime();
       const end = new Date(r.exitDate!).getTime();
       totalRepairHours += (end - start) / (1000 * 60 * 60);
@@ -65,14 +75,14 @@ export class DataService {
 
     const currentMonth = new Date().getMonth();
     const monthlyCost = this.reportsSignal()
-      .filter(r => new Date(r.entryDate).getMonth() === currentMonth)
+      .filter((r) => new Date(r.entryDate).getMonth() === currentMonth)
       .reduce((acc, curr) => acc + curr.estimatedCost, 0);
 
     return {
       availability: totalAssets > 0 ? (operativeAssets / totalAssets) * 100 : 0,
       mttr: Math.round(mttr * 10) / 10,
       totalCostMonth: monthlyCost,
-      budgetMonth: 18000
+      budgetMonth: 18000,
     };
   });
 
@@ -80,20 +90,20 @@ export class DataService {
     const allAssets = this.assetsSignal();
     if (allAssets.length === 0) return { percentage: 100, label: 'Excelente', color: '#22c55e' };
 
-    const operativeUnits = allAssets.filter(m => m.status.name === 'Operativo').length;
+    const operativeUnits = allAssets.filter((m) => m.status.name === 'Operativo').length;
     const percentage = (operativeUnits / allAssets.length) * 100;
 
     return {
       percentage: Math.round(percentage),
       label: percentage >= 90 ? 'Excelente' : percentage >= 80 ? 'Regular' : 'Crítico',
-      color: percentage >= 90 ? '#22c55e' : percentage >= 80 ? '#eab308' : '#ef4444'
+      color: percentage >= 90 ? '#22c55e' : percentage >= 80 ? '#eab308' : '#ef4444',
     };
   });
 
   readonly topOperators = computed(() => {
     const failures = this.forkliftFailures();
-    const counts: {[key: string]: number} = {};
-    failures.forEach(f => {
+    const counts: { [key: string]: number } = {};
+    failures.forEach((f) => {
       if (f.reporta) counts[f.reporta] = (counts[f.reporta] || 0) + 10;
     });
     return Object.entries(counts)
@@ -105,7 +115,7 @@ export class DataService {
   readonly safetyStats = signal({
     daysWithoutAccident: 142,
     record: 180,
-    announcement: 'Uso obligatorio de chaleco en Patio de Maniobras'
+    announcement: 'Uso obligatorio de chaleco en Patio de Maniobras',
   });
 
   readonly crewLeaderboard = signal([
@@ -127,6 +137,16 @@ export class DataService {
 
   // --- Initialization ---
   private initFirebase() {
+    const isDemo =
+      this.firebaseConfig.apiKey === 'demo-key' ||
+      this.firebaseConfig.databaseURL.includes('demo-project');
+
+    if (isDemo) {
+      console.info('ℹ️ Running in Local Mode (Demo keys detected)');
+      this.dbConnected = false;
+      return;
+    }
+
     try {
       this.app = initializeApp(this.firebaseConfig);
       this.db = getDatabase(this.app);
@@ -135,7 +155,7 @@ export class DataService {
       console.log('✅ Firebase Initialized');
       this.setupListeners();
     } catch (e) {
-      console.error("Firebase init error:", e);
+      console.error('Firebase init error:', e);
       this.dbConnected = false;
     }
   }
@@ -145,47 +165,57 @@ export class DataService {
 
     // Listen for Failures
     const failuresRef = ref(this.db, 'failures');
-    onValue(failuresRef, (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        // Data exists: Sync local state with Server
-        const list = Object.values(data) as ForkliftFailureEntry[];
-        list.sort((a, b) => new Date(b.fechaIngreso).getTime() - new Date(a.fechaIngreso).getTime());
-        this.forkliftFailures.set(list);
-        this.syncAssetsWithFailures(list);
-      } else {
-        // DB is empty/null.
-        // If we have local mock data, let's SEED the database so it's not empty for other users.
-        console.log("Database empty. Seeding with initial mock data...");
-        this.seedDatabase();
+    onValue(
+      failuresRef,
+      (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          // Data exists: Sync local state with Server
+          const list = Object.values(data) as ForkliftFailureEntry[];
+          list.sort(
+            (a, b) => new Date(b.fechaIngreso).getTime() - new Date(a.fechaIngreso).getTime()
+          );
+          this.forkliftFailures.set(list);
+          this.syncAssetsWithFailures(list);
+        } else {
+          // DB is empty/null.
+          // If we have local mock data, let's SEED the database so it's not empty for other users.
+          console.log('Database empty. Seeding with initial mock data...');
+          this.seedDatabase();
+        }
+      },
+      (error) => {
+        console.warn('⚠️ Firebase Permission Denied or Offline. Switching to Local Mode.', error);
+        this.dbConnected = false;
+        // We keep existing local state (mock data) and will use local updates from now on.
       }
-    }, (error) => {
-      console.warn("⚠️ Firebase Permission Denied or Offline. Switching to Local Mode.", error);
-      this.dbConnected = false;
-      // We keep existing local state (mock data) and will use local updates from now on.
-    });
+    );
 
     // Listen for Settings (Kiosk)
     const kioskRef = ref(this.db, 'settings/kioskMode');
-    onValue(kioskRef, (snapshot) => {
-      const val = snapshot.val();
-      if (val !== null && this.isKioskMode() !== val) this.isKioskMode.set(val);
-    }, () => {
-       // Ignore settings error in offline mode
-    });
+    onValue(
+      kioskRef,
+      (snapshot) => {
+        const val = snapshot.val();
+        if (val !== null && this.isKioskMode() !== val) this.isKioskMode.set(val);
+      },
+      () => {
+        // Ignore settings error in offline mode
+      }
+    );
   }
 
   private seedDatabase() {
     const updates: any = {};
     const initialFailures = this.forkliftFailures();
-    initialFailures.forEach(f => {
+    initialFailures.forEach((f) => {
       updates['failures/' + f.id] = f;
     });
     // Also seed settings
     updates['settings/kioskMode'] = false;
 
-    update(ref(this.db), updates).catch(err => {
-      console.error("Seeding failed (likely permissions):", err);
+    update(ref(this.db), updates).catch((err) => {
+      console.error('Seeding failed (likely permissions):', err);
       this.dbConnected = false; // Fallback to local
     });
   }
@@ -201,7 +231,7 @@ export class DataService {
   private startKioskRotation() {
     if (this.kioskInterval) clearInterval(this.kioskInterval);
     this.kioskInterval = setInterval(() => {
-      this.activeSlide.update(current => (current + 1) % 3);
+      this.activeSlide.update((current) => (current + 1) % 3);
     }, 15000);
   }
 
@@ -211,17 +241,17 @@ export class DataService {
   }
 
   togglePlantMode() {
-    this.plantMode.update(v => !v);
+    this.plantMode.update((v) => !v);
   }
 
   getAsset(id: string): Asset | undefined {
-    return this.assetsSignal().find(a => a.id === id);
+    return this.assetsSignal().find((a) => a.id === id);
   }
 
   getAssetHistory(assetId: string): FailureReport[] {
-    return this.reportsSignal().filter(r => r.assetId === assetId).sort((a, b) =>
-      new Date(b.entryDate).getTime() - new Date(a.entryDate).getTime()
-    );
+    return this.reportsSignal()
+      .filter((r) => r.assetId === assetId)
+      .sort((a, b) => new Date(b.entryDate).getTime() - new Date(a.entryDate).getTime());
   }
 
   // --- ACTIONS WITH OPTIMISTIC UPDATES ---
@@ -237,7 +267,7 @@ export class DataService {
       falla: description,
       prioridad: 'Media',
       reporta: 'Operador (App)',
-      estatus: 'Abierta'
+      estatus: 'Abierta',
     });
   }
 
@@ -246,115 +276,142 @@ export class DataService {
       ...entry,
       id: 'F-' + Date.now(),
       fechaIngreso: new Date().toISOString(),
-      seguimiento: []
+      seguimiento: [],
     };
 
     // 1. Optimistic Update (Local)
-    this.forkliftFailures.update(list => [newEntry, ...list]);
+    this.forkliftFailures.update((list) => [newEntry, ...list]);
     this.syncAssetsWithFailures(this.forkliftFailures());
 
     // 2. Try Remote
     if (this.dbConnected) {
-      set(ref(this.db, 'failures/' + newEntry.id), newEntry).catch(err => {
-        console.error("Sync failed:", err);
+      set(ref(this.db, 'failures/' + newEntry.id), newEntry).catch((err) => {
+        console.error('Sync failed:', err);
         // We already updated local, so we just log.
       });
     }
   }
 
   addFailureUpdate(failureId: string, message: string, user: string) {
-    const failure = this.forkliftFailures().find(f => f.id === failureId);
+    const failure = this.forkliftFailures().find((f) => f.id === failureId);
     if (!failure) return;
 
     const updatedFailure = {
       ...failure,
       estatus: 'En Proceso' as const,
-      seguimiento: [...failure.seguimiento, { usuario: user, mensaje: message, fecha: new Date().toISOString() }]
+      seguimiento: [
+        ...failure.seguimiento,
+        { usuario: user, mensaje: message, fecha: new Date().toISOString() },
+      ],
     };
 
     // 1. Optimistic
-    this.forkliftFailures.update(list => list.map(f => f.id === failureId ? updatedFailure : f));
+    this.forkliftFailures.update((list) =>
+      list.map((f) => (f.id === failureId ? updatedFailure : f))
+    );
 
     // 2. Remote
     if (this.dbConnected) {
-      update(ref(this.db, 'failures/' + failureId), updatedFailure).catch(err => console.error(err));
+      update(ref(this.db, 'failures/' + failureId), updatedFailure).catch((err) =>
+        console.error(err)
+      );
     }
   }
 
-  updateToyotaLogistics(failureId: string, po: string, statusRef: ForkliftFailureEntry['estatusRefaccion'], promiseDate?: string) {
-    const updates = { ordenCompra: po, estatusRefaccion: statusRef, fechaPromesa: promiseDate, estatus: 'En Proceso' };
+  updateToyotaLogistics(
+    failureId: string,
+    po: string,
+    statusRef: ForkliftFailureEntry['estatusRefaccion'],
+    promiseDate?: string
+  ) {
+    const updates = {
+      ordenCompra: po,
+      estatusRefaccion: statusRef,
+      fechaPromesa: promiseDate,
+      estatus: 'En Proceso',
+    };
 
     // 1. Optimistic
-    this.forkliftFailures.update(list => list.map(f => {
-       if (f.id === failureId) return { ...f, ...updates, estatus: 'En Proceso' };
-       return f;
-    }));
+    this.forkliftFailures.update((list) =>
+      list.map((f) => {
+        if (f.id === failureId) return { ...f, ...updates, estatus: 'En Proceso' };
+        return f;
+      })
+    );
 
     // 2. Remote
     if (this.dbConnected) {
-      update(ref(this.db, 'failures/' + failureId), updates).catch(err => console.error(err));
+      update(ref(this.db, 'failures/' + failureId), updates).catch((err) => console.error(err));
     }
   }
 
   closeLiveFailure(id: string) {
-    const failure = this.forkliftFailures().find(f => f.id === id);
+    const failure = this.forkliftFailures().find((f) => f.id === id);
     if (!failure) return;
 
-    const updatedFailure = { ...failure, estatus: 'Cerrada' as const, fechaSalida: new Date().toISOString() };
+    const updatedFailure = {
+      ...failure,
+      estatus: 'Cerrada' as const,
+      fechaSalida: new Date().toISOString(),
+    };
 
     // 1. Optimistic
-    this.forkliftFailures.update(list => list.map(f => f.id === id ? updatedFailure : f));
+    this.forkliftFailures.update((list) => list.map((f) => (f.id === id ? updatedFailure : f)));
     this.syncAssetsWithFailures(this.forkliftFailures());
 
     // 2. Remote
     if (this.dbConnected) {
-      update(ref(this.db, 'failures/' + id), updatedFailure).catch(err => console.error(err));
+      update(ref(this.db, 'failures/' + id), updatedFailure).catch((err) => console.error(err));
     }
   }
 
   completeRepair(_assetId: string, _diagnosis: string, _cost: number, _parts: string[]) {
     // Legacy handler
-    const activeFailure = this.forkliftFailures().find(f => f.economico === _assetId && f.estatus !== 'Cerrada');
+    const activeFailure = this.forkliftFailures().find(
+      (f) => f.economico === _assetId && f.estatus !== 'Cerrada'
+    );
     if (activeFailure) {
       this.closeLiveFailure(activeFailure.id);
     }
     // Also update reports history (legacy)
-    this.reportsSignal.update(reports => {
-       // Logic to close open legacy report if any
-       return reports;
+    this.reportsSignal.update((reports) => {
+      // Logic to close open legacy report if any
+      return reports;
     });
   }
 
   private syncAssetsWithFailures(failures: ForkliftFailureEntry[]) {
-    const activeFailures = failures.filter(f => f.estatus !== 'Cerrada');
-    const activeIds = new Set(activeFailures.map(f => f.economico));
-    const activeFailureMap = new Map(activeFailures.map(f => [f.economico, f]));
-    const tallerStatus = this.statuses.find(s => s.name === 'Taller')!;
-    const opStatus = this.statuses.find(s => s.name === 'Operativo')!;
+    const activeFailures = failures.filter((f) => f.estatus !== 'Cerrada');
+    const activeIds = new Set(activeFailures.map((f) => f.economico));
+    const activeFailureMap = new Map(activeFailures.map((f) => [f.economico, f]));
+    const tallerStatus = this.statuses.find((s) => s.name === 'Taller')!;
+    const opStatus = this.statuses.find((s) => s.name === 'Operativo')!;
 
-    this.assetsSignal.update(assets => assets.map(a => {
-      if (activeIds.has(a.id)) {
-        if (a.status.name !== 'Taller') {
+    this.assetsSignal.update((assets) =>
+      assets.map((a) => {
+        if (activeIds.has(a.id)) {
+          if (a.status.name !== 'Taller') {
+            return {
+              ...a,
+              status: tallerStatus,
+              statusSince: activeFailureMap.get(a.id)?.fechaIngreso || new Date().toISOString(),
+              lastFailure: activeFailureMap.get(a.id)?.falla,
+            };
+          }
+        } else if (a.status.name === 'Taller' && !activeIds.has(a.id)) {
+          // Only flip back to operative if it was in Taller and now has no active failure
+          // But respect "Preventivo" or other statuses if they weren't failure driven?
+          // For simplicity, if it was Taller and no failure, it goes Operative.
           return {
             ...a,
-            status: tallerStatus,
-            statusSince: activeFailureMap.get(a.id)?.fechaIngreso || new Date().toISOString(),
-            lastFailure: activeFailureMap.get(a.id)?.falla
+            status: opStatus,
+            statusSince: new Date().toISOString(),
+            lastFailure: undefined,
           };
         }
-      } else if (a.status.name === 'Taller' && !activeIds.has(a.id)) {
-        // Only flip back to operative if it was in Taller and now has no active failure
-        // But respect "Preventivo" or other statuses if they weren't failure driven?
-        // For simplicity, if it was Taller and no failure, it goes Operative.
-        return {
-          ...a,
-          status: opStatus,
-          statusSince: new Date().toISOString(),
-          lastFailure: undefined
-        };
-      }
-      return a;
-    }));
+        return a;
+      })
+    );
   }
 
   updateAssetsFromExcel(_importedData: any[]) {
@@ -367,7 +424,7 @@ export class DataService {
 
     // Generate tasks for each
     realAssets.forEach((a, index) => {
-       a.maintenanceTasks = this.generateMockMaintenance(index);
+      a.maintenanceTasks = this.generateMockMaintenance(index);
     });
 
     return realAssets;
@@ -378,12 +435,18 @@ export class DataService {
     const daysFromNow = Math.floor(Math.random() * 45) - 5;
     const date = new Date();
     date.setDate(date.getDate() + daysFromNow);
-    const taskType = ['Cambio de Aceite', 'Revisión de Frenos', 'Ajuste de Cadenas', 'Servicio General', 'Inspección de Batería'][index % 5];
+    const taskType = [
+      'Cambio de Aceite',
+      'Revisión de Frenos',
+      'Ajuste de Cadenas',
+      'Servicio General',
+      'Inspección de Batería',
+    ][index % 5];
     tasks.push({
       id: `T-${index}-1`,
       date: date.toISOString(),
       description: taskType,
-      status: daysFromNow < 0 ? 'Overdue' : 'Pending'
+      status: daysFromNow < 0 ? 'Overdue' : 'Pending',
     });
     return tasks;
   }
@@ -398,14 +461,14 @@ export class DataService {
   private generateRealLiveFailures(): ForkliftFailureEntry[] {
     // Generate one guaranteed failure for the demo unit from prompt
     const demoFailure: ForkliftFailureEntry = {
-      id: "FAIL-2026-0001",
-      economico: "35526",
-      falla: "Fuga de aceite hidráulico en cilindro de elevación principal.",
-      reporta: "Carlos Eduardo Vazquez Calderon",
+      id: 'FAIL-2026-0001',
+      economico: '35526',
+      falla: 'Fuga de aceite hidráulico en cilindro de elevación principal.',
+      reporta: 'Carlos Eduardo Vazquez Calderon',
       fechaIngreso: new Date().toISOString(),
       prioridad: 'Alta',
       estatus: 'Abierta',
-      seguimiento: []
+      seguimiento: [],
     };
 
     return [demoFailure];
