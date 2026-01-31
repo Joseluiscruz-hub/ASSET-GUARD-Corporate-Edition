@@ -4,8 +4,8 @@ import { CommonModule, DatePipe, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DataService } from '../../services/data.service';
 import { GeminiService } from '../../services/gemini.service';
-import { Asset, FailureReport, AIInspectionResponse } from '../../types';
-import { jsPDF } from 'jspdf';
+import { AIInspectionResponse } from '../../types';
+import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
 @Component({
@@ -306,14 +306,15 @@ export class AssetDetailComponent {
   // --- Actions ---
   
   // Prompt 2: Image Upload Handler
-  handleImageUpload(event: any) {
-    const file = event.target.files[0];
+  handleImageUpload(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
     if (!file) return;
 
     this.analyzingImage.set(true);
     const reader = new FileReader();
-    reader.onload = async (e: any) => {
-      const base64Data = e.target.result.split(',')[1]; // Remove data URL prefix
+    reader.onload = async (e: ProgressEvent<FileReader>) => {
+      const base64Data = (e.target?.result as string).split(',')[1]; // Remove data URL prefix
       const result = await this.geminiService.analyzeImageInspection(base64Data);
       this.inspectionData.set(result);
       this.analyzingImage.set(false);
@@ -347,9 +348,9 @@ export class AssetDetailComponent {
     }
   }
 
-  reportFailure(desc: string, type: any) {
+  reportFailure(desc: string, _type: string) {
     if (!desc) return alert('Por favor describe la falla.');
-    this.dataService.reportFailure(this.assetId(), desc, type);
+    this.dataService.reportFailure(this.assetId(), desc, _type as any);
   }
 
   finishRepair(diag: string, costStr: string, partsStr: string) {

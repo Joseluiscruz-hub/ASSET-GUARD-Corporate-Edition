@@ -1,8 +1,8 @@
 import { Injectable, signal, computed, effect } from '@angular/core';
-import { Asset, FailureReport, Status, KPIData, ForkliftFailureEntry, FailureUpdate, MaintenanceTask } from '../types';
+import { Asset, FailureReport, Status, KPIData, ForkliftFailureEntry, MaintenanceTask } from '../types';
 import { initializeApp } from 'firebase/app';
-import { getDatabase, ref, onValue, set, push, update } from 'firebase/database';
-import { hydrateRealAssets, REAL_FLEET_DATA } from '../data/real-fleet';
+import { getDatabase, ref, onValue, set, update } from '@firebase/database';
+import { hydrateRealAssets } from '../data/real-fleet';
 
 @Injectable({
   providedIn: 'root'
@@ -170,7 +170,7 @@ export class DataService {
     onValue(kioskRef, (snapshot) => {
       const val = snapshot.val();
       if (val !== null && this.isKioskMode() !== val) this.isKioskMode.set(val);
-    }, (error) => {
+    }, () => {
        // Ignore settings error in offline mode
     });
   }
@@ -226,7 +226,7 @@ export class DataService {
 
   // --- ACTIONS WITH OPTIMISTIC UPDATES ---
 
-  reportFailure(assetId: string, description: string, type: FailureReport['type']) {
+  reportFailure(assetId: string, description: string, _type: FailureReport['type']) {
     // Legacy method for Asset Detail
     const asset = this.getAsset(assetId);
     if (!asset) return;
@@ -312,9 +312,9 @@ export class DataService {
     }
   }
 
-  completeRepair(assetId: string, diagnosis: string, cost: number, parts: string[]) {
+  completeRepair(_assetId: string, _diagnosis: string, _cost: number, _parts: string[]) {
     // Legacy handler
-    const activeFailure = this.forkliftFailures().find(f => f.economico === assetId && f.estatus !== 'Cerrada');
+    const activeFailure = this.forkliftFailures().find(f => f.economico === _assetId && f.estatus !== 'Cerrada');
     if (activeFailure) {
       this.closeLiveFailure(activeFailure.id);
     }
@@ -357,7 +357,7 @@ export class DataService {
     }));
   }
 
-  updateAssetsFromExcel(importedData: any[]) {
+  updateAssetsFromExcel(_importedData: any[]) {
     // ... existing excel logic
   }
 
@@ -392,24 +392,6 @@ export class DataService {
   private generateRealReports(): FailureReport[] {
     // ... existing mock reports logic ...
     return []; // returning empty to rely on live failures for cleaner demo, or keep mock:
-    /* Keep mock implementation for history view */
-    const realAssets = REAL_FLEET_DATA;
-    const realisticFailures = [
-      { desc: "Fuga de aceite hidráulico en cilindro de elevación", type: "Hidráulico", cost: 1200 },
-      // ... more
-    ];
-    // Simple mock generation
-    return Array.from({ length: 30 }, (_, i) => ({
-        id: `FAIL-HIST-${i}`,
-        assetId: realAssets[i % realAssets.length].eco,
-        entryDate: new Date(Date.now() - Math.random() * 1e10).toISOString(),
-        exitDate: new Date().toISOString(),
-        failureDescription: "Mantenimiento Preventivo",
-        partsUsed: [],
-        estimatedCost: 100,
-        technician: "System",
-        type: "Mecánico" as any
-    }));
   }
 
   // --- LIVE FAILURES FOR REAL ASSETS ---
