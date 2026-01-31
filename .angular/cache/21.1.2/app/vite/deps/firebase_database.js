@@ -39,10 +39,10 @@ import {
   stringToByteArray,
   stringify,
   updateEmulatorBanner
-} from "./chunk-DGRTD5TF.js";
+} from "./chunk-33FEFQSB.js";
 import {
   __spreadValues
-} from "./chunk-R327OCYJ.js";
+} from "./chunk-VL5VAURS.js";
 
 // node_modules/@firebase/database/dist/index.esm.js
 var name = "@firebase/database";

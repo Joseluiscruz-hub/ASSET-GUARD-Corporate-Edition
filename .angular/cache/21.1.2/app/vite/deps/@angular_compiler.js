@@ -1,7 +1,7 @@
 import {
   __spreadProps,
   __spreadValues
-} from "./chunk-R327OCYJ.js";
+} from "./chunk-VL5VAURS.js";
 
 // node_modules/@angular/compiler/fesm2022/compiler.mjs
 var _SELECTOR_REGEXP = new RegExp(`(\\:not\\()|(([\\.\\#]?)[-\\w]+)|(?:\\[([-.\\w*\\\\$]+)(?:=(["']?)([^\\]"']*)\\5)?\\])|(\\))|(\\s*,\\s*)`, "g");
