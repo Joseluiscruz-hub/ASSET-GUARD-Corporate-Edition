@@ -7,7 +7,7 @@ import { FailureReport, Asset, KPIData, AIInspectionResponse } from '../types';
 })
 export class GeminiService {
 
-  private ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
+  private ai = new GoogleGenAI({ apiKey: (import.meta as any).env?.VITE_GEMINI_API_KEY || 'demo-key' });
 
   // --- BONUS 1: PREDICCIÓN DE FALLAS (MANTENIMIENTO PREDICTIVO) ---
   async analyzeMaintenanceHistory(asset: Asset, history: FailureReport[]): Promise<string> {
