@@ -10,25 +10,14 @@ import {
 import { initializeApp } from 'firebase/app';
 import { getDatabase, ref, onValue, set, update } from '@firebase/database';
 import { hydrateRealAssets } from '../data/real-fleet';
+import { environment } from '../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DataService {
   // --- FIREBASE CONFIGURATION ---
-  private firebaseConfig = {
-    apiKey: (import.meta as any).env?.VITE_FIREBASE_API_KEY || 'demo-key',
-    authDomain:
-      (import.meta as any).env?.VITE_FIREBASE_AUTH_DOMAIN || 'demo-project.firebaseapp.com',
-    databaseURL:
-      (import.meta as any).env?.VITE_FIREBASE_DATABASE_URL ||
-      'https://demo-project-default-rtdb.firebaseio.com',
-    projectId: (import.meta as any).env?.VITE_FIREBASE_PROJECT_ID || 'demo-project',
-    storageBucket:
-      (import.meta as any).env?.VITE_FIREBASE_STORAGE_BUCKET || 'demo-project.appspot.com',
-    messagingSenderId: (import.meta as any).env?.VITE_FIREBASE_MESSAGING_SENDER_ID || '123456789',
-    appId: (import.meta as any).env?.VITE_FIREBASE_APP_ID || '1:123456789:web:abcdef123456',
-  };
+  private firebaseConfig = environment.firebase;
 
   private app: any;
   private db: any;
