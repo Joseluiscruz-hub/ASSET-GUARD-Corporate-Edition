@@ -8,10 +8,21 @@ import { FailureReport, Asset, KPIData, AIInspectionResponse } from '../types';
 })
 export class GeminiService {
   
-  private ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_API_KEY });
+  private ai: GoogleGenAI;
+
+  constructor() {
+    const apiKey = import.meta.env.VITE_API_KEY;
+    if (!apiKey) {
+      console.warn('VITE_API_KEY not configured. AI features will not be available.');
+    }
+    this.ai = new GoogleGenAI({ apiKey: apiKey || '' });
+  }
 
   // --- BONUS 1: PREDICCIÓN DE FALLAS (MANTENIMIENTO PREDICTIVO) ---
   async analyzeMaintenanceHistory(asset: Asset, history: FailureReport[]): Promise<string> {
+    if (!import.meta.env.VITE_API_KEY) {
+      return '<p class="text-yellow-600">⚠️ API key no configurada. Por favor configura VITE_API_KEY en tu archivo .env.local</p>';
+    }
     try {
       const prompt = `
         Actúa como Analista de Mantenimiento Predictivo con especialización en Machine Learning aplicado a activos industriales.
@@ -55,6 +66,9 @@ export class GeminiService {
 
   // --- PROMPT 5: RESUMEN EJECUTIVO SEMANAL ---
   async generateExecutiveReport(kpi: KPIData, activeFailures: any[], availability: any): Promise<string> {
+    if (!import.meta.env.VITE_API_KEY) {
+      return '<p class="text-yellow-600">⚠️ API key no configurada. Por favor configura VITE_API_KEY en tu archivo .env.local</p>';
+    }
     try {
       const prompt = `
         Analiza el estado actual de AssetGuard CMMS y genera un resumen ejecutivo profesional para Gerencia de Operaciones.
@@ -99,6 +113,9 @@ export class GeminiService {
 
   // --- BONUS 3: GENERADOR DE PROCEDIMIENTOS DE SEGURIDAD (LOTO) ---
   async generateLotoProcedure(asset: Asset, failureDescription: string): Promise<string> {
+    if (!import.meta.env.VITE_API_KEY) {
+      return '<p class="text-yellow-600">⚠️ API key no configurada. Por favor configura VITE_API_KEY en tu archivo .env.local</p>';
+    }
     try {
       const prompt = `
         Actúa como Ingeniero de Seguridad Industrial certificado en LOTO (NOM-004-STPS-1999).
@@ -137,6 +154,10 @@ export class GeminiService {
 
   // --- PROMPT 2: INSPECCIÓN VISUAL MULTIMODAL ---
   async analyzeImageInspection(imageBase64: string): Promise<AIInspectionResponse | null> {
+    if (!import.meta.env.VITE_API_KEY) {
+      console.warn('VITE_API_KEY not configured. Image analysis unavailable.');
+      return null;
+    }
     try {
       const prompt = `
         Analiza esta imagen capturada por un operador en planta industrial. Actúa como Inspector de Mantenimiento Certificado.

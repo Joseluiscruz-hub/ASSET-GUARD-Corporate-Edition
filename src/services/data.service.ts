@@ -131,6 +131,16 @@ export class DataService {
   // --- Initialization ---
   private initFirebase() {
     try {
+      // Validate Firebase configuration
+      const requiredEnvVars = ['VITE_FIREBASE_API_KEY', 'VITE_FIREBASE_DATABASE_URL', 'VITE_FIREBASE_PROJECT_ID'];
+      const missingVars = requiredEnvVars.filter(varName => !import.meta.env[varName]);
+      
+      if (missingVars.length > 0) {
+        console.warn(`Firebase configuration incomplete. Missing: ${missingVars.join(', ')}. Running in offline mode.`);
+        this.connectionStatus.set('offline');
+        return;
+      }
+
       this.app = initializeApp(this.firebaseConfig);
       this.db = getDatabase(this.app);
       
