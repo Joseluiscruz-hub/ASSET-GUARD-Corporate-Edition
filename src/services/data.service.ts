@@ -1,7 +1,7 @@
 
 import { Injectable, signal, computed, effect } from '@angular/core';
 import { Asset, FailureReport, Status, KPIData, ForkliftFailureEntry, FailureUpdate, MaintenanceTask } from '../types';
-import { initializeApp } from 'firebase/app';
+import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getDatabase, ref, onValue, set, push, update, onDisconnect, goOffline, goOnline } from 'firebase/database';
 import { hydrateRealAssets, REAL_FLEET_DATA } from '../data/real-fleet';
 import { environment } from '../environments/environment';
@@ -124,7 +124,8 @@ export class DataService {
   // --- Initialization ---
   private initFirebase() {
     try {
-      this.app = initializeApp(this.firebaseConfig);
+      // Usar la app existente o crear una nueva
+      this.app = getApps().length > 0 ? getApp() : initializeApp(this.firebaseConfig);
       this.db = getDatabase(this.app);
       
       // Monitor connection state

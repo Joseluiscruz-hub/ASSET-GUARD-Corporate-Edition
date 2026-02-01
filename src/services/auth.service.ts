@@ -1,5 +1,5 @@
 import { Injectable, signal, computed } from '@angular/core';
-import { initializeApp } from 'firebase/app';
+import { initializeApp, getApps, getApp } from 'firebase/app';
 import {
   getAuth,
   signInWithEmailAndPassword,
@@ -23,7 +23,8 @@ export interface AuthUser {
 })
 export class AuthService {
 
-  private app = initializeApp(environment.firebase, 'auth-app');
+  // Usar la app existente o crear una nueva
+  private app = getApps().length > 0 ? getApp() : initializeApp(environment.firebase);
   private auth = getAuth(this.app);
 
   // --- Auth State Signals ---
