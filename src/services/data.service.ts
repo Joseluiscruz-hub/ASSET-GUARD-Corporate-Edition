@@ -126,8 +126,12 @@ export class DataService {
     try {
       // Usar la app existente o crear una nueva
       this.app = getApps().length > 0 ? getApp() : initializeApp(this.firebaseConfig);
-      this.db = getDatabase(this.app);
-      
+      // Usar la URL explícita de la base de datos
+      this.db = getDatabase(this.app, this.firebaseConfig.databaseURL);
+
+      console.log('✅ Firebase Initialized');
+      console.log('📊 Database URL:', this.firebaseConfig.databaseURL);
+
       // Monitor connection state
       const connectedRef = ref(this.db, '.info/connected');
       onValue(connectedRef, (snap) => {
