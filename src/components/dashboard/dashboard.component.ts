@@ -100,9 +100,9 @@ import { ForkliftFailureEntry } from '../../types';
             <div>
                <h3 class="font-bold text-slate-800 dark:text-white flex items-center gap-2">
                  <i class="fas fa-wrench text-slate-400"></i> Taller en Vivo
-                 @if (issueFilter()) {
+                 @if (activeIssueFilter()) {
                    <span class="ml-2 text-xs font-bold text-blue-600 bg-blue-50 dark:bg-blue-500/10 px-3 py-1 rounded-full border border-blue-200 dark:border-blue-500/20 flex items-center gap-2">
-                     <i class="fas fa-filter text-[10px]"></i> Filtrado: {{ issueFilter() }}
+                     <i class="fas fa-filter text-[10px]"></i> Filtrado: {{ activeIssueFilter() }}
                      <button (click)="clearFilter()" class="ml-1 hover:text-blue-800 dark:hover:text-blue-300 transition-colors" title="Limpiar filtro">
                        <i class="fas fa-times text-[10px]"></i>
                      </button>
@@ -289,7 +289,10 @@ export class DashboardComponent {
   fleetAvailability = this.dataService.fleetAvailability;
   
   // Filter state
-  issueFilter = signal<string | null>(null);
+  activeIssueFilter = signal<string | null>(null);
+  
+  // Base button classes shared by all filter buttons
+  private readonly filterButtonBaseClasses = 'w-full text-left p-3 rounded-xl border group transition-colors cursor-pointer relative';
   
   // Filter button styling configuration
   private readonly filterButtonStyles = {
@@ -314,13 +317,15 @@ export class DashboardComponent {
   // Updated activeFailures to respect the filter
   activeFailures = computed(() => {
     const failures = this.dataService.forkliftFailures().filter(f => f.estatus !== 'Cerrada');
-    const filter = this.issueFilter();
+    const filter = this.activeIssueFilter();
     
     if (!filter) return failures;
     
     // Filter failures that contain the issue type in their description
+    // Convert to lowercase once for efficiency
+    const filterLower = filter.toLowerCase();
     return failures.filter(f => 
-      f.falla.toLowerCase().includes(filter.toLowerCase())
+      f.falla.toLowerCase().includes(filterLower)
     );
   });
   
@@ -410,39 +415,39 @@ export class DashboardComponent {
 
   filterByIssue(issue: string) {
     // Set the filter or toggle it off if clicking the same filter
-    if (this.issueFilter() === issue) {
-      this.issueFilter.set(null);
+    if (this.activeIssueFilter() === issue) {
+      this.activeIssueFilter.set(null);
     } else {
-      this.issueFilter.set(issue);
+      this.activeIssueFilter.set(issue);
     }
   }
   
   clearFilter() {
-    this.issueFilter.set(null);
+    this.activeIssueFilter.set(null);
   }
   
   // Helper methods for filter button styling
   getFilterButtonClass(issue: string, baseColor: 'red' | 'amber'): string {
-    const isActive = this.issueFilter() === issue;
+    const isActive = this.activeIssueFilter() === issue;
     const styles = this.filterButtonStyles[baseColor];
     const state = isActive ? styles.active : styles.inactive;
-    return `w-full text-left p-3 rounded-xl border group transition-colors cursor-pointer relative ${state}`;
+    return `${this.filterButtonBaseClasses} ${state}`;
   }
   
   getFilterTitleClass(issue: string, baseColor: 'red' | 'amber'): string {
-    const isActive = this.issueFilter() === issue;
+    const isActive = this.activeIssueFilter() === issue;
     const styles = this.filterButtonStyles[baseColor];
     return isActive ? styles.titleActive : styles.titleInactive;
   }
   
   getFilterActionClass(issue: string, baseColor: 'red' | 'amber'): string {
-    const isActive = this.issueFilter() === issue;
+    const isActive = this.activeIssueFilter() === issue;
     const styles = this.filterButtonStyles[baseColor];
     return isActive ? styles.actionActive : styles.actionInactive;
   }
   
   getFilterActionText(issue: string): string {
-    return this.issueFilter() === issue ? 'Filtro activo' : 'Ver equipos';
+    return this.activeIssueFilter() === issue ? 'Filtro activo' : 'Ver equipos';
   }
 
   downloadReport() {
