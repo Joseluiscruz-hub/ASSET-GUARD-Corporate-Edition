@@ -217,7 +217,7 @@ import { ForkliftFailureEntry } from '../../types';
                  <!-- Item 1 -->
                  <button (click)="filterByIssue('Hidráulico')" [class]="getFilterButtonClass('Hidráulico', 'red')">
                     <div class="flex justify-between items-start mb-2">
-                       <span [class]="getFilterTitleClass('Hidráulico', 'text-[#ce1126]')">Sistema Hidráulico</span>
+                       <span [class]="getFilterTitleClass('Hidráulico', 'red')">Sistema Hidráulico</span>
                        <span class="text-xs font-black text-red-500">45%</span>
                     </div>
                     <div class="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden mb-3">
@@ -225,7 +225,7 @@ import { ForkliftFailureEntry } from '../../types';
                     </div>
                     <div class="flex justify-between items-center">
                        <span class="text-[10px] text-slate-400 font-medium">12 incidentes reportados</span>
-                       <span [class]="getFilterActionClass('Hidráulico', 'bg-[#ce1126]', 'text-[#ce1126]')">
+                       <span [class]="getFilterActionClass('Hidráulico', 'red')">
                          {{ getFilterActionText('Hidráulico') }} <i class="fas fa-arrow-right text-[9px]"></i>
                        </span>
                     </div>
@@ -234,7 +234,7 @@ import { ForkliftFailureEntry } from '../../types';
                  <!-- Item 2 -->
                  <button (click)="filterByIssue('Frenos')" [class]="getFilterButtonClass('Frenos', 'amber')">
                     <div class="flex justify-between items-start mb-2">
-                       <span [class]="getFilterTitleClass('Frenos', 'text-amber-600')">Frenos / Desgaste</span>
+                       <span [class]="getFilterTitleClass('Frenos', 'amber')">Frenos / Desgaste</span>
                        <span class="text-xs font-black text-amber-500">20%</span>
                     </div>
                     <div class="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden mb-3">
@@ -242,7 +242,7 @@ import { ForkliftFailureEntry } from '../../types';
                     </div>
                     <div class="flex justify-between items-center">
                        <span class="text-[10px] text-slate-400 font-medium">8 incidentes reportados</span>
-                       <span [class]="getFilterActionClass('Frenos', 'bg-amber-600', 'text-amber-600')">
+                       <span [class]="getFilterActionClass('Frenos', 'amber')">
                          {{ getFilterActionText('Frenos') }} <i class="fas fa-arrow-right text-[9px]"></i>
                        </span>
                     </div>
@@ -290,6 +290,26 @@ export class DashboardComponent {
   
   // Filter state
   issueFilter = signal<string | null>(null);
+  
+  // Filter button styling configuration
+  private readonly filterButtonStyles = {
+    red: {
+      active: 'bg-red-50 dark:bg-red-900/20 border-red-300 dark:border-red-500 ring-2 ring-red-200 dark:ring-red-500/50',
+      inactive: 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-700 hover:border-red-200',
+      titleActive: 'text-xs font-bold transition-colors text-[#ce1126]',
+      titleInactive: 'text-xs font-bold transition-colors text-slate-700 dark:text-slate-200 group-hover:text-[#ce1126]',
+      actionActive: 'text-[10px] border px-3 py-1.5 rounded-lg font-bold shadow-md transition-all flex items-center gap-1 bg-[#ce1126] text-white border-[#ce1126]',
+      actionInactive: 'text-[10px] border px-3 py-1.5 rounded-lg font-bold shadow-sm transition-all flex items-center gap-1 bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-600 group-hover:text-[#ce1126] group-hover:border-red-100 group-hover:shadow-md'
+    },
+    amber: {
+      active: 'bg-amber-50 dark:bg-amber-900/20 border-amber-300 dark:border-amber-500 ring-2 ring-amber-200 dark:ring-amber-500/50',
+      inactive: 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-700 hover:border-amber-200',
+      titleActive: 'text-xs font-bold transition-colors text-amber-600',
+      titleInactive: 'text-xs font-bold transition-colors text-slate-700 dark:text-slate-200 group-hover:text-amber-600',
+      actionActive: 'text-[10px] border px-3 py-1.5 rounded-lg font-bold shadow-md transition-all flex items-center gap-1 bg-amber-600 text-white border-amber-600',
+      actionInactive: 'text-[10px] border px-3 py-1.5 rounded-lg font-bold shadow-sm transition-all flex items-center gap-1 bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-600 group-hover:text-amber-600 group-hover:border-amber-100 group-hover:shadow-md'
+    }
+  };
   
   // Updated activeFailures to respect the filter
   activeFailures = computed(() => {
@@ -402,34 +422,23 @@ export class DashboardComponent {
   }
   
   // Helper methods for filter button styling
-  getFilterButtonClass(issue: string, baseColor: string): string {
+  getFilterButtonClass(issue: string, baseColor: 'red' | 'amber'): string {
     const isActive = this.issueFilter() === issue;
-    const colorMap: {[key: string]: {active: string, inactive: string}} = {
-      'red': {
-        active: 'bg-red-50 dark:bg-red-900/20 border-red-300 dark:border-red-500 ring-2 ring-red-200 dark:ring-red-500/50',
-        inactive: 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-700 hover:border-red-200'
-      },
-      'amber': {
-        active: 'bg-amber-50 dark:bg-amber-900/20 border-amber-300 dark:border-amber-500 ring-2 ring-amber-200 dark:ring-amber-500/50',
-        inactive: 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-700 hover:border-amber-200'
-      }
-    };
-    const classes = colorMap[baseColor] || colorMap['red'];
-    return `w-full text-left p-3 rounded-xl border group transition-colors cursor-pointer relative ${isActive ? classes.active : classes.inactive}`;
+    const styles = this.filterButtonStyles[baseColor];
+    const state = isActive ? styles.active : styles.inactive;
+    return `w-full text-left p-3 rounded-xl border group transition-colors cursor-pointer relative ${state}`;
   }
   
-  getFilterTitleClass(issue: string, hoverColor: string): string {
+  getFilterTitleClass(issue: string, baseColor: 'red' | 'amber'): string {
     const isActive = this.issueFilter() === issue;
-    if (isActive) return `text-xs font-bold transition-colors ${hoverColor}`;
-    return `text-xs font-bold transition-colors text-slate-700 dark:text-slate-200 group-hover:${hoverColor}`;
+    const styles = this.filterButtonStyles[baseColor];
+    return isActive ? styles.titleActive : styles.titleInactive;
   }
   
-  getFilterActionClass(issue: string, activeColor: string, hoverColor: string): string {
+  getFilterActionClass(issue: string, baseColor: 'red' | 'amber'): string {
     const isActive = this.issueFilter() === issue;
-    if (isActive) {
-      return `text-[10px] border px-3 py-1.5 rounded-lg font-bold shadow-md transition-all flex items-center gap-1 ${activeColor} text-white border-${activeColor}`;
-    }
-    return `text-[10px] border px-3 py-1.5 rounded-lg font-bold shadow-sm transition-all flex items-center gap-1 bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-600 group-hover:${hoverColor} group-hover:border-${hoverColor.replace('text-', '')}-100 group-hover:shadow-md`;
+    const styles = this.filterButtonStyles[baseColor];
+    return isActive ? styles.actionActive : styles.actionInactive;
   }
   
   getFilterActionText(issue: string): string {
