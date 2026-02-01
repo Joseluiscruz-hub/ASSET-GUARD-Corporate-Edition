@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "ng serve",
-    "build": "ng build",
-    "preview": "ng serve --configuration=production"
+    "build": "ng build --base-href /ASSET-GUARD-Corporate-Edition/",
+    "preview": "ng serve --configuration=production",
+    "deploy": "ng build --base-href /ASSET-GUARD-Corporate-Edition/ && npx angular-cli-ghpages --dir=dist"
   },
   "dependencies": {
     "@angular/build": "^21.1.0",
@@ -28,7 +29,7 @@
   "devDependencies": {
     "@types/node": "^22.14.0",
     "angular-cli-ghpages": "^3.0.2",
-    "typescript": "~5.8.2",
+    "typescript": "~5.9.3",
     "vite": "^6.2.0"
   }
 }
