@@ -1,7 +1,7 @@
 
 import { Component, signal, effect, inject, computed } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { DomSanitizer, SafeHtml, SecurityContext } from '@angular/platform-browser';
 import { DataService } from './services/data.service';
 import { GeminiService } from './services/gemini.service';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
@@ -102,7 +102,7 @@ export class AppComponent {
     const active = this.failures().filter(f => f.estatus !== 'Cerrada');
     
     const summary = await this.geminiService.generateExecutiveReport(kpi, active, availability);
-    this.aiInsights.set(this.sanitizer.sanitize(1, summary));
+    this.aiInsights.set(this.sanitizer.sanitize(SecurityContext.HTML, summary));
     this.aiLoading.set(false);
   }
 

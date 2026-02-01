@@ -1,7 +1,7 @@
 
 import { Component, input, inject, signal, computed, effect } from '@angular/core';
 import { CommonModule, DatePipe, CurrencyPipe } from '@angular/common';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { DomSanitizer, SafeHtml, SecurityContext } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { DataService } from '../../services/data.service';
 import { GeminiService } from '../../services/gemini.service';
@@ -338,9 +338,9 @@ export class AssetDetailComponent {
     // Uses the last failure or a generic context
     const lastFailure = currentAsset.lastFailure || "Mantenimiento General Preventivo";
     
-    this.lotoResult.set(this.sanitizer.sanitize(1, '<p class="text-gray-500 animate-pulse">Generando procedimiento de seguridad...</p>'));
+    this.lotoResult.set(this.sanitizer.sanitize(SecurityContext.HTML, '<p class="text-gray-500 animate-pulse">Generando procedimiento de seguridad...</p>'));
     const html = await this.geminiService.generateLotoProcedure(currentAsset, lastFailure);
-    this.lotoResult.set(this.sanitizer.sanitize(1, html));
+    this.lotoResult.set(this.sanitizer.sanitize(SecurityContext.HTML, html));
   }
 
   printLoto() {
@@ -376,7 +376,7 @@ export class AssetDetailComponent {
     this.aiLoading.set(true);
     // Updated to use the new Bonus 1 Predictive Analysis logic
     const result = await this.geminiService.analyzeMaintenanceHistory(currentAsset, this.history());
-    this.aiResult.set(this.sanitizer.sanitize(1, result));
+    this.aiResult.set(this.sanitizer.sanitize(SecurityContext.HTML, result));
     this.aiLoading.set(false);
   }
 

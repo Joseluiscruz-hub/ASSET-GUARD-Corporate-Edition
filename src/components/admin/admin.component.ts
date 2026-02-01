@@ -1,7 +1,7 @@
 
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { DomSanitizer, SafeHtml, SecurityContext } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { DataService } from '../../services/data.service';
 import { GeminiService } from '../../services/gemini.service';
@@ -227,7 +227,7 @@ export class AdminComponent {
 
     const reportHtml = await this.geminiService.generateDailySummary(fleetData, activeFailures, history);
     
-    this.aiReport.set(this.sanitizer.sanitize(1, reportHtml));
+    this.aiReport.set(this.sanitizer.sanitize(SecurityContext.HTML, reportHtml));
     this.isAnalyzing.set(false);
   }
 
