@@ -16,7 +16,7 @@
     "@angular/core": "^21.1.0",
     "@angular/platform-browser": "^21.1.0",
     "@angular/forms": "^21.1.2",
-    "jspdf": "2.5.1",
+    "jspdf": "4.0.0",
     "jspdf-autotable": "3.8.2",
     "xlsx": "latest",
     "@angular/build": "^21.1.0",
