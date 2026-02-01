@@ -2,14 +2,13 @@
 import { Injectable } from '@angular/core';
 import { GoogleGenAI } from "@google/genai";
 import { FailureReport, Asset, KPIData, AIInspectionResponse } from '../types';
-import { environment } from '../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GeminiService {
   
-  private ai = new GoogleGenAI({ apiKey: environment.geminiApiKey });
+  private ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
   // --- BONUS 1: PREDICCIÓN DE FALLAS (MANTENIMIENTO PREDICTIVO) ---
   async analyzeMaintenanceHistory(asset: Asset, history: FailureReport[]): Promise<string> {

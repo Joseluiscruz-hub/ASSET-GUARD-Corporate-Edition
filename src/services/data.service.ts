@@ -1,10 +1,9 @@
 
 import { Injectable, signal, computed, effect } from '@angular/core';
 import { Asset, FailureReport, Status, KPIData, ForkliftFailureEntry, FailureUpdate, MaintenanceTask } from '../types';
-import { initializeApp, getApps, getApp } from 'firebase/app';
+import { initializeApp } from 'firebase/app';
 import { getDatabase, ref, onValue, set, push, update, onDisconnect, goOffline, goOnline } from 'firebase/database';
 import { hydrateRealAssets, REAL_FLEET_DATA } from '../data/real-fleet';
-import { environment } from '../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +11,15 @@ import { environment } from '../environments/environment';
 export class DataService {
   
   // --- FIREBASE CONFIGURATION ---
-  private firebaseConfig = environment.firebase;
+  private firebaseConfig = {
+    apiKey: "AIzaSyBfdkTmTXNW7zP2Pbo_qktwevU12ff16Ng",
+    authDomain: "sample-firebase-ai-app-c84d2.firebaseapp.com",
+    databaseURL: "https://sample-firebase-ai-app-c84d2-default-rtdb.firebaseio.com",
+    projectId: "sample-firebase-ai-app-c84d2",
+    storageBucket: "sample-firebase-ai-app-c84d2.firebasestorage.app",
+    messagingSenderId: "572595334513",
+    appId: "1:572595334513:web:725d1fb5fbe9ed48dc9ad0"
+  };
 
   private app: any;
   private db: any;
@@ -124,14 +131,9 @@ export class DataService {
   // --- Initialization ---
   private initFirebase() {
     try {
-      // Usar la app existente o crear una nueva
-      this.app = getApps().length > 0 ? getApp() : initializeApp(this.firebaseConfig);
-      // Usar la URL explícita de la base de datos
-      this.db = getDatabase(this.app, this.firebaseConfig.databaseURL);
-
-      console.log('✅ Firebase Initialized');
-      console.log('📊 Database URL:', this.firebaseConfig.databaseURL);
-
+      this.app = initializeApp(this.firebaseConfig);
+      this.db = getDatabase(this.app);
+      
       // Monitor connection state
       const connectedRef = ref(this.db, '.info/connected');
       onValue(connectedRef, (snap) => {

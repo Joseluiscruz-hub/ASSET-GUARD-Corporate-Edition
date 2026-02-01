@@ -1,5 +1,5 @@
 
-import { Component, inject, computed, signal } from '@angular/core';
+import { Component, inject, computed } from '@angular/core';
 import { CommonModule, DatePipe, CurrencyPipe } from '@angular/common';
 import { DataService } from '../../services/data.service';
 import { KpiCardComponent, KpiStatus } from '../ui/kpi-card.component';
@@ -100,14 +100,6 @@ import { ForkliftFailureEntry } from '../../types';
             <div>
                <h3 class="font-bold text-slate-800 dark:text-white flex items-center gap-2">
                  <i class="fas fa-wrench text-slate-400"></i> Taller en Vivo
-                 @if (activeIssueFilter()) {
-                   <span class="ml-2 text-xs font-bold text-blue-600 bg-blue-50 dark:bg-blue-500/10 px-3 py-1 rounded-full border border-blue-200 dark:border-blue-500/20 flex items-center gap-2">
-                     <i class="fas fa-filter text-[10px]"></i> Filtrado: {{ activeIssueFilter() }}
-                     <button (click)="clearFilter()" class="ml-1 hover:text-blue-800 dark:hover:text-blue-300 transition-colors" title="Limpiar filtro">
-                       <i class="fas fa-times text-[10px]"></i>
-                     </button>
-                   </span>
-                 }
                </h3>
                <p class="text-xs text-slate-500 mt-1">Órdenes activas y tiempos de respuesta</p>
             </div>
@@ -215,9 +207,9 @@ import { ForkliftFailureEntry } from '../../types';
               
               <div class="space-y-3">
                  <!-- Item 1 -->
-                 <button (click)="filterByIssue('Hidráulico')" [class]="getFilterButtonClass('Hidráulico', 'red')">
+                 <button (click)="filterByIssue('Hidráulico')" class="w-full text-left p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700 group hover:border-red-200 transition-colors cursor-pointer relative">
                     <div class="flex justify-between items-start mb-2">
-                       <span [class]="getFilterTitleClass('Hidráulico', 'red')">Sistema Hidráulico</span>
+                       <span class="text-xs font-bold text-slate-700 dark:text-slate-200 group-hover:text-[#ce1126] transition-colors">Sistema Hidráulico</span>
                        <span class="text-xs font-black text-red-500">45%</span>
                     </div>
                     <div class="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden mb-3">
@@ -225,16 +217,16 @@ import { ForkliftFailureEntry } from '../../types';
                     </div>
                     <div class="flex justify-between items-center">
                        <span class="text-[10px] text-slate-400 font-medium">12 incidentes reportados</span>
-                       <span [class]="getFilterActionClass('Hidráulico', 'red')">
-                         {{ getFilterActionText('Hidráulico') }} <i class="fas fa-arrow-right text-[9px]"></i>
+                       <span class="text-[10px] bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 px-3 py-1.5 rounded-lg text-slate-600 group-hover:text-[#ce1126] group-hover:border-red-100 font-bold shadow-sm transition-all group-hover:shadow-md flex items-center gap-1">
+                         Ver equipos <i class="fas fa-arrow-right text-[9px]"></i>
                        </span>
                     </div>
                  </button>
 
                  <!-- Item 2 -->
-                 <button (click)="filterByIssue('Frenos')" [class]="getFilterButtonClass('Frenos', 'amber')">
+                 <button (click)="filterByIssue('Frenos')" class="w-full text-left p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700 group hover:border-amber-200 transition-colors cursor-pointer relative">
                     <div class="flex justify-between items-start mb-2">
-                       <span [class]="getFilterTitleClass('Frenos', 'amber')">Frenos / Desgaste</span>
+                       <span class="text-xs font-bold text-slate-700 dark:text-slate-200 group-hover:text-amber-600 transition-colors">Frenos / Desgaste</span>
                        <span class="text-xs font-black text-amber-500">20%</span>
                     </div>
                     <div class="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden mb-3">
@@ -242,8 +234,8 @@ import { ForkliftFailureEntry } from '../../types';
                     </div>
                     <div class="flex justify-between items-center">
                        <span class="text-[10px] text-slate-400 font-medium">8 incidentes reportados</span>
-                       <span [class]="getFilterActionClass('Frenos', 'amber')">
-                         {{ getFilterActionText('Frenos') }} <i class="fas fa-arrow-right text-[9px]"></i>
+                       <span class="text-[10px] bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 px-3 py-1.5 rounded-lg text-slate-600 group-hover:text-amber-600 group-hover:border-amber-100 font-bold shadow-sm transition-all group-hover:shadow-md flex items-center gap-1">
+                         Ver equipos <i class="fas fa-arrow-right text-[9px]"></i>
                        </span>
                     </div>
                  </button>
@@ -287,48 +279,7 @@ export class DashboardComponent {
   kpi = this.dataService.kpiData;
   safetyStats = this.dataService.safetyStats;
   fleetAvailability = this.dataService.fleetAvailability;
-  
-  // Filter state
-  activeIssueFilter = signal<string | null>(null);
-  
-  // Base button classes shared by all filter buttons
-  private readonly filterButtonBaseClasses = 'w-full text-left p-3 rounded-xl border group transition-colors cursor-pointer relative';
-  
-  // Filter button styling configuration
-  private readonly filterButtonStyles = {
-    red: {
-      active: 'bg-red-50 dark:bg-red-900/20 border-red-300 dark:border-red-500 ring-2 ring-red-200 dark:ring-red-500/50',
-      inactive: 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-700 hover:border-red-200',
-      titleActive: 'text-xs font-bold transition-colors text-[#ce1126]',
-      titleInactive: 'text-xs font-bold transition-colors text-slate-700 dark:text-slate-200 group-hover:text-[#ce1126]',
-      actionActive: 'text-[10px] border px-3 py-1.5 rounded-lg font-bold shadow-md transition-all flex items-center gap-1 bg-[#ce1126] text-white border-[#ce1126]',
-      actionInactive: 'text-[10px] border px-3 py-1.5 rounded-lg font-bold shadow-sm transition-all flex items-center gap-1 bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-600 group-hover:text-[#ce1126] group-hover:border-red-100 group-hover:shadow-md'
-    },
-    amber: {
-      active: 'bg-amber-50 dark:bg-amber-900/20 border-amber-300 dark:border-amber-500 ring-2 ring-amber-200 dark:ring-amber-500/50',
-      inactive: 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-700 hover:border-amber-200',
-      titleActive: 'text-xs font-bold transition-colors text-amber-600',
-      titleInactive: 'text-xs font-bold transition-colors text-slate-700 dark:text-slate-200 group-hover:text-amber-600',
-      actionActive: 'text-[10px] border px-3 py-1.5 rounded-lg font-bold shadow-md transition-all flex items-center gap-1 bg-amber-600 text-white border-amber-600',
-      actionInactive: 'text-[10px] border px-3 py-1.5 rounded-lg font-bold shadow-sm transition-all flex items-center gap-1 bg-white dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-600 group-hover:text-amber-600 group-hover:border-amber-100 group-hover:shadow-md'
-    }
-  };
-  
-  // Updated activeFailures to respect the filter
-  activeFailures = computed(() => {
-    const failures = this.dataService.forkliftFailures().filter(f => f.estatus !== 'Cerrada');
-    const filter = this.activeIssueFilter();
-    
-    if (!filter) return failures;
-    
-    // Filter failures that contain the issue type in their description
-    // Convert to lowercase once for efficiency
-    const filterLower = filter.toLowerCase();
-    return failures.filter(f => 
-      f.falla.toLowerCase().includes(filterLower)
-    );
-  });
-  
+  activeFailures = computed(() => this.dataService.forkliftFailures().filter(f => f.estatus !== 'Cerrada'));
   operativeCount = computed(() => this.dataService.assets().filter(a => a.status.name === 'Operativo').length);
   totalAssets = computed(() => this.dataService.assets().length);
   lastUpdate = this.dataService.lastUpdate;
@@ -414,40 +365,7 @@ export class DashboardComponent {
   }
 
   filterByIssue(issue: string) {
-    // Set the filter or toggle it off if clicking the same filter
-    if (this.activeIssueFilter() === issue) {
-      this.activeIssueFilter.set(null);
-    } else {
-      this.activeIssueFilter.set(issue);
-    }
-  }
-  
-  clearFilter() {
-    this.activeIssueFilter.set(null);
-  }
-  
-  // Helper methods for filter button styling
-  getFilterButtonClass(issue: string, baseColor: 'red' | 'amber'): string {
-    const isActive = this.activeIssueFilter() === issue;
-    const styles = this.filterButtonStyles[baseColor];
-    const state = isActive ? styles.active : styles.inactive;
-    return `${this.filterButtonBaseClasses} ${state}`;
-  }
-  
-  getFilterTitleClass(issue: string, baseColor: 'red' | 'amber'): string {
-    const isActive = this.activeIssueFilter() === issue;
-    const styles = this.filterButtonStyles[baseColor];
-    return isActive ? styles.titleActive : styles.titleInactive;
-  }
-  
-  getFilterActionClass(issue: string, baseColor: 'red' | 'amber'): string {
-    const isActive = this.activeIssueFilter() === issue;
-    const styles = this.filterButtonStyles[baseColor];
-    return isActive ? styles.actionActive : styles.actionInactive;
-  }
-  
-  getFilterActionText(issue: string): string {
-    return this.activeIssueFilter() === issue ? 'Filtro activo' : 'Ver equipos';
+    alert(`[DEMO] Filtrando activos con fallas en: ${issue}`);
   }
 
   downloadReport() {

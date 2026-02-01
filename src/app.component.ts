@@ -3,14 +3,12 @@ import { Component, signal, effect, inject, computed } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { DataService } from './services/data.service';
 import { GeminiService } from './services/gemini.service';
-import { AuthService } from './services/auth.service';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { AssetListComponent } from './components/asset-list/asset-list.component';
 import { AssetDetailComponent } from './components/asset-detail/asset-detail.component';
 import { AdminComponent } from './components/admin/admin.component';
 import { ServicePanelComponent } from './components/service-panel/service-panel.component';
 import { SolicitorPanelComponent } from './components/solicitor-panel/solicitor-panel.component';
-import { LoginComponent } from './components/login/login.component';
 
 type View = 'dashboard' | 'assets' | 'service' | 'solicitor' | 'settings';
 
@@ -25,8 +23,7 @@ type View = 'dashboard' | 'assets' | 'service' | 'solicitor' | 'settings';
     AssetDetailComponent, 
     AdminComponent, 
     ServicePanelComponent,
-    SolicitorPanelComponent,
-    LoginComponent
+    SolicitorPanelComponent
   ],
   templateUrl: './app.component.html',
   styles: [`
@@ -37,12 +34,6 @@ type View = 'dashboard' | 'assets' | 'service' | 'solicitor' | 'settings';
 export class AppComponent {
   dataService = inject(DataService);
   geminiService = inject(GeminiService);
-  authService = inject(AuthService);
-
-  // Auth State
-  isAuthenticated = this.authService.isAuthenticated;
-  isAuthLoading = this.authService.isLoading;
-  currentUser = this.authService.currentUser;
 
   // State
   currentView = signal<View>('dashboard');
@@ -129,9 +120,5 @@ export class AppComponent {
       case 'settings': return 'Configuración';
       default: return 'AssetGuard';
     }
-  }
-
-  async logout() {
-    await this.authService.logout();
   }
 }
