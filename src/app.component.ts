@@ -1,6 +1,7 @@
 
 import { Component, signal, effect, inject, computed } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { DataService } from './services/data.service';
 import { GeminiService } from './services/gemini.service';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
@@ -34,6 +35,7 @@ type View = 'dashboard' | 'assets' | 'service' | 'solicitor' | 'settings';
 export class AppComponent {
   dataService = inject(DataService);
   geminiService = inject(GeminiService);
+  private sanitizer = inject(DomSanitizer);
 
   // State
   currentView = signal<View>('dashboard');
@@ -47,7 +49,7 @@ export class AppComponent {
   failures = this.dataService.forkliftFailures;
 
   // AI Insights State
-  aiInsights = signal<string | null>(null);
+  aiInsights = signal<SafeHtml | null>(null);
   aiLoading = signal(false);
 
   private previousFailureCount = 0;
@@ -100,7 +102,7 @@ export class AppComponent {
     const active = this.failures().filter(f => f.estatus !== 'Cerrada');
     
     const summary = await this.geminiService.generateExecutiveReport(kpi, active, availability);
-    this.aiInsights.set(summary);
+    this.aiInsights.set(this.sanitizer.sanitize(1, summary));
     this.aiLoading.set(false);
   }
 

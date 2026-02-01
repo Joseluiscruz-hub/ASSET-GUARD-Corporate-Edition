@@ -1,6 +1,7 @@
 
 import { Component, input, inject, signal, computed, effect } from '@angular/core';
 import { CommonModule, DatePipe, CurrencyPipe } from '@angular/common';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { DataService } from '../../services/data.service';
 import { GeminiService } from '../../services/gemini.service';
@@ -288,17 +289,18 @@ export class AssetDetailComponent {
   
   private dataService = inject(DataService);
   private geminiService = inject(GeminiService);
+  private sanitizer = inject(DomSanitizer);
 
   asset = computed(() => this.dataService.getAsset(this.assetId()));
   history = computed(() => this.assetId() ? this.dataService.getAssetHistory(this.assetId()) : []);
   
   aiLoading = signal(false);
-  aiResult = signal<string | null>(null);
+  aiResult = signal<SafeHtml | null>(null);
 
   // New Signals for Prompts
   analyzingImage = signal(false);
   inspectionData = signal<AIInspectionResponse | null>(null);
-  lotoResult = signal<string | null>(null);
+  lotoResult = signal<SafeHtml | null>(null);
 
   constructor() {
     effect(() => {
@@ -336,9 +338,9 @@ export class AssetDetailComponent {
     // Uses the last failure or a generic context
     const lastFailure = currentAsset.lastFailure || "Mantenimiento General Preventivo";
     
-    this.lotoResult.set('<p class="text-gray-500 animate-pulse">Generando procedimiento de seguridad...</p>');
+    this.lotoResult.set(this.sanitizer.sanitize(1, '<p class="text-gray-500 animate-pulse">Generando procedimiento de seguridad...</p>'));
     const html = await this.geminiService.generateLotoProcedure(currentAsset, lastFailure);
-    this.lotoResult.set(html);
+    this.lotoResult.set(this.sanitizer.sanitize(1, html));
   }
 
   printLoto() {
@@ -374,7 +376,7 @@ export class AssetDetailComponent {
     this.aiLoading.set(true);
     // Updated to use the new Bonus 1 Predictive Analysis logic
     const result = await this.geminiService.analyzeMaintenanceHistory(currentAsset, this.history());
-    this.aiResult.set(result);
+    this.aiResult.set(this.sanitizer.sanitize(1, result));
     this.aiLoading.set(false);
   }
 

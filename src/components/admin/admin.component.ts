@@ -1,6 +1,7 @@
 
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { DataService } from '../../services/data.service';
 import { GeminiService } from '../../services/gemini.service';
@@ -168,6 +169,7 @@ import * as XLSX from 'xlsx';
 export class AdminComponent {
   private dataService = inject(DataService);
   private geminiService = inject(GeminiService);
+  private sanitizer = inject(DomSanitizer);
 
   // Form State
   failureForm = {
@@ -179,7 +181,7 @@ export class AdminComponent {
 
   // AI State
   isAnalyzing = signal(false);
-  aiReport = signal<string | null>(null);
+  aiReport = signal<SafeHtml | null>(null);
   
   // KIOSK REMOTE STATE
   isKioskMode = this.dataService.isKioskMode;
@@ -225,7 +227,7 @@ export class AdminComponent {
 
     const reportHtml = await this.geminiService.generateDailySummary(fleetData, activeFailures, history);
     
-    this.aiReport.set(reportHtml);
+    this.aiReport.set(this.sanitizer.sanitize(1, reportHtml));
     this.isAnalyzing.set(false);
   }
 
