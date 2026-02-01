@@ -1,16 +1,17 @@
+
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DataService } from '../../services/data.service';
 import { GeminiService } from '../../services/gemini.service';
-import ExcelJS from 'exceljs';
+import * as XLSX from 'xlsx';
 
 @Component({
   selector: 'app-admin',
   imports: [CommonModule, FormsModule],
   template: `
     <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-8 max-w-5xl mx-auto">
-
+      
       <!-- Header -->
       <div class="mb-8 border-b border-gray-100 pb-4">
         <h2 class="text-3xl font-black text-gray-800 tracking-tight">Panel de Administración</h2>
@@ -33,23 +34,23 @@ import ExcelJS from 'exceljs';
                Activa remotamente el <strong>Modo Quiosco</strong> en las Smart TVs de la planta. Esto iniciará la rotación automática de KPIs, Mejores Tripulaciones y Seguridad.
             </p>
          </div>
-
+         
          <div class="flex items-center gap-4 relative z-10 bg-white px-6 py-3 rounded-2xl shadow-sm border border-indigo-100">
             <div class="text-right">
                <p class="text-[10px] font-bold uppercase tracking-wider text-gray-500">Estatus Transmisión</p>
-               <p class="text-sm font-black transition-colors"
-                  [class.text-green-500]="isKioskMode()"
+               <p class="text-sm font-black transition-colors" 
+                  [class.text-green-500]="isKioskMode()" 
                   [class.text-gray-400]="!isKioskMode()">
                   {{ isKioskMode() ? 'EN VIVO (ON AIR)' : 'OFFLINE' }}
                </p>
             </div>
-
-            <button (click)="toggleKiosk()"
+            
+            <button (click)="toggleKiosk()" 
                     class="relative inline-flex h-8 w-14 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 cursor-pointer"
-                    [class.bg-indigo-600]="isKioskMode()"
+                    [class.bg-indigo-600]="isKioskMode()" 
                     [class.bg-gray-300]="!isKioskMode()">
                <span class="inline-block h-6 w-6 transform rounded-full bg-white transition-transform shadow-md"
-                     [class.translate-x-7]="isKioskMode()"
+                     [class.translate-x-7]="isKioskMode()" 
                      [class.translate-x-1]="!isKioskMode()"></span>
             </button>
          </div>
@@ -60,7 +61,7 @@ import ExcelJS from 'exceljs';
         <div class="absolute top-0 right-0 p-8 opacity-10">
           <i class="fas fa-brain text-9xl text-white"></i>
         </div>
-
+        
         <div class="relative z-10">
           <h3 class="text-xl font-bold flex items-center gap-2 mb-2">
             <span class="bg-[#ce1126] p-1.5 rounded text-xs"><i class="fas fa-robot"></i> GEMINI 2.0</span>
@@ -71,7 +72,7 @@ import ExcelJS from 'exceljs';
           </p>
 
           @if (!aiReport()) {
-            <button (click)="generateDailyReport()"
+            <button (click)="generateDailyReport()" 
                     [disabled]="isAnalyzing()"
                     class="bg-white text-gray-900 px-6 py-3 rounded-lg font-bold shadow hover:bg-gray-100 transition flex items-center gap-2 disabled:opacity-50">
               @if (isAnalyzing()) {
@@ -97,13 +98,13 @@ import ExcelJS from 'exceljs';
         <h3 class="text-lg font-bold mb-4 flex items-center gap-2 text-gray-800">
           <span class="text-[#ce1126]"><i class="fas fa-broadcast-tower"></i></span> Registro de Falla (Torre de Control)
         </h3>
-
+        
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
           <div>
             <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Unidad (ID)</label>
             <input [(ngModel)]="failureForm.economico" type="text" class="w-full p-2.5 border border-gray-300 rounded shadow-sm focus:ring-2 focus:ring-[#ce1126] focus:outline-none" placeholder="Ej: M-105">
           </div>
-
+          
           <div class="lg:col-span-2">
             <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Descripción de Falla</label>
             <input [(ngModel)]="failureForm.falla" type="text" class="w-full p-2.5 border border-gray-300 rounded shadow-sm focus:ring-2 focus:ring-[#ce1126] focus:outline-none" placeholder="Describe el problema...">
@@ -118,13 +119,13 @@ import ExcelJS from 'exceljs';
             </select>
           </div>
         </div>
-
+        
         <div class="flex justify-between items-center">
           <div class="w-1/3">
              <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Reporta</label>
              <input [(ngModel)]="failureForm.reporta" type="text" class="w-full p-2.5 border border-gray-300 rounded shadow-sm focus:ring-2 focus:ring-[#ce1126] focus:outline-none" placeholder="Nombre Supervisor">
           </div>
-          <button (click)="registerFailure()"
+          <button (click)="registerFailure()" 
                   class="bg-[#ce1126] hover:bg-[#a30d1d] text-white px-8 py-3 rounded-lg font-bold shadow-md transition transform hover:scale-105 flex items-center gap-2">
              <i class="fas fa-paper-plane"></i> ENVIAR ALERTA
           </button>
@@ -179,7 +180,7 @@ export class AdminComponent {
   // AI State
   isAnalyzing = signal(false);
   aiReport = signal<string | null>(null);
-
+  
   // KIOSK REMOTE STATE
   isKioskMode = this.dataService.isKioskMode;
 
@@ -211,19 +212,19 @@ export class AdminComponent {
       prioridad: 'Media',
       reporta: ''
     };
-
+    
     // Optional: Visual confirmation could be added here
   }
 
   async generateDailyReport() {
     this.isAnalyzing.set(true);
-
+    
     const fleetData = this.dataService.fleetAvailability();
     const activeFailures = this.dataService.forkliftFailures().filter(f => f.estatus !== 'Cerrada');
     const history = this.dataService.forkliftFailures().slice(0, 10);
 
     const reportHtml = await this.geminiService.generateDailySummary(fleetData, activeFailures, history);
-
+    
     this.aiReport.set(reportHtml);
     this.isAnalyzing.set(false);
   }
@@ -234,7 +235,7 @@ export class AdminComponent {
       // For email/chat, rich text is better.
       const el = document.createElement('div');
       el.innerHTML = this.aiReport()!;
-
+      
       const blob = new Blob([el.innerText], { type: 'text/plain' });
       const item = new ClipboardItem({ 'text/plain': blob });
       navigator.clipboard.write([item]).then(() => alert('Reporte copiado al portapapeles!'));
@@ -243,28 +244,26 @@ export class AdminComponent {
 
   // --- Excel Import/Export ---
 
-  async handleFileInput(event: any) {
+  handleFileInput(event: any) {
     const file = event.target.files[0];
     if (!file) return;
 
-    const workbook = new ExcelJS.Workbook();
-    await workbook.xlsx.load(await file.arrayBuffer());
-    const worksheet = workbook.worksheets[0];
-    const data: any[] = [];
-    worksheet.eachRow((row, rowNumber) => {
-      if (rowNumber === 1) return; // skip header
-      const rowData: any = {};
-      worksheet.getRow(1).eachCell((cell, colNumber) => {
-        rowData[cell.value as string] = row.getCell(colNumber).value;
-      });
-      data.push(rowData);
-    });
-
-    this.dataService.updateAssetsFromExcel(data);
-    alert(`Se procesaron ${data.length} registros exitosamente.`);
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      const bstr = e.target.result;
+      const wb = XLSX.read(bstr, { type: 'binary' });
+      const wsname = wb.SheetNames[0];
+      const ws = wb.Sheets[wsname];
+      const data = XLSX.utils.sheet_to_json(ws);
+      
+      // Send to Service
+      this.dataService.updateAssetsFromExcel(data);
+      alert(`Se procesaron ${data.length} registros exitosamente.`);
+    };
+    reader.readAsBinaryString(file);
   }
 
-  async exportData() {
+  exportData() {
     // 1. Prepare Data
     const failures = this.dataService.forkliftFailures().map(f => ({
       ID: f.id,
@@ -278,40 +277,23 @@ export class AdminComponent {
     }));
 
     const assets = this.dataService.assets().map(a => ({
-      Economico: a.id,
-      Marca: a.brand,
-      Modelo: a.model,
-      Serie: a.serial,
-      Estatus: a.status.name,
-      Desde: a.statusSince
+       Economico: a.id,
+       Marca: a.brand,
+       Modelo: a.model,
+       Serie: a.serial,
+       Estatus: a.status.name,
+       Desde: a.statusSince
     }));
 
     // 2. Create Workbook
-    const workbook = new ExcelJS.Workbook();
-    const wsAssets = workbook.addWorksheet('Inventario');
-    const wsFailures = workbook.addWorksheet('Reporte de Fallas');
+    const wb = XLSX.utils.book_new();
+    const wsFailures = XLSX.utils.json_to_sheet(failures);
+    const wsAssets = XLSX.utils.json_to_sheet(assets);
 
-    // Add headers and rows for assets
-    if (assets.length > 0) {
-      wsAssets.addRow(Object.keys(assets[0]));
-      assets.forEach(row => wsAssets.addRow(Object.values(row)));
-    }
-    // Add headers and rows for failures
-    if (failures.length > 0) {
-      wsFailures.addRow(Object.keys(failures[0]));
-      failures.forEach(row => wsFailures.addRow(Object.values(row)));
-    }
+    XLSX.utils.book_append_sheet(wb, wsAssets, 'Inventario');
+    XLSX.utils.book_append_sheet(wb, wsFailures, 'Reporte de Fallas');
 
     // 3. Save
-    const buffer = await workbook.xlsx.writeBuffer();
-    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `AssetGuard_Reporte_${new Date().toISOString().slice(0,10)}.xlsx`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
+    XLSX.writeFile(wb, `AssetGuard_Reporte_${new Date().toISOString().slice(0,10)}.xlsx`);
   }
 }

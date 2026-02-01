@@ -1,5 +1,5 @@
 
-import { Component, inject } from '@angular/core';
+import { Component, inject, computed } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DataService } from '../../services/data.service';
@@ -9,191 +9,158 @@ import { DataService } from '../../services/data.service';
   standalone: true,
   imports: [CommonModule, DatePipe, FormsModule],
   template: `
-    <div class="bg-slate-50 min-h-screen p-4 md:p-8 font-sans">
-      
-      <!-- Header -->
-      <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
-        <div>
-          <h2 class="text-3xl font-black text-slate-800 tracking-tighter flex items-center gap-2">
-            <i class="fas fa-tools text-orange-600"></i> GESTIÓN TÉCNICA TOYOTA
-          </h2>
-          <p class="text-slate-500 font-medium">Control de Taller y Refaccionamiento</p>
-        </div>
-        <div class="flex gap-4 mt-4 md:mt-0">
-           <div class="bg-white p-3 rounded-xl shadow-sm border border-slate-200 text-center min-w-[120px]">
-              <p class="text-[10px] text-slate-400 uppercase font-bold">Refacciones Pendientes</p>
-              <p class="text-2xl font-black text-orange-500 leading-none mt-1">
-                {{ countWaitingParts() }}
-              </p>
-           </div>
-        </div>
-      </div>
+    <div class="space-y-6">
+       
+       <!-- Header Stats -->
+       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="bg-orange-600 text-white p-6 rounded-xl shadow-lg relative overflow-hidden">
+             <i class="fas fa-wrench absolute -right-4 -bottom-4 text-8xl text-orange-700 opacity-50"></i>
+             <p class="text-xs uppercase font-bold text-orange-100">Unidades en Taller</p>
+             <p class="text-4xl font-black mt-2">{{ openFailures().length }}</p>
+          </div>
+          
+          <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center">
+             <p class="text-xs uppercase font-bold text-slate-400">Refacciones Pendientes</p>
+             <p class="text-3xl font-black text-slate-700 mt-1">{{ pendingParts() }}</p>
+          </div>
 
-      <!-- Horizontal List Container -->
-      <div class="flex flex-col gap-6 max-w-6xl mx-auto">
-        @for (f of dataService.forkliftFailures(); track f.id) {
-          @if (f.estatus !== 'Cerrada') {
-            <!-- Horizontal Card -->
-            <div class="bg-white rounded-3xl shadow-lg overflow-hidden border border-slate-200 flex flex-col md:flex-row group transition-all hover:shadow-xl">
-              
-              <!-- Left: Asset Info (Dark) -->
-              <div class="p-6 md:w-1/3 bg-slate-900 text-white flex flex-col justify-between relative overflow-hidden">
-                <!-- Background Decoration -->
-                <div class="absolute top-0 right-0 p-8 opacity-5 transform translate-x-1/2 -translate-y-1/2">
-                   <i class="fas fa-truck-loading text-9xl"></i>
-                </div>
+           <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center">
+             <p class="text-xs uppercase font-bold text-slate-400">Prioridad Alta</p>
+             <p class="text-3xl font-black text-red-500 mt-1">{{ criticalCount() }}</p>
+          </div>
+       </div>
 
-                <div>
-                  <div class="flex justify-between items-start mb-4 relative z-10">
-                    <span class="text-4xl font-black text-orange-500 tracking-tighter">{{ f.economico }}</span>
-                    <span [class]="'px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ' + 
-                      (f.prioridad === 'Alta' ? 'bg-red-500 text-white' : 'bg-slate-700 text-slate-300')">
-                      {{ f.prioridad }}
-                    </span>
-                  </div>
-                  
-                  <div class="mb-4 relative z-10">
-                     <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Diagnóstico Inicial</p>
-                     <p class="text-lg font-medium leading-tight text-slate-100">{{ f.falla }}</p>
-                  </div>
+       <!-- Main Content -->
+       <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden min-h-[500px]">
+          <div class="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+             <h3 class="font-bold text-slate-700 uppercase tracking-wide text-sm">Órdenes de Trabajo Activas</h3>
+          </div>
 
-                  <div class="flex flex-col gap-1 text-xs text-slate-500 relative z-10">
-                    <div class="flex items-center gap-2">
-                       <i class="fas fa-user-circle"></i> {{ f.reporta }}
-                    </div>
-                    <div class="flex items-center gap-2">
-                       <i class="fas fa-clock"></i> {{ f.fechaIngreso | date:'dd/MM HH:mm' }}
-                    </div>
-                  </div>
-                </div>
-                
-                <!-- Chat Quick View -->
-                <div class="mt-6 pt-4 border-t border-slate-700 relative z-10">
-                   <div class="max-h-24 overflow-y-auto custom-scroll space-y-2 text-xs">
-                     @if (f.seguimiento.length === 0) {
-                        <p class="text-slate-600 italic">Sin notas técnicas.</p>
-                     }
-                     @for (msg of f.seguimiento; track msg.fecha) {
-                       <div>
-                         <span class="font-bold text-orange-500">{{ msg.usuario }}:</span>
-                         <span class="text-slate-400 ml-1">{{ msg.mensaje }}</span>
-                       </div>
-                     }
+          <div class="divide-y divide-slate-100">
+             @for (f of openFailures(); track f.id) {
+                <div class="p-6 hover:bg-slate-50 transition-colors">
+                   
+                   <!-- Top Row: ID + Status -->
+                   <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
+                      <div class="flex items-center gap-4">
+                         <div class="w-12 h-12 rounded-lg bg-slate-900 text-white flex items-center justify-center font-black text-lg">
+                            {{ f.economico.slice(-3) }}
+                         </div>
+                         <div>
+                            <h4 class="font-black text-xl text-slate-800">{{ f.economico }}</h4>
+                            <p class="text-xs text-slate-500">{{ f.fechaIngreso | date:'medium' }}</p>
+                         </div>
+                      </div>
+                      
+                      <div class="flex gap-2">
+                         <span [class]="'px-3 py-1 rounded text-xs font-bold uppercase ' + (f.prioridad === 'Alta' ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-600')">
+                            {{ f.prioridad }}
+                         </span>
+                         <span class="px-3 py-1 rounded text-xs font-bold uppercase bg-blue-100 text-blue-700">
+                            {{ f.estatus }}
+                         </span>
+                      </div>
+                   </div>
+
+                   <!-- Diagnosis & Form -->
+                   <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                      <!-- Left: Diagnosis -->
+                      <div class="lg:col-span-1">
+                         <p class="text-xs font-bold text-slate-400 uppercase mb-2">Diagnóstico Reportado</p>
+                         <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-sm text-slate-700 font-medium">
+                            {{ f.falla }}
+                         </div>
+                         <div class="mt-4">
+                            <p class="text-xs font-bold text-slate-400 uppercase mb-2">Historial Técnico</p>
+                            <div class="space-y-2 max-h-32 overflow-y-auto custom-scroll text-xs">
+                               @for (msg of f.seguimiento; track msg.fecha) {
+                                  <div class="p-2 rounded bg-slate-50 border border-slate-100">
+                                     <span class="font-bold text-orange-600">{{ msg.usuario }}:</span> {{ msg.mensaje }}
+                                  </div>
+                               }
+                            </div>
+                         </div>
+                      </div>
+
+                      <!-- Middle: Logistics -->
+                      <div class="lg:col-span-2 bg-slate-50 rounded-xl p-5 border border-slate-200">
+                         <h5 class="font-bold text-slate-700 mb-4 flex items-center gap-2">
+                            <i class="fas fa-box-open"></i> Logística de Refacciones
+                         </h5>
+                         
+                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                               <label class="text-xs font-bold text-slate-400 uppercase">Orden de Compra (PO)</label>
+                               <input type="text" #po [value]="f.ordenCompra || ''" class="w-full mt-1 p-2 rounded border border-slate-300 text-sm focus:ring-2 focus:ring-orange-500">
+                            </div>
+                             <div>
+                               <label class="text-xs font-bold text-slate-400 uppercase">Estatus Refacción</label>
+                               <select #status [value]="f.estatusRefaccion || 'N/A'" class="w-full mt-1 p-2 rounded border border-slate-300 text-sm bg-white">
+                                  <option value="N/A">N/A (Solo Mano de Obra)</option>
+                                  <option value="En Stock">En Stock</option>
+                                  <option value="Pedida">Pedida a Planta</option>
+                                  <option value="Por Recibir">En Tránsito</option>
+                               </select>
+                            </div>
+                         </div>
+                         
+                         <!-- Actions -->
+                         <div class="flex gap-2 mt-4">
+                            <input #note type="text" placeholder="Agregar nota técnica..." class="flex-1 p-2 rounded border border-slate-300 text-sm">
+                            <button (click)="addNote(f.id, note.value); note.value=''" class="px-4 py-2 bg-slate-200 text-slate-700 font-bold rounded text-xs hover:bg-slate-300 transition">
+                               <i class="fas fa-comment"></i>
+                            </button>
+                         </div>
+                         
+                         <div class="flex gap-3 mt-4 pt-4 border-t border-slate-200">
+                            <button (click)="saveLogistics(f.id, po.value, status.value)" class="flex-1 py-2 bg-slate-800 text-white rounded font-bold text-xs uppercase hover:bg-slate-900 transition">
+                               Guardar Cambios
+                            </button>
+                            <button (click)="closeTicket(f.id)" class="px-6 py-2 bg-green-600 text-white rounded font-bold text-xs uppercase hover:bg-green-700 transition">
+                               Liberar
+                            </button>
+                         </div>
+                      </div>
                    </div>
                 </div>
-              </div>
-
-              <!-- Right: Management Form (Light) -->
-              <div class="p-6 md:w-2/3 flex flex-col justify-between">
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                  
-                  <!-- PO Field -->
-                  <div>
-                    <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Orden de Compra (PO)</label>
-                    <div class="relative">
-                      <i class="fas fa-file-invoice absolute left-3 top-3 text-slate-300"></i>
-                      <input type="text" 
-                             [value]="f.ordenCompra || ''"
-                             #poInput
-                             placeholder="Pendiente..."
-                             class="w-full pl-9 p-2.5 bg-slate-50 border-none rounded-xl text-sm font-bold text-slate-700 focus:ring-2 focus:ring-orange-500 transition-all">
-                    </div>
-                  </div>
-
-                  <!-- Parts Status -->
-                  <div>
-                    <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Estatus Refacción</label>
-                    <select #statusInput
-                            [value]="f.estatusRefaccion || 'N/A'"
-                            class="w-full p-2.5 bg-slate-50 border-none rounded-xl text-sm font-bold text-slate-700 focus:ring-2 focus:ring-orange-500 transition-all cursor-pointer">
-                      <option value="N/A">N/A (Mano de Obra)</option>
-                      <option value="En Stock">En Stock (Almacén)</option>
-                      <option value="Pedida">Pedida (Backlog)</option>
-                      <option value="Por Recibir">En Tránsito</option>
-                    </select>
-                  </div>
-
-                  <!-- Promise Date (NEW) -->
-                  <div>
-                    <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Fecha Promesa</label>
-                    <input type="date"
-                           [value]="f.fechaPromesa ? (f.fechaPromesa | date:'yyyy-MM-dd') : ''"
-                           #dateInput
-                           class="w-full p-2.5 bg-slate-50 border-none rounded-xl text-sm font-bold text-slate-700 focus:ring-2 focus:ring-orange-500 transition-all">
-                  </div>
-
-                  <!-- Quick Note Input -->
-                  <div>
-                    <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Agregar Nota Técnica</label>
-                    <div class="flex gap-2">
-                       <input #noteInput type="text" 
-                              placeholder="Avance..."
-                              (keyup.enter)="enviarAvance(f.id, noteInput.value); noteInput.value=''"
-                              class="flex-1 p-2.5 bg-slate-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-orange-500">
-                       <button (click)="enviarAvance(f.id, noteInput.value); noteInput.value=''"
-                               class="bg-slate-200 hover:bg-slate-300 text-slate-600 rounded-xl px-3 transition-colors">
-                         <i class="fas fa-paper-plane"></i>
-                       </button>
-                    </div>
-                  </div>
-
+             } @empty {
+                <div class="py-20 text-center">
+                   <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-slate-100 text-slate-300 mb-4">
+                      <i class="fas fa-check text-4xl"></i>
+                   </div>
+                   <h3 class="font-bold text-slate-600">Todo limpio</h3>
+                   <p class="text-slate-400 text-sm">No hay unidades pendientes en taller.</p>
                 </div>
-
-                <!-- Action Buttons -->
-                <div class="flex flex-col md:flex-row gap-3 pt-4 border-t border-slate-100">
-                   <button (click)="updateLogistics(f.id, poInput.value, statusInput.value, dateInput.value)"
-                           class="flex-1 bg-slate-800 hover:bg-slate-700 text-white py-3 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2">
-                      <i class="fas fa-save"></i> GUARDAR AVANCE
-                   </button>
-                   
-                   <button (click)="closeFailureReport(f.id)" 
-                           class="flex-1 bg-green-100 hover:bg-green-200 text-green-700 py-3 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2">
-                      <i class="fas fa-check-circle"></i> FINALIZAR & LIBERAR
-                   </button>
-                </div>
-
-              </div>
-            </div>
-          }
-        } @empty {
-           <div class="py-20 flex flex-col items-center justify-center text-slate-400">
-             <div class="bg-white p-8 rounded-full shadow-sm mb-4">
-                <i class="fas fa-clipboard-check text-6xl text-green-200"></i>
-             </div>
-             <p class="text-xl font-bold text-slate-600">Todo al día</p>
-             <p class="text-sm">No hay unidades reportadas en taller.</p>
-           </div>
-        }
-      </div>
+             }
+          </div>
+       </div>
     </div>
-  `,
-  styles: [`
-    .custom-scroll::-webkit-scrollbar { width: 4px; }
-    .custom-scroll::-webkit-scrollbar-track { background: #0f172a; }
-    .custom-scroll::-webkit-scrollbar-thumb { background: #334155; border-radius: 2px; }
-  `]
+  `
 })
 export class ServicePanelComponent {
   dataService = inject(DataService);
 
-  countWaitingParts() {
-    return this.dataService.forkliftFailures()
-      .filter(f => f.estatusRefaccion === 'Pedida' || f.estatusRefaccion === 'Por Recibir').length;
+  openFailures = this.dataService.forkliftFailures; 
+  
+  pendingParts = computed(() => 
+     this.dataService.forkliftFailures().filter(f => f.estatusRefaccion === 'Pedida').length
+  );
+  
+  criticalCount = computed(() => 
+     this.dataService.forkliftFailures().filter(f => f.prioridad === 'Alta' && f.estatus !== 'Cerrada').length
+  );
+
+  saveLogistics(id: string, po: string, status: any) {
+    this.dataService.updateToyotaLogistics(id, po, status);
   }
 
-  updateLogistics(id: string, po: string, status: any, date: string) {
-    this.dataService.updateToyotaLogistics(id, po, status, date);
-    alert('Información técnica actualizada.');
+  addNote(id: string, note: string) {
+    if(!note) return;
+    this.dataService.addFailureUpdate(id, note, 'Toyota Tech');
   }
 
-  enviarAvance(id: string, msg: string) {
-    if (!msg.trim()) return;
-    this.dataService.addFailureUpdate(id, msg, 'Toyota');
-  }
-
-  closeFailureReport(id: string) {
-    if(confirm('¿Confirmar que la unidad está operativa y lista para producción?')) {
+  closeTicket(id: string) {
+    if(confirm('¿Confirmar liberación de equipo?')) {
       this.dataService.closeLiveFailure(id);
     }
   }

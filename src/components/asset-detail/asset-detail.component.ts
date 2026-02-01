@@ -4,8 +4,8 @@ import { CommonModule, DatePipe, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DataService } from '../../services/data.service';
 import { GeminiService } from '../../services/gemini.service';
-import { AIInspectionResponse } from '../../types';
-import jsPDF from 'jspdf';
+import { Asset, FailureReport, AIInspectionResponse } from '../../types';
+import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
 @Component({
@@ -238,8 +238,12 @@ import autoTable from 'jspdf-autotable';
               </p>
 
               @if (aiLoading()) {
-                <div class="flex items-center gap-3 text-[#ce1126] font-bold animate-pulse mb-4">
-                  <i class="fas fa-circle-notch fa-spin"></i> Procesando datos...
+                <div class="flex flex-col items-center justify-center py-6 text-center space-y-3">
+                  <div class="relative">
+                    <i class="fas fa-circle-notch fa-spin text-3xl text-[#ce1126]"></i>
+                    <i class="fas fa-brain absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[10px] text-white"></i>
+                  </div>
+                  <p class="text-xs font-bold text-gray-300 animate-pulse uppercase tracking-wide">Analizando historial y sensores...</p>
                 </div>
               } @else if (aiResult()) {
                 <div class="prose prose-sm prose-invert bg-white/5 p-4 rounded-lg border border-white/10 max-h-96 overflow-y-auto custom-scroll text-sm" [innerHTML]="aiResult()"></div>
@@ -247,8 +251,11 @@ import autoTable from 'jspdf-autotable';
                   Regenerar Análisis
                 </button>
               } @else {
+                <div class="bg-white/5 rounded-lg p-3 mb-4 border border-white/10">
+                   <p class="text-[10px] text-gray-400 italic mb-1"><i class="fas fa-info-circle mr-1"></i> Esto enviará los últimos 20 reportes a Gemini.</p>
+                </div>
                 <button (click)="runAnalysis()" class="w-full py-3 bg-[#ce1126] hover:bg-[#a30d1d] text-white rounded-lg font-bold shadow-lg shadow-red-900/20 transition flex items-center justify-center gap-2 uppercase tracking-wide text-xs">
-                  <i class="fas fa-microchip"></i> Ejecutar Diagnóstico
+                  <i class="fas fa-magic"></i> Ejecutar Predicción con IA
                 </button>
               }
             </div>
@@ -306,15 +313,14 @@ export class AssetDetailComponent {
   // --- Actions ---
   
   // Prompt 2: Image Upload Handler
-  handleImageUpload(event: Event) {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
+  handleImageUpload(event: any) {
+    const file = event.target.files[0];
     if (!file) return;
 
     this.analyzingImage.set(true);
     const reader = new FileReader();
-    reader.onload = async (e: ProgressEvent<FileReader>) => {
-      const base64Data = (e.target?.result as string).split(',')[1]; // Remove data URL prefix
+    reader.onload = async (e: any) => {
+      const base64Data = e.target.result.split(',')[1]; // Remove data URL prefix
       const result = await this.geminiService.analyzeImageInspection(base64Data);
       this.inspectionData.set(result);
       this.analyzingImage.set(false);
@@ -348,9 +354,9 @@ export class AssetDetailComponent {
     }
   }
 
-  reportFailure(desc: string, _type: string) {
+  reportFailure(desc: string, type: any) {
     if (!desc) return alert('Por favor describe la falla.');
-    this.dataService.reportFailure(this.assetId(), desc, _type as any);
+    this.dataService.reportFailure(this.assetId(), desc, type);
   }
 
   finishRepair(diag: string, costStr: string, partsStr: string) {
