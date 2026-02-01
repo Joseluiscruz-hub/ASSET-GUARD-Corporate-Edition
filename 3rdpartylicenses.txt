@@ -654,6 +654,11 @@ License: "Apache-2.0"
    limitations under the License.
 
 --------------------------------------------------------------------------------
+Package: @firebase/auth
+License: "Apache-2.0"
+
+
+--------------------------------------------------------------------------------
 Package: @angular/forms
 License: "MIT"
 
