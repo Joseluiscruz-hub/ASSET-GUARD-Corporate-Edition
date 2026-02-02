@@ -5,11 +5,10 @@
   "type": "module",
   "scripts": {
     "start": "ng serve",
-    "dev": "ng serve",
-    "build": "ng build --base-href /ASSET-GUARD-Corporate-Edition/",
+    "build": "ng build",
     "watch": "ng build --watch",
-    "test": "ng test",
-    "deploy": "ng build --base-href /ASSET-GUARD-Corporate-Edition/ && npx angular-cli-ghpages --dir=dist"
+    "test": "vitest",
+    "deploy": "ng build --base-href /ASSET-GUARD-Corporate-Edition/ && npx angular-cli-ghpages --dir=dist --repo=https://github.com/Joseluiscruz-hub/ASSET-GUARD-Corporate-Edition.git --branch=gh-pages"
   },
   "dependencies": {
     "@angular/animations": "^19.0.0",
@@ -23,7 +22,7 @@
     "firebase": "^12.8.0",
     "jspdf": "^4.1.0",
     "jspdf-autotable": "^5.0.7",
-    "xlsx": "^0.18.5",
+    "exceljs": "^4.4.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"
@@ -34,7 +33,7 @@
     "@angular/build": "^19.0.0",
     "@angular/cli": "^21.1.2",
     "@angular/compiler-cli": "^19.0.0",
-    "@types/node": "^18.18.0",
+    "@types/node": "^20.19.0",
     "autoprefixer": "^10.4.19",
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.3",

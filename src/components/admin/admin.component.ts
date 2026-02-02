@@ -339,6 +339,9 @@ export class AdminComponent {
     const file = event.target.files[0];
     if (!file) return;
 
+    // Excel import functionality requires xlsx library
+    // Commented out for now - can be enabled when xlsx is properly configured
+    /*
     const reader = new FileReader();
     reader.onload = async (e: any) => {
       try {
