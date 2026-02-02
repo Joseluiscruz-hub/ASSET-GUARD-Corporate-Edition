@@ -9,10 +9,23 @@ import { environment } from '../environments/environment';
 })
 export class GeminiService {
 
-  private ai = new GoogleGenAI({ apiKey: environment.geminiApiKey });
+  private ai: GoogleGenAI | null = null;
+  private isConfigured = false;
+
+  constructor() {
+    if (environment.geminiApiKey && environment.geminiApiKey !== '') {
+      this.ai = new GoogleGenAI({ apiKey: environment.geminiApiKey });
+      this.isConfigured = true;
+    } else {
+      console.warn('⚠️ Gemini API Key no configurada. Las funciones de IA no estarán disponibles.');
+    }
+  }
 
   // --- BONUS 1: PREDICCIÓN DE FALLAS (MANTENIMIENTO PREDICTIVO) ---
   async analyzeMaintenanceHistory(asset: Asset, history: FailureReport[]): Promise<string> {
+    if (!this.isConfigured || !this.ai) {
+      return '<p class="text-amber-400">⚠️ Servicio de IA no disponible. Configure la API Key de Gemini.</p>';
+    }
     try {
       const prompt = `
         Actúa como Analista de Mantenimiento Predictivo con especialización en Machine Learning aplicado a activos industriales.
@@ -56,6 +69,9 @@ export class GeminiService {
 
   // --- PROMPT 5: RESUMEN EJECUTIVO SEMANAL ---
   async generateExecutiveReport(kpi: KPIData, activeFailures: any[], availability: any): Promise<string> {
+    if (!this.isConfigured || !this.ai) {
+      return '<p class="text-amber-400">⚠️ Servicio de IA no disponible. Configure la API Key de Gemini.</p>';
+    }
     try {
       const prompt = `
         Analiza el estado actual de AssetGuard CMMS y genera un resumen ejecutivo profesional para Gerencia de Operaciones.
@@ -100,6 +116,9 @@ export class GeminiService {
 
   // --- BONUS 3: GENERADOR DE PROCEDIMIENTOS DE SEGURIDAD (LOTO) ---
   async generateLotoProcedure(asset: Asset, failureDescription: string): Promise<string> {
+    if (!this.isConfigured || !this.ai) {
+      return '<p class="text-amber-400">⚠️ Servicio de IA no disponible. Configure la API Key de Gemini.</p>';
+    }
     try {
       const prompt = `
         Actúa como Ingeniero de Seguridad Industrial certificado en LOTO (NOM-004-STPS-1999).
@@ -138,6 +157,10 @@ export class GeminiService {
 
   // --- PROMPT 2: INSPECCIÓN VISUAL MULTIMODAL ---
   async analyzeImageInspection(imageBase64: string): Promise<AIInspectionResponse | null> {
+    if (!this.isConfigured || !this.ai) {
+      console.warn('⚠️ Servicio de IA no disponible.');
+      return null;
+    }
     try {
       const prompt = `
         Analiza esta imagen capturada por un operador en planta industrial. Actúa como Inspector de Mantenimiento Certificado.
