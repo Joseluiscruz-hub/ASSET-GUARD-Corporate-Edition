@@ -1,6 +1,6 @@
 {
   "name": "asset-guard-cmms",
-  "version": "1.0.0",
+  "version": "2.1.0",
   "description": "AssetGuard CMMS - Zoneless Angular Application",
   "type": "module",
   "scripts": {
