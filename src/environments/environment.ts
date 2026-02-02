@@ -9,5 +9,5 @@ export const environment = {
     messagingSenderId: "572595334513",
     appId: "1:572595334513:web:d1d78bc8de1f2ceadc9ad0"
   },
-  geminiApiKey: ""
+  geminiApiKey: "AIzaSyDg8FHddzecQHxBFWr49q5l2ZooifvHNO8"
 };
