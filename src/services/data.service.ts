@@ -131,14 +131,7 @@ export class DataService {
   // --- Initialization ---
   private initFirebase() {
     try {
-      // Check if Firebase is already initialized
-      const apps = (window as any).firebase?.apps || [];
-      if (apps.length > 0) {
-        this.app = apps[0];
-      } else {
-        this.app = initializeApp(this.firebaseConfig);
-      }
-
+      this.app = initializeApp(this.firebaseConfig);
       this.db = getDatabase(this.app);
 
       // Monitor connection state
