@@ -67,6 +67,7 @@ import { AuthService } from '../../services/auth.service';
                   name="email"
                   placeholder="tu@email.com"
                   required
+                  autocomplete="email"
                   class="w-full pl-11 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all">
               </div>
             </div>
@@ -82,6 +83,7 @@ import { AuthService } from '../../services/auth.service';
                   placeholder="••••••••"
                   required
                   minlength="6"
+                  autocomplete="current-password"
                   class="w-full pl-11 pr-12 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all">
                 <button
                   type="button"
