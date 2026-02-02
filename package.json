@@ -4,10 +4,12 @@
   "description": "AssetGuard CMMS - Zoneless Angular Application",
   "type": "module",
   "scripts": {
-    "start": "vite",
-    "build": "vite build",
-    "watch": "vite build --watch",
-    "test": "vitest"
+    "start": "ng serve",
+    "dev": "ng serve",
+    "build": "ng build --base-href /ASSET-GUARD-Corporate-Edition/",
+    "watch": "ng build --watch",
+    "test": "ng test",
+    "deploy": "ng build --base-href /ASSET-GUARD-Corporate-Edition/ && npx angular-cli-ghpages --dir=dist"
   },
   "dependencies": {
     "@angular/animations": "^19.0.0",
