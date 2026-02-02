@@ -1,6 +1,6 @@
 import { Component, input, inject, signal, computed, effect } from '@angular/core';
 import { CommonModule, DatePipe, CurrencyPipe } from '@angular/common';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { DomSanitizer } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { DataService } from '../../services/data.service';
 import { GeminiService } from '../../services/gemini.service';
