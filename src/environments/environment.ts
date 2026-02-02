@@ -1,13 +1,13 @@
 export const environment = {
   production: false,
   firebase: {
-    apiKey: "AIzaSyBWFB68YUKo6BJ6sOcI9ToyINvZ8QhO8nI",
-    authDomain: "sample-firebase-ai-app-c84d2.firebaseapp.com",
-    databaseURL: "https://sample-firebase-ai-app-c84d2-default-rtdb.firebaseio.com",
-    projectId: "sample-firebase-ai-app-c84d2",
-    storageBucket: "sample-firebase-ai-app-c84d2.firebasestorage.app",
-    messagingSenderId: "572595334513",
-    appId: "1:572595334513:web:d1d78bc8de1f2ceadc9ad0"
+    apiKey: "AIzaSyCL28Xt-OJlBQQNXdWQ_QlmXz5eACAruO",
+    authDomain: "asset-guard-demo.firebaseapp.com",
+    databaseURL: "https://asset-guard-demo-default-rtdb.firebaseio.com",
+    projectId: "asset-guard-demo",
+    storageBucket: "asset-guard-demo.firebasestorage.app",
+    messagingSenderId: "730419123254",
+    appId: "1:730419123254:web:74de062f3e9e0851087497"
   },
-  geminiApiKey: "AIzaSyDg8FHddzecQHxBFWr49q5l2ZooifvHNO8"
+  geminiApiKey: "AIzaSyDg8fHddzerQHkBfWr49q51ZZoo1fvHMO8"
 };
