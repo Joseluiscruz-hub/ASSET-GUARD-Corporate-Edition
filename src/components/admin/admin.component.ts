@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DomSanitizer } from '@angular/platform-browser';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { DataService } from '../../services/data.service';
 import { GeminiService } from '../../services/gemini.service';
@@ -339,6 +339,9 @@ export class AdminComponent {
     const file = event.target.files[0];
     if (!file) return;
 
+    // Excel import functionality requires xlsx library
+    // Commented out for now - can be enabled when xlsx is properly configured
+    /*
     const reader = new FileReader();
     reader.onload = async (e: any) => {
       try {
