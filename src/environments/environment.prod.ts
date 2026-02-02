@@ -1,3 +1,6 @@
+// NOTE: These credentials are for a public demo Firebase project and are safe to commit.
+// For production use, consider using environment variables or build-time secrets.
+// See: https://angular.dev/guide/build#configure-environment-specific-defaults
 export const environment = {
   production: true,
   firebase: {
