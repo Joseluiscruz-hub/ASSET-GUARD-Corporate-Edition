@@ -17,7 +17,7 @@ export class GeminiService {
       this.ai = new GoogleGenAI({ apiKey: environment.geminiApiKey });
       this.isConfigured = true;
     } else {
-      console.warn('⚠️ Gemini API Key no configurada. Las funciones de IA no estarán disponibles.');
+      console.info('ℹ️ Modo Demo: Las funciones de IA están deshabilitadas. Para activarlas, configure la API Key de Gemini en environment.ts');
     }
   }
 

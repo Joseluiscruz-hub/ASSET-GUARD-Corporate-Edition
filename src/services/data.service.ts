@@ -171,7 +171,7 @@ export class DataService {
         this.seedDatabase();
       }
     }, (error) => {
-      console.warn("Using Offline Mode.", error);
+      console.info("📴 Modo Offline activado - Usando datos locales de demostración.");
       this.connectionStatus.set('offline');
     });
 
