@@ -9,7 +9,7 @@ import { hydrateRealAssets, REAL_FLEET_DATA } from '../data/real-fleet';
   providedIn: 'root'
 })
 export class DataService {
-  
+
   // --- FIREBASE CONFIGURATION ---
   private firebaseConfig = {
     apiKey: "AIzaSyBfdkTmTXNW7zP2Pbo_qktwevU12ff16Ng",
@@ -23,13 +23,13 @@ export class DataService {
 
   private app: any;
   private db: any;
-  
+
   // --- System State Signals ---
   readonly connectionStatus = signal<'online' | 'offline' | 'syncing'>('syncing');
   readonly lastUpdate = signal<Date>(new Date());
   readonly plantMode = signal<boolean>(false); // Dark/Light Theme
   readonly isKioskMode = signal<boolean>(false);
-  readonly activeSlide = signal<number>(0); 
+  readonly activeSlide = signal<number>(0);
   private kioskInterval: any;
 
   // --- Master Catalogs ---
@@ -53,7 +53,7 @@ export class DataService {
   readonly kpiData = computed<KPIData>(() => {
     const totalAssets = this.assetsSignal().length;
     const operativeAssets = this.assetsSignal().filter(a => a.status.name === 'Operativo').length;
-    
+
     const closedReports = this.reportsSignal().filter(r => r.exitDate);
     let totalRepairHours = 0;
     closedReports.forEach(r => {
@@ -82,7 +82,7 @@ export class DataService {
 
     const operativeUnits = allAssets.filter(m => m.status.name === 'Operativo').length;
     const percentage = (operativeUnits / allAssets.length) * 100;
-    
+
     return {
       percentage: Math.round(percentage),
       label: percentage >= 90 ? 'Excelente' : percentage >= 80 ? 'Regular' : 'Crítico',
@@ -117,7 +117,7 @@ export class DataService {
   constructor() {
     this.initFirebase();
     this.syncAssetsWithFailures(this.forkliftFailures());
-    
+
     effect(() => {
       if (this.isKioskMode()) this.startKioskRotation();
       else this.stopKioskRotation();
@@ -131,9 +131,16 @@ export class DataService {
   // --- Initialization ---
   private initFirebase() {
     try {
-      this.app = initializeApp(this.firebaseConfig);
+      // Check if Firebase is already initialized
+      const apps = (window as any).firebase?.apps || [];
+      if (apps.length > 0) {
+        this.app = apps[0];
+      } else {
+        this.app = initializeApp(this.firebaseConfig);
+      }
+
       this.db = getDatabase(this.app);
-      
+
       // Monitor connection state
       const connectedRef = ref(this.db, '.info/connected');
       onValue(connectedRef, (snap) => {
@@ -161,7 +168,7 @@ export class DataService {
     onValue(failuresRef, (snapshot) => {
       const data = snapshot.val();
       this.lastUpdate.set(new Date());
-      
+
       if (data) {
         const list = Object.values(data) as ForkliftFailureEntry[];
         list.sort((a, b) => new Date(b.fechaIngreso).getTime() - new Date(a.fechaIngreso).getTime());
@@ -224,7 +231,7 @@ export class DataService {
   }
 
   getAssetHistory(assetId: string): FailureReport[] {
-    return this.reportsSignal().filter(r => r.assetId === assetId).sort((a, b) => 
+    return this.reportsSignal().filter(r => r.assetId === assetId).sort((a, b) =>
       new Date(b.entryDate).getTime() - new Date(a.entryDate).getTime()
     );
   }
@@ -262,7 +269,7 @@ export class DataService {
     };
 
     this.forkliftFailures.update(list => list.map(f => f.id === failureId ? updatedFailure : f));
-    
+
     if (this.connectionStatus() !== 'offline') {
       update(ref(this.db, 'failures/' + failureId), updatedFailure).catch(console.error);
     }
@@ -270,7 +277,7 @@ export class DataService {
 
   updateToyotaLogistics(failureId: string, po: string, statusRef: ForkliftFailureEntry['estatusRefaccion'], promiseDate?: string) {
     const updates = { ordenCompra: po, estatusRefaccion: statusRef, fechaPromesa: promiseDate, estatus: 'En Proceso' };
-    
+
     this.forkliftFailures.update(list => list.map(f => {
        if (f.id === failureId) return { ...f, ...updates, estatus: 'En Proceso' };
        return f;
@@ -284,9 +291,9 @@ export class DataService {
   closeLiveFailure(id: string) {
     const failure = this.forkliftFailures().find(f => f.id === id);
     if (!failure) return;
-    
+
     const updatedFailure = { ...failure, estatus: 'Cerrada' as const, fechaSalida: new Date().toISOString() };
-    
+
     this.forkliftFailures.update(list => list.map(f => f.id === id ? updatedFailure : f));
     this.syncAssetsWithFailures(this.forkliftFailures());
 
@@ -321,26 +328,26 @@ export class DataService {
     const activeFailures = failures.filter(f => f.estatus !== 'Cerrada');
     const activeIds = new Set(activeFailures.map(f => f.economico));
     const activeFailureMap = new Map(activeFailures.map(f => [f.economico, f]));
-    
+
     const tallerStatus = this.statuses.find(s => s.name === 'Taller')!;
     const opStatus = this.statuses.find(s => s.name === 'Operativo')!;
 
     this.assetsSignal.update(assets => assets.map(a => {
       if (activeIds.has(a.id)) {
         if (a.status.name !== 'Taller') {
-          return { 
-            ...a, 
-            status: tallerStatus, 
-            statusSince: activeFailureMap.get(a.id)?.fechaIngreso || new Date().toISOString(), 
-            lastFailure: activeFailureMap.get(a.id)?.falla 
+          return {
+            ...a,
+            status: tallerStatus,
+            statusSince: activeFailureMap.get(a.id)?.fechaIngreso || new Date().toISOString(),
+            lastFailure: activeFailureMap.get(a.id)?.falla
           };
         }
       } else if (a.status.name === 'Taller' && !activeIds.has(a.id)) {
-        return { 
-          ...a, 
-          status: opStatus, 
-          statusSince: new Date().toISOString(), 
-          lastFailure: undefined 
+        return {
+          ...a,
+          status: opStatus,
+          statusSince: new Date().toISOString(),
+          lastFailure: undefined
         };
       }
       return a;
@@ -358,7 +365,7 @@ export class DataService {
 
   private generateMockMaintenance(index: number): MaintenanceTask[] {
     const tasks: MaintenanceTask[] = [];
-    const daysFromNow = Math.floor(Math.random() * 45) - 5; 
+    const daysFromNow = Math.floor(Math.random() * 45) - 5;
     const date = new Date();
     date.setDate(date.getDate() + daysFromNow);
     const taskType = ['Cambio de Aceite', 'Revisión de Frenos', 'Ajuste de Cadenas', 'Servicio General', 'Inspección de Batería'][index % 5];
