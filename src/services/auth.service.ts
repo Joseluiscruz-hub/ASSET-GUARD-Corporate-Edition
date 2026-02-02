@@ -100,6 +100,18 @@ export class AuthService {
     }
   }
 
+  // Modo demo sin Firebase Authentication
+  loginAsDemo(): void {
+    this.error.set(null);
+    this.currentUser.set({
+      uid: 'demo-user-001',
+      email: 'demo@assetguard.com',
+      displayName: 'Usuario Demo',
+      photoURL: null
+    });
+    this.isLoading.set(false);
+  }
+
   private handleAuthError(err: any): void {
     const errorCode = err.code;
     let message = 'Error desconocido. Intenta de nuevo.';
