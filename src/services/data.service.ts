@@ -12,13 +12,13 @@ export class DataService {
   
   // --- FIREBASE CONFIGURATION ---
   private firebaseConfig = {
-    apiKey: "AIzaSyBfdkTmTXNW7zP2Pbo_qktwevU12ff16Ng",
-    authDomain: "sample-firebase-ai-app-c84d2.firebaseapp.com",
-    databaseURL: "https://sample-firebase-ai-app-c84d2-default-rtdb.firebaseio.com",
-    projectId: "sample-firebase-ai-app-c84d2",
-    storageBucket: "sample-firebase-ai-app-c84d2.firebasestorage.app",
-    messagingSenderId: "572595334513",
-    appId: "1:572595334513:web:725d1fb5fbe9ed48dc9ad0"
+    apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "",
+    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "",
+    databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL || "",
+    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "",
+    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "",
+    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "",
+    appId: import.meta.env.VITE_FIREBASE_APP_ID || ""
   };
 
   private app: any;
@@ -131,6 +131,16 @@ export class DataService {
   // --- Initialization ---
   private initFirebase() {
     try {
+      // Validate Firebase configuration
+      const requiredEnvVars = ['VITE_FIREBASE_API_KEY', 'VITE_FIREBASE_DATABASE_URL', 'VITE_FIREBASE_PROJECT_ID'];
+      const missingVars = requiredEnvVars.filter(varName => !import.meta.env[varName]);
+      
+      if (missingVars.length > 0) {
+        console.warn(`Firebase configuration incomplete. Missing: ${missingVars.join(', ')}. Running in offline mode.`);
+        this.connectionStatus.set('offline');
+        return;
+      }
+
       this.app = initializeApp(this.firebaseConfig);
       this.db = getDatabase(this.app);
       
