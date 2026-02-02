@@ -6,7 +6,8 @@ import {
   createUserWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
-  updateProfile
+  updateProfile,
+  signInAnonymously
 } from 'firebase/auth';
 import { environment } from '../environments/environment';
 
@@ -100,16 +101,33 @@ export class AuthService {
     }
   }
 
-  // Modo demo sin Firebase Authentication
-  loginAsDemo(): void {
+  // Modo demo con autenticación anónima de Firebase
+  async loginAsDemo(): Promise<boolean> {
     this.error.set(null);
-    this.currentUser.set({
-      uid: 'demo-user-001',
-      email: 'demo@assetguard.com',
-      displayName: 'Usuario Demo',
-      photoURL: null
-    });
-    this.isLoading.set(false);
+    this.isLoading.set(true);
+
+    try {
+      const result = await signInAnonymously(this.auth);
+      this.currentUser.set({
+        uid: result.user.uid,
+        email: 'demo@assetguard.com',
+        displayName: 'Usuario Demo',
+        photoURL: null
+      });
+      this.isLoading.set(false);
+      return true;
+    } catch (err: any) {
+      console.error('Error en acceso demo:', err);
+      // Fallback: usuario local si Firebase falla
+      this.currentUser.set({
+        uid: 'demo-user-local',
+        email: 'demo@assetguard.com',
+        displayName: 'Usuario Demo (Offline)',
+        photoURL: null
+      });
+      this.isLoading.set(false);
+      return true;
+    }
   }
 
   private handleAuthError(err: any): void {

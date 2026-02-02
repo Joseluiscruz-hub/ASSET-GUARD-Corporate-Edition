@@ -156,7 +156,9 @@ export class LoginComponent {
     this.isSubmitting.set(false);
   }
 
-  loginDemo() {
-    this.authService.loginAsDemo();
+  async loginDemo() {
+    this.isSubmitting.set(true);
+    await this.authService.loginAsDemo();
+    this.isSubmitting.set(false);
   }
 }
