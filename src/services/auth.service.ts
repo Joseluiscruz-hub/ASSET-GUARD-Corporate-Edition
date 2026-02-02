@@ -1,4 +1,4 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, inject, NgZone } from '@angular/core';
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import {
   getAuth,
@@ -21,7 +21,7 @@ export interface AuthUser {
   providedIn: 'root'
 })
 export class AuthService {
-
+  private ngZone = inject(NgZone);
   private app = getApps().length > 0 ? getApp() : initializeApp(environment.firebase);
   private auth = getAuth(this.app);
 
@@ -33,17 +33,19 @@ export class AuthService {
 
   constructor() {
     onAuthStateChanged(this.auth, (user) => {
-      if (user) {
-        this.currentUser.set({
-          uid: user.uid,
-          email: user.email,
-          displayName: user.displayName,
-          photoURL: user.photoURL
-        });
-      } else {
-        this.currentUser.set(null);
-      }
-      this.isLoading.set(false);
+      this.ngZone.run(() => {
+        if (user) {
+          this.currentUser.set({
+            uid: user.uid,
+            email: user.email,
+            displayName: user.displayName,
+            photoURL: user.photoURL
+          });
+        } else {
+          this.currentUser.set(null);
+        }
+        this.isLoading.set(false);
+      });
     });
   }
 
@@ -53,17 +55,21 @@ export class AuthService {
 
     try {
       const result = await signInWithEmailAndPassword(this.auth, email, password);
-      this.currentUser.set({
-        uid: result.user.uid,
-        email: result.user.email,
-        displayName: result.user.displayName,
-        photoURL: result.user.photoURL
+      this.ngZone.run(() => {
+        this.currentUser.set({
+          uid: result.user.uid,
+          email: result.user.email,
+          displayName: result.user.displayName,
+          photoURL: result.user.photoURL
+        });
+        this.isLoading.set(false);
       });
-      this.isLoading.set(false);
       return true;
     } catch (err: any) {
-      this.handleAuthError(err);
-      this.isLoading.set(false);
+      this.ngZone.run(() => {
+        this.handleAuthError(err);
+        this.isLoading.set(false);
+      });
       return false;
     }
   }
@@ -76,17 +82,21 @@ export class AuthService {
       const result = await createUserWithEmailAndPassword(this.auth, email, password);
       await updateProfile(result.user, { displayName });
 
-      this.currentUser.set({
-        uid: result.user.uid,
-        email: result.user.email,
-        displayName: displayName,
-        photoURL: result.user.photoURL
+      this.ngZone.run(() => {
+        this.currentUser.set({
+          uid: result.user.uid,
+          email: result.user.email,
+          displayName: displayName,
+          photoURL: result.user.photoURL
+        });
+        this.isLoading.set(false);
       });
-      this.isLoading.set(false);
       return true;
     } catch (err: any) {
-      this.handleAuthError(err);
-      this.isLoading.set(false);
+      this.ngZone.run(() => {
+        this.handleAuthError(err);
+        this.isLoading.set(false);
+      });
       return false;
     }
   }
@@ -94,7 +104,9 @@ export class AuthService {
   async logout(): Promise<void> {
     try {
       await signOut(this.auth);
-      this.currentUser.set(null);
+      this.ngZone.run(() => {
+        this.currentUser.set(null);
+      });
     } catch (err: any) {
       console.error('Error al cerrar sesión:', err);
     }
