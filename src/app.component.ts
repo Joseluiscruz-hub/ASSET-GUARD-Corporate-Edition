@@ -1,6 +1,6 @@
 import { Component, signal, effect, inject, computed } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
-import { DomSanitizer, SafeHtml, SecurityContext } from '@angular/platform-browser';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { DataService } from './services/data.service';
 import { GeminiService } from './services/gemini.service';
 import { AuthService } from './services/auth.service';
@@ -38,6 +38,7 @@ export class AppComponent {
   dataService = inject(DataService);
   geminiService = inject(GeminiService);
   authService = inject(AuthService);
+  sanitizer = inject(DomSanitizer);
 
   // Auth State
   isAuthenticated = this.authService.isAuthenticated;
@@ -109,7 +110,7 @@ export class AppComponent {
     const active = this.failures().filter(f => f.estatus !== 'Cerrada');
 
     const summary = await this.geminiService.generateExecutiveReport(kpi, active, availability);
-    this.aiInsights.set(this.sanitizer.sanitize(SecurityContext.HTML, summary));
+    this.aiInsights.set(this.sanitizer.bypassSecurityTrustHtml(summary));
     this.aiLoading.set(false);
   }
 

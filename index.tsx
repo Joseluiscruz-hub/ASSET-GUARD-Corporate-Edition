@@ -1,13 +1,13 @@
 
 import '@angular/compiler';
 import { bootstrapApplication } from '@angular/platform-browser';
-import { provideZonelessChangeDetection } from '@angular/core';
+import { provideZoneChangeDetection } from '@angular/core';
 import { AppComponent } from './src/app.component';
 import './src/index.css';
 
 bootstrapApplication(AppComponent, {
   providers: [
-    provideZonelessChangeDetection()
+    provideZoneChangeDetection()
   ]
 }).catch(err => console.error(err));
 
