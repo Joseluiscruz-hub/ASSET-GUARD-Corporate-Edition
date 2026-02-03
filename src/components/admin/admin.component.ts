@@ -369,6 +369,7 @@ export class AdminComponent {
       }
     };
     reader.readAsArrayBuffer(file);
+    */
   }
 
   async exportData() {

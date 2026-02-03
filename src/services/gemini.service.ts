@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { FailureReport, Asset, KPIData, AIInspectionResponse } from '../types';
 import { environment } from '../environments/environment';
 
@@ -7,17 +7,17 @@ import { environment } from '../environments/environment';
   providedIn: 'root'
 })
 export class GeminiService {
-  private ai: GoogleGenAI;
+  private ai: GoogleGenerativeAI;
 
   constructor() {
     const apiKey = environment.geminiApiKey;
     if (apiKey && apiKey !== '') {
-      this.ai = new GoogleGenAI({ apiKey: apiKey });
+      this.ai = new GoogleGenerativeAI(apiKey);
     } else {
       console.info(
         'ℹ️ Modo Demo: Las funciones de IA están deshabilitadas. Para activarlas, configure la API Key de Gemini en environment.ts'
       );
-      this.ai = new GoogleGenAI({ apiKey: '' });
+      this.ai = new GoogleGenerativeAI('');
     }
   }
 
@@ -57,12 +57,11 @@ export class GeminiService {
         </div>
       `;
 
-      const response = await this.ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: prompt
-      });
+      const model = this.ai.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
 
-      return response.text || '<p>Datos insuficientes para predicción.</p>';
+      return response.text() || '<p>Datos insuficientes para predicción.</p>';
     } catch (error) {
       console.error('Gemini Error:', error);
       return '<p class="text-red-500">Error conectando con el servicio de IA.</p>';
@@ -108,12 +107,11 @@ export class GeminiService {
         TONO: Profesional, directo, español mexicano empresarial. Sin saludos.
       `;
 
-      const response = await this.ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: prompt
-      });
+      const model = this.ai.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
 
-      return response.text || 'No se pudo generar el reporte ejecutivo.';
+      return response.text() || 'No se pudo generar el reporte ejecutivo.';
     } catch (error) {
       console.error('Gemini Error:', error);
       return 'Error conectando con IA para el reporte.';
@@ -150,12 +148,11 @@ export class GeminiService {
         Resalta ADVERTENCIAS DE SEGURIDAD en negritas.
       `;
 
-      const response = await this.ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: prompt
-      });
+      const model = this.ai.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
 
-      return response.text || 'Error generando LOTO.';
+      return response.text() || 'Error generando LOTO.';
     } catch (error) {
       return '<p>No disponible.</p>';
     }
@@ -197,24 +194,26 @@ export class GeminiService {
         }
       `;
 
-      const response = await this.ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: [
-          {
-            inlineData: {
-              mimeType: 'image/jpeg',
-              data: imageBase64
-            }
-          },
-          { text: prompt }
-        ],
-        config: {
+      const model = this.ai.getGenerativeModel({ 
+        model: 'gemini-2.0-flash-exp',
+        generationConfig: {
           responseMimeType: 'application/json'
         }
       });
+      const result = await model.generateContent([
+        {
+          inlineData: {
+            mimeType: 'image/jpeg',
+            data: imageBase64
+          }
+        },
+        prompt
+      ]);
+      const response = await result.response;
 
-      if (response.text) {
-        return JSON.parse(response.text) as AIInspectionResponse;
+      const text = response.text();
+      if (text) {
+        return JSON.parse(text) as AIInspectionResponse;
       }
       return null;
     } catch (error) {
