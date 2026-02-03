@@ -4,7 +4,7 @@
 export const environment = {
   production: false,
   firebase: {
-    apiKey: "AIzaSyCL28Xt-OJlBQQNXdWQ_QlmXz5eACAruO",
+    apiKey: "AIzaSyCQkT-TQy-rtkr_bmTWJS78hghTh97x3eE",
     authDomain: "asset-guard-demo.firebaseapp.com",
     databaseURL: "https://asset-guard-demo-default-rtdb.firebaseio.com",
     projectId: "asset-guard-demo",
