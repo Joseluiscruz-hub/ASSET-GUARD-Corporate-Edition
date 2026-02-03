@@ -158,7 +158,7 @@ export class LoginComponent {
 
   async loginDemo() {
     this.isSubmitting.set(true);
-    await this.authService.login('demo@assetguard.com', 'demo123456');
+    await this.authService.loginAsDemo();
     this.isSubmitting.set(false);
   }
 }

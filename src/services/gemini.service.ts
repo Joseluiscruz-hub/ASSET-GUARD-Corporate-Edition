@@ -1,6 +1,5 @@
-
 import { Injectable } from '@angular/core';
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { FailureReport, Asset, KPIData, AIInspectionResponse } from '../types';
 import { environment } from '../environments/environment';
 
@@ -8,23 +7,24 @@ import { environment } from '../environments/environment';
   providedIn: 'root'
 })
 export class GeminiService {
-
-  private ai: GoogleGenAI | null = null;
-  private isConfigured = false;
+  private ai: GoogleGenerativeAI;
 
   constructor() {
-    if (environment.geminiApiKey && environment.geminiApiKey !== '') {
-      this.ai = new GoogleGenAI({ apiKey: environment.geminiApiKey });
-      this.isConfigured = true;
+    const apiKey = environment.geminiApiKey;
+    if (apiKey && apiKey !== '') {
+      this.ai = new GoogleGenerativeAI(apiKey);
     } else {
-      console.warn('⚠️ Gemini API Key no configurada. Las funciones de IA no estarán disponibles.');
+      console.info(
+        'ℹ️ Modo Demo: Las funciones de IA están deshabilitadas. Para activarlas, configure la API Key de Gemini en environment.ts'
+      );
+      this.ai = new GoogleGenerativeAI('');
     }
   }
 
   // --- BONUS 1: PREDICCIÓN DE FALLAS (MANTENIMIENTO PREDICTIVO) ---
   async analyzeMaintenanceHistory(asset: Asset, history: FailureReport[]): Promise<string> {
-    if (!this.isConfigured || !this.ai) {
-      return '<p class="text-amber-400">⚠️ Servicio de IA no disponible. Configure la API Key de Gemini.</p>';
+    if (!environment.geminiApiKey) {
+      return '<p class="text-yellow-600">⚠️ API key no configurada. Por favor configura geminiApiKey en tu archivo environment.ts</p>';
     }
     try {
       const prompt = `
@@ -33,12 +33,14 @@ export class GeminiService {
         ENTRADA DE DATOS:
         Activo: ${asset.brand} ${asset.model} (ID: ${asset.id})
         Historial de Fallas:
-        ${JSON.stringify(history.map(h => ({
-          fecha: h.entryDate,
-          tipo: h.type,
-          componente: h.failureDescription,
-          severidad: h.estimatedCost > 2000 ? 'Alta' : 'Media'
-        })))}
+        ${JSON.stringify(
+          history.map(h => ({
+            fecha: h.entryDate,
+            tipo: h.type,
+            componente: h.failureDescription,
+            severidad: h.estimatedCost > 2000 ? 'Alta' : 'Media'
+          }))
+        )}
 
         ANÁLISIS REQUERIDO:
         1. 🔮 DETECCIÓN DE PATRONES: Identifica fallas recurrentes y calcula MTBF aproximado.
@@ -55,12 +57,11 @@ export class GeminiService {
         </div>
       `;
 
-      const response = await this.ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: prompt,
-      });
+      const model = this.ai.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
 
-      return response.text || '<p>Datos insuficientes para predicción.</p>';
+      return response.text() || '<p>Datos insuficientes para predicción.</p>';
     } catch (error) {
       console.error('Gemini Error:', error);
       return '<p class="text-red-500">Error conectando con el servicio de IA.</p>';
@@ -68,9 +69,13 @@ export class GeminiService {
   }
 
   // --- PROMPT 5: RESUMEN EJECUTIVO SEMANAL ---
-  async generateExecutiveReport(kpi: KPIData, activeFailures: any[], availability: any): Promise<string> {
-    if (!this.isConfigured || !this.ai) {
-      return '<p class="text-amber-400">⚠️ Servicio de IA no disponible. Configure la API Key de Gemini.</p>';
+  async generateExecutiveReport(
+    kpi: KPIData,
+    activeFailures: any[],
+    availability: any
+  ): Promise<string> {
+    if (!environment.geminiApiKey) {
+      return '<p class="text-yellow-600">⚠️ API key no configurada. Por favor configura VITE_API_KEY en tu archivo .env.local</p>';
     }
     try {
       const prompt = `
@@ -80,7 +85,7 @@ export class GeminiService {
         - Disponibilidad: ${availability.percentage}% (Meta: 95%)
         - MTTR Promedio: ${kpi.mttr} horas
         - Gasto Mes: $${kpi.totalCostMonth} USD
-        - Equipos Detenidos (Top 3): ${JSON.stringify(activeFailures.slice(0,3).map(f => `${f.economico} (${f.falla})`))}
+        - Equipos Detenidos (Top 3): ${JSON.stringify(activeFailures.slice(0, 3).map(f => `${f.economico} (${f.falla})`))}
 
         ESTRUCTURA DEL REPORTE (HTML simple para renderizar):
 
@@ -102,12 +107,11 @@ export class GeminiService {
         TONO: Profesional, directo, español mexicano empresarial. Sin saludos.
       `;
 
-      const response = await this.ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: prompt,
-      });
+      const model = this.ai.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
 
-      return response.text || 'No se pudo generar el reporte ejecutivo.';
+      return response.text() || 'No se pudo generar el reporte ejecutivo.';
     } catch (error) {
       console.error('Gemini Error:', error);
       return 'Error conectando con IA para el reporte.';
@@ -116,8 +120,8 @@ export class GeminiService {
 
   // --- BONUS 3: GENERADOR DE PROCEDIMIENTOS DE SEGURIDAD (LOTO) ---
   async generateLotoProcedure(asset: Asset, failureDescription: string): Promise<string> {
-    if (!this.isConfigured || !this.ai) {
-      return '<p class="text-amber-400">⚠️ Servicio de IA no disponible. Configure la API Key de Gemini.</p>';
+    if (!environment.geminiApiKey) {
+      return '<p class="text-yellow-600">⚠️ API key no configurada. Por favor configura VITE_API_KEY en tu archivo .env.local</p>';
     }
     try {
       const prompt = `
@@ -144,21 +148,20 @@ export class GeminiService {
         Resalta ADVERTENCIAS DE SEGURIDAD en negritas.
       `;
 
-      const response = await this.ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: prompt,
-      });
+      const model = this.ai.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
 
-      return response.text || 'Error generando LOTO.';
+      return response.text() || 'Error generando LOTO.';
     } catch (error) {
-       return '<p>No disponible.</p>';
+      return '<p>No disponible.</p>';
     }
   }
 
   // --- PROMPT 2: INSPECCIÓN VISUAL MULTIMODAL ---
   async analyzeImageInspection(imageBase64: string): Promise<AIInspectionResponse | null> {
-    if (!this.isConfigured || !this.ai) {
-      console.warn('⚠️ Servicio de IA no disponible.');
+    if (!environment.geminiApiKey) {
+      console.warn('VITE_API_KEY not configured. Image analysis unavailable.');
       return null;
     }
     try {
@@ -191,24 +194,26 @@ export class GeminiService {
         }
       `;
 
-      const response = await this.ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: [
-          {
-            inlineData: {
-              mimeType: 'image/jpeg',
-              data: imageBase64
-            }
-          },
-          { text: prompt }
-        ],
-        config: {
+      const model = this.ai.getGenerativeModel({ 
+        model: 'gemini-2.0-flash-exp',
+        generationConfig: {
           responseMimeType: 'application/json'
         }
       });
+      const result = await model.generateContent([
+        {
+          inlineData: {
+            mimeType: 'image/jpeg',
+            data: imageBase64
+          }
+        },
+        prompt
+      ]);
+      const response = await result.response;
 
-      if (response.text) {
-        return JSON.parse(response.text) as AIInspectionResponse;
+      const text = response.text();
+      if (text) {
+        return JSON.parse(text) as AIInspectionResponse;
       }
       return null;
     } catch (error) {
@@ -218,7 +223,11 @@ export class GeminiService {
   }
 
   // --- Helper for Daily Summary (Legacy) ---
-  async generateDailySummary(fleetData: any, activeFailures: any[], history: any[]): Promise<string> {
+  async generateDailySummary(
+    fleetData: any,
+    activeFailures: any[],
+    history: any[]
+  ): Promise<string> {
     return this.generateExecutiveReport(
       { availability: fleetData.percentage, mttr: 4.5, totalCostMonth: 12500, budgetMonth: 15000 },
       activeFailures,

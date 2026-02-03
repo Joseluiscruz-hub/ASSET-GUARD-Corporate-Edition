@@ -1,6 +1,6 @@
 import { Component, signal, effect, inject, computed } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
-import { DomSanitizer, SafeHtml, SecurityContext } from '@angular/platform-browser';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { DataService } from './services/data.service';
 import { GeminiService } from './services/gemini.service';
 import { AuthService } from './services/auth.service';
@@ -19,7 +19,6 @@ type View = 'dashboard' | 'assets' | 'service' | 'solicitor' | 'settings';
   standalone: true,
   imports: [
     CommonModule,
-    DatePipe,
     DashboardComponent,
     AssetListComponent,
     AssetDetailComponent,
@@ -29,15 +28,29 @@ type View = 'dashboard' | 'assets' | 'service' | 'solicitor' | 'settings';
     LoginComponent
   ],
   templateUrl: './app.component.html',
-  styles: [`
-    .fade-enter { animation: fadeIn 0.3s ease-out forwards; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-  `]
+  styles: [
+    `
+      .fade-enter {
+        animation: fadeIn 0.3s ease-out forwards;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(5px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    `
+  ]
 })
 export class AppComponent {
   dataService = inject(DataService);
   geminiService = inject(GeminiService);
   authService = inject(AuthService);
+  sanitizer = inject(DomSanitizer);
 
   // Auth State
   isAuthenticated = this.authService.isAuthenticated;
@@ -63,9 +76,9 @@ export class AppComponent {
 
   // Derived
   syncText = computed(() => {
-     if (this.connectionStatus() === 'online') return 'Conectado (Firebase RTDB)';
-     if (this.connectionStatus() === 'syncing') return 'Sincronizando...';
-     return 'Modo Offline (Solo Lectura)';
+    if (this.connectionStatus() === 'online') return 'Conectado (Firebase RTDB)';
+    if (this.connectionStatus() === 'syncing') return 'Sincronizando...';
+    return 'Modo Offline (Solo Lectura)';
   });
 
   constructor() {
@@ -75,7 +88,7 @@ export class AppComponent {
       if (list.length > this.previousFailureCount) {
         const latest = list[0];
         if (latest.estatus === 'Abierta' && this.previousFailureCount > 0) {
-           this.playAlert(latest.prioridad === 'Alta');
+          this.playAlert(latest.prioridad === 'Alta');
         }
       }
       this.previousFailureCount = list.length;
@@ -109,14 +122,16 @@ export class AppComponent {
     const active = this.failures().filter(f => f.estatus !== 'Cerrada');
 
     const summary = await this.geminiService.generateExecutiveReport(kpi, active, availability);
-    this.aiInsights.set(this.sanitizer.sanitize(SecurityContext.HTML, summary));
+    this.aiInsights.set(this.sanitizer.bypassSecurityTrustHtml(summary));
     this.aiLoading.set(false);
   }
 
   playAlert(critical: boolean) {
-    const audio = new Audio(critical
-      ? 'https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3'
-      : 'https://assets.mixkit.co/active_storage/sfx/2345/2345-preview.mp3');
+    const audio = new Audio(
+      critical
+        ? 'https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3'
+        : 'https://assets.mixkit.co/active_storage/sfx/2345/2345-preview.mp3'
+    );
     audio.play().catch(() => {});
   }
 
@@ -125,13 +140,19 @@ export class AppComponent {
   }
 
   get viewTitle(): string {
-    switch(this.currentView()) {
-      case 'dashboard': return 'Centro de Monitoreo (NOC)';
-      case 'assets': return 'Inventario de Flota';
-      case 'service': return 'Gestión Técnica Toyota';
-      case 'solicitor': return 'App Operador';
-      case 'settings': return 'Configuración';
-      default: return 'AssetGuard';
+    switch (this.currentView()) {
+      case 'dashboard':
+        return 'Centro de Monitoreo (NOC)';
+      case 'assets':
+        return 'Inventario de Flota';
+      case 'service':
+        return 'Gestión Técnica Toyota';
+      case 'solicitor':
+        return 'App Operador';
+      case 'settings':
+        return 'Configuración';
+      default:
+        return 'AssetGuard';
     }
   }
 }

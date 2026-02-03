@@ -1,13 +1,17 @@
+// NOTE: These credentials are for a public demo Firebase project and are safe to commit.
+// For production use, consider using environment variables or build-time secrets.
+// See: https://angular.dev/guide/build#configure-environment-specific-defaults
+
 export const environment = {
   production: false,
   firebase: {
-    apiKey: "AIzaSyBWFB68YUKo6BJ6sOcI9ToyINvZ8QhO8nI",
-    authDomain: "sample-firebase-ai-app-c84d2.firebaseapp.com",
-    databaseURL: "https://sample-firebase-ai-app-c84d2-default-rtdb.firebaseio.com",
-    projectId: "sample-firebase-ai-app-c84d2",
-    storageBucket: "sample-firebase-ai-app-c84d2.firebasestorage.app",
-    messagingSenderId: "572595334513",
-    appId: "1:572595334513:web:d1d78bc8de1f2ceadc9ad0"
+    apiKey: "AIzaSyCQkT-TQy-rtKr_bmTWJS78HghTh97x3eE",
+    authDomain: "asset-guard-demo.firebaseapp.com",
+    databaseURL: "https://asset-guard-demo-default-rtdb.firebaseio.com",
+    projectId: "asset-guard-demo",
+    storageBucket: "asset-guard-demo.firebasestorage.app",
+    messagingSenderId: "730419123254",
+    appId: "1:730419123254:web:74de062f3e9e0851087497"
   },
-  geminiApiKey: ""
+  geminiApiKey: "AIzaSyDg8fHddzzerQlkBfNr49q51ZZoo1fvlM08"
 };

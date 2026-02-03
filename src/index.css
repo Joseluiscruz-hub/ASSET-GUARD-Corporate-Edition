@@ -1,41 +1,44 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* Global Styles */
-body {
-  font-family: 'Inter', sans-serif;
-  background-color: #f3f4f6;
+/* Custom scrollbar styles for the application */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
 }
 
-/* Custom scrollbar for table containers and panels */
-.custom-scroll::-webkit-scrollbar {
-  height: 8px;
-  width: 8px;
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 5px;
 }
 
-.custom-scroll::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-
-.custom-scroll::-webkit-scrollbar-thumb {
+::-webkit-scrollbar-thumb {
   background: #cbd5e1;
-  border-radius: 4px;
+  border-radius: 5px;
+  border: 2px solid #f1f5f9;
 }
 
-.custom-scroll::-webkit-scrollbar-thumb:hover {
+::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
 
-/* Dark mode adjustments for scrollbar */
-.dark .custom-scroll::-webkit-scrollbar-track {
+/* Dark mode scrollbar */
+.dark ::-webkit-scrollbar-track {
   background: #1e293b;
 }
 
-.dark .custom-scroll::-webkit-scrollbar-thumb {
+.dark ::-webkit-scrollbar-thumb {
   background: #475569;
+  border-color: #1e293b;
 }
 
-.dark .custom-scroll::-webkit-scrollbar-thumb:hover {
+.dark ::-webkit-scrollbar-thumb:hover {
   background: #64748b;
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+.dark * {
+  scrollbar-color: #475569 #1e293b;
 }
