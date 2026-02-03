@@ -6,10 +6,10 @@
   "scripts": {
     "start": "ng serve",
     "dev": "ng serve",
-    "build": "ng build --base-href /ASSET-GUARD-Corporate-Edition/",
+    "build": "ng build --output-path=dist --base-href /ASSET-GUARD-Corporate-Edition/",
     "watch": "ng build --watch",
     "test": "ng test",
-    "deploy": "ng build --base-href /ASSET-GUARD-Corporate-Edition/ && npx angular-cli-ghpages --dir=dist"
+    "deploy": "ng build --output-path=dist --base-href /ASSET-GUARD-Corporate-Edition/ && npx angular-cli-ghpages --dir=dist"
   },
   "dependencies": {
     "@angular/animations": "^19.0.0",
