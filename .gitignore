@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+.angular/
+dist/
+node_modules/
+npm-debug.log
