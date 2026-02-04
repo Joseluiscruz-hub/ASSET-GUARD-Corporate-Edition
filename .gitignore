@@ -12,17 +12,16 @@ dist
 dist-ssr
 *.local
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+# Ignore Angular build/cache and node modules
 .angular/
 dist/
 node_modules/
+.env
 npm-debug.log
+.DS_Store
+coverage/
+
+# Editor/IDE files
+.vscode/
+.idea/
+*.iml
