@@ -27,6 +27,7 @@
     "@angular/platform-browser": "^19.0.0",
     "@angular/router": "^19.0.0",
     "@google/generative-ai": "^0.21.0",
+    "exceljs": "^4.4.0",
     "firebase": "^12.8.0",
     "jspdf": "^4.1.0",
     "jspdf-autotable": "^5.0.7",
@@ -39,9 +40,13 @@
     "rxjs": "~7.8.0",
 =======
     "rxjs": "^7.8.2",
+<<<<<<< HEAD
     "xlsx": "0.18.5",
 >>>>>>> b18b0150 (fix: lowercase base-href for GitHub Pages; pin xlsx@0.18.5; add deploy script)
+=======
+>>>>>>> 72b99d8f (chore(workspace): save progress — package.json fixes, deploy script, collect-console script, index.tsx placeholder)
     "tslib": "^2.3.0",
+    "xlsx": "0.18.5",
     "zone.js": "~0.15.0"
   },
   "devDependencies": {
@@ -55,6 +60,7 @@
     "@types/node": "^20.19.0",
 >>>>>>> 2fedf58f (chore: update deps to resolve peer conflicts (update @types/node, xlsx))
     "autoprefixer": "^10.4.19",
+    "playwright": "^1.58.1",
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.3",
 <<<<<<< HEAD
@@ -74,5 +80,4 @@
     ]
 >>>>>>> b18b0150 (fix: lowercase base-href for GitHub Pages; pin xlsx@0.18.5; add deploy script)
   }
-}
 }
