@@ -1,7 +1,7 @@
 import { chromium } from 'playwright';
 
 (async () => {
-  const url = 'https://joseluiscruz-hub.github.io/ASSET-GUARD-Corporate-Edition/';
+  const url = process.env.TEST_URL || 'https://joseluiscruz-hub.github.io/asset-guard-corporate-edition/';
   const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
 
