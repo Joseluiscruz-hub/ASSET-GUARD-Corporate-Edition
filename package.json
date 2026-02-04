@@ -33,7 +33,7 @@
     "jspdf-autotable": "^5.0.7",
     "rxjs": "^7.8.2",
     "tslib": "^2.3.0",
-    "xlsx": "0.18.5",
+    "xlsx": "0.18.7",
     "zone.js": "~0.15.0"
   },
   "devDependencies": {
@@ -52,7 +52,7 @@
     "husky": "^8.0.0"
   },
   "overrides": {
-    "xlsx": "0.18.5"
+    "xlsx": "0.18.7"
   },
   "lint-staged": {
     "src/**/*.{ts}": [
