@@ -15,7 +15,7 @@
     "lint:fix": "eslint src --ext .ts --fix",
     "format": "prettier --write \"src/**/*.{ts,html,css,scss,json}\"",
     "format:check": "prettier --check \"src/**/*.{ts,html,css,scss,json}\"",
-    "prepare": "husky",
+    "prepare": "husky install",
     "deploy": "ng build --output-path=dist --base-href /asset-guard-corporate-edition/ && npx angular-cli-ghpages --dir=dist"
   },
   "dependencies": {
@@ -46,6 +46,7 @@
     "@types/node": "^20.19.0",
     "autoprefixer": "^10.4.24",
     "playwright": "^1.58.1",
+    "husky": "^8.0.0",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.3",
     "typescript": "~5.5.0",
