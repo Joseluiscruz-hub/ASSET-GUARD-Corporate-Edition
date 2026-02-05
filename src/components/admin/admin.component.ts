@@ -4,7 +4,6 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { DataService } from '../../services/data.service';
 import { GeminiService } from '../../services/gemini.service';
-import ExcelJS from 'exceljs';
 
 @Component({
   selector: 'app-admin',
@@ -393,8 +392,10 @@ export class AdminComponent {
       Desde: a.statusSince
     }));
 
-    // Create workbook with ExcelJS
-    const workbook = new ExcelJS.Workbook();
+    // Create workbook with ExcelJS (dynamic import to avoid bundling CommonJS at startup)
+    const excelMod = await import('exceljs');
+    const ExcelJSLib: any = excelMod && (excelMod.default ?? excelMod);
+    const workbook = new ExcelJSLib.Workbook();
 
     // Assets sheet
     const wsAssets = workbook.addWorksheet('Inventario');
