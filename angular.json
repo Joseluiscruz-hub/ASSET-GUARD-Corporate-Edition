@@ -19,7 +19,16 @@
             "index": "src/index.html",
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.json",
-            "styles": ["src/index.css"]
+            "styles": ["src/index.css"],
+            "allowedCommonJsDependencies": [
+              "canvg",
+              "exceljs",
+              "jspdf",
+              "html2canvas",
+              "rgbcolor",
+              "raf",
+              "core-js"
+            ]
           },
           "configurations": {
             "production": {
