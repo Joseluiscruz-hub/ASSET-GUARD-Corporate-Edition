@@ -96,8 +96,19 @@ View your app in AI Studio: https://ai.studio/apps/drive/1xmkKI_zwsDwh9od6bCatws
    - Abrir issues para bugs o propuestas de mejora.
    - Crear pull requests con cambios pequeños y tests cuando corresponda.
 
-   ## Contacto
+## Smoke tests (Playwright) 🔬
 
+He añadido un test de humo con Playwright en `tests/smoke.spec.ts` y configuración en `playwright.config.ts`.
+
+- Ejecutar localmente (instala dependencias y deps de navegador si es necesario):
+
+```bash
+npm install
+npx playwright install --with-deps
+npm run test:smoke
+```
+
+Esto abre una comprobación rápida que carga la página principal y toma una captura `tmp/smoke.png` para revisión.
    Si necesitas ayuda o quieres colaborar, abre un issue en este repositorio.
 
    ***
