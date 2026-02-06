@@ -337,38 +337,41 @@ export class AdminComponent {
   async handleFileInput(event: any) {
     const file = event.target.files[0];
     if (!file) return;
+    // Excel import using ExcelJS (dynamic import to avoid bundling CommonJS at startup)
+    try {
+      const reader = new FileReader();
+      reader.onload = async (e: any) => {
+        try {
+          const excelMod = await import('exceljs');
+          const ExcelJSLib: any = excelMod && (excelMod.default ?? excelMod);
+          const workbook = new ExcelJSLib.Workbook();
+          await workbook.xlsx.load(e.target.result);
+          const worksheet = workbook.worksheets[0];
+          const data: any[] = [];
 
-    // Excel import functionality requires xlsx library
-    // Commented out for now - can be enabled when xlsx is properly configured
-    /*
-    const reader = new FileReader();
-    reader.onload = async (e: any) => {
-      try {
-        const workbook = new ExcelJS.Workbook();
-        await workbook.xlsx.load(e.target.result);
-        const worksheet = workbook.worksheets[0];
-        const data: any[] = [];
+          worksheet.eachRow((row: any, rowNumber: number) => {
+            if (rowNumber > 1) {
+              data.push({
+                Economico: row.getCell(1).value,
+                Marca: row.getCell(2).value,
+                Modelo: row.getCell(3).value,
+                Estatus: row.getCell(4).value
+              });
+            }
+          });
 
-        worksheet.eachRow((row, rowNumber) => {
-          if (rowNumber > 1) {
-            data.push({
-              Economico: row.getCell(1).value,
-              Marca: row.getCell(2).value,
-              Modelo: row.getCell(3).value,
-              Estatus: row.getCell(4).value
-            });
-          }
-        });
-
-        this.dataService.updateAssetsFromExcel(data);
-        alert(`Se procesaron ${data.length} registros exitosamente.`);
-      } catch (error) {
-        alert('Error al procesar el archivo Excel.');
-        console.error(error);
-      }
-    };
-    reader.readAsArrayBuffer(file);
-    */
+          this.dataService.updateAssetsFromExcel(data);
+          alert(`Se procesaron ${data.length} registros exitosamente.`);
+        } catch (error) {
+          alert('Error al procesar el archivo Excel.');
+          console.error(error);
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    } catch (err) {
+      console.error('Import error', err);
+      alert('No se pudo iniciar la importación.');
+    }
   }
 
   async exportData() {
