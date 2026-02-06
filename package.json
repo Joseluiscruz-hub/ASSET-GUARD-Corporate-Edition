@@ -18,8 +18,8 @@
     "prepare": "husky",
     "deploy": "ng build --output-path=dist --base-href /asset-guard-corporate-edition/ && npx angular-cli-ghpages --dir=dist",
     "test:smoke": "playwright test smoke --project=chromium",
-    "check:lock": "npm install --package-lock-only --silent && git --no-pager diff --exit-code package-lock.json || (echo 'package-lock.json out of sync; run npm install and commit the lock' && exit 1)"
-  ,
+    "check:lock": "npm install --package-lock-only --silent && git diff --quiet package-lock.json || (echo 'error: package-lock.json is out of sync. Run \"npm install\" and commit changes.' >&2 && exit 1)"
+  },
   "dependencies": {
     "@angular/animations": "^19.0.0",
     "@angular/common": "^19.0.0",
