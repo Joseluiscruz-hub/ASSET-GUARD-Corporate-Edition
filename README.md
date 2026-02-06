@@ -109,8 +109,8 @@ npm run test:smoke
 ```
 
 Esto abre una comprobación rápida que carga la página principal y toma una captura `tmp/smoke.png` para revisión.
-   Si necesitas ayuda o quieres colaborar, abre un issue en este repositorio.
+Si necesitas ayuda o quieres colaborar, abre un issue en este repositorio.
 
-   ***
+---
 
-   Si quieres, lo traduzco al inglés o añado instrucciones de despliegue específicas (Firebase, Vercel, Netlify).
+Si quieres, lo traduzco al inglés o añado instrucciones de despliegue específicas (Firebase, Vercel, Netlify).
