@@ -1,9 +1,10 @@
-name: CI / Build & Deploy to GitHub Pages
+name: CI / Build (pages deploy disabled)
 
 on:
-  push:
-    branches: [ main ]
   workflow_dispatch: {}
+
+permissions:
+  contents: write
 
 jobs:
   build-and-deploy:
@@ -16,7 +17,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
           cache: 'npm'
 
       - name: Try clean install (npm ci)
@@ -31,15 +32,15 @@ jobs:
         run: |
           # If npm ci failed, fallback to legacy peer deps install
           echo "Running npm install --legacy-peer-deps as fallback"
-          npm install --legacy-peer-deps
+          npm install --legacy-peer-deps --ignore-scripts
 
       - name: Build
-        run: npm run build
+        run: npm run build -- --base-href=/ASSET-GUARD-Corporate-Edition/
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GH_PAGES_TOKEN }}
           publish_dir: ./dist
           publish_branch: gh-pages
           keep_files: false
