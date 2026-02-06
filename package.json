@@ -16,7 +16,8 @@
     "format": "prettier --write \"src/**/*.{ts,html,css,scss,json}\"",
     "format:check": "prettier --check \"src/**/*.{ts,html,css,scss,json}\"",
     "prepare": "husky",
-    "deploy": "ng build --output-path=dist --base-href /asset-guard-corporate-edition/ && npx angular-cli-ghpages --dir=dist"
+    "deploy": "ng build --output-path=dist --base-href /asset-guard-corporate-edition/ && npx angular-cli-ghpages --dir=dist",
+    "test:smoke": "playwright test smoke --project=chromium"
   },
   "dependencies": {
     "@angular/animations": "^19.0.0",
