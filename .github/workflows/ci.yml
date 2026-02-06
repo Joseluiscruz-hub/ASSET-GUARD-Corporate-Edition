@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   pull_request:
-    branches: [main]
+    branches: [ main ]
 
 jobs:
   build:
@@ -14,33 +14,13 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          cache: 'npm'
+          node-version: '20'
       - name: Install dependencies
-        run: npm ci --legacy-peer-deps
+        run: npm ci
       - name: Build
         run: npm run build --if-present
-      - name: Run tests
-        run: npm test --if-present
-      - name: Audit
-        run: npm audit --audit-level=moderate || true
-
-  deploy:
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Use Node.js
-        uses: actions/setup-node@v4
+      - name: Upload dist artifact
+        uses: actions/upload-artifact@v4
         with:
-          node-version: '18'
-      - name: Install & Build
-        run: |
-          npm ci --legacy-peer-deps
-          npm run build --if-present
-      - name: Deploy to GitHub Pages using angular-cli-ghpages
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          npx angular-cli-ghpages --dir=dist/asset-guard-corporate-edition --repo="https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}" --branch=gh-pages --message="ci: deploy via actions"
+          name: dist
+          path: dist

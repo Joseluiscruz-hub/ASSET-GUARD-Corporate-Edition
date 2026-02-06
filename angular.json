@@ -19,16 +19,7 @@
             "index": "src/index.html",
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.json",
-            "styles": ["src/index.css"],
-            "allowedCommonJsDependencies": [
-              "canvg",
-              "exceljs",
-              "jspdf",
-              "html2canvas",
-              "rgbcolor",
-              "raf",
-              "core-js"
-            ]
+            "styles": ["src/index.css"]
           },
           "configurations": {
             "production": {
@@ -61,6 +52,6 @@
     }
   },
   "cli": {
-    "analytics": "87879207-6230-4325-b300-3fceb65f3f73"
+    "analytics": false
   }
 }
