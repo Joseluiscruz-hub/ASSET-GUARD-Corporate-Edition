@@ -47,4 +47,4 @@ jobs:
 
       - name: Run tests (if configured)
         run: |
-          npm test --if-present --silent || echo "No tests configured or tests failed" 
+          npm test --if-present --silent || echo "No tests configured or tests failed"
