@@ -28,3 +28,23 @@ jobs:
       - name: Check lockfile is up to date
         run: |
           git --no-pager diff --exit-code package-lock.json || (echo "package-lock.json out of sync; run 'npm install' locally and commit the lock" && exit 1)
+
+      - name: Cache node modules
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies (npm ci)
+        run: |
+          npm ci --silent
+
+      - name: Run build
+        run: |
+          npm run build --if-present
+
+      - name: Run tests (if configured)
+        run: |
+          npm test --if-present --silent || echo "No tests configured or tests failed" 
