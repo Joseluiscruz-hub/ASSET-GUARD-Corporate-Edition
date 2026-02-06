@@ -96,7 +96,7 @@ View your app in AI Studio: https://ai.studio/apps/drive/1xmkKI_zwsDwh9od6bCatws
    - Abrir issues para bugs o propuestas de mejora.
    - Crear pull requests con cambios pequeños y tests cuando corresponda.
 
-## Smoke tests (Playwright) 🔬
+> Tip: Antes de abrir un PR, ejecuta `npm run check:lock` para validar que `package-lock.json` está sincronizado con `package.json`. Si falla, ejecuta `npm install` y commitea el nuevo `package-lock.json`.
 
 He añadido un test de humo con Playwright en `tests/smoke.spec.ts` y configuración en `playwright.config.ts`.
 

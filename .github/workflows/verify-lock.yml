@@ -1,0 +1,30 @@
+name: Verify package-lock
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch: {}
+
+jobs:
+  verify-lock:
+    name: Verify package-lock is up to date
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install package-lock only
+        run: |
+          npm ci --silent || true
+          npm install --package-lock-only --silent
+
+      - name: Check lockfile is up to date
+        run: |
+          git --no-pager diff --exit-code package-lock.json || (echo "package-lock.json out of sync; run 'npm install' locally and commit the lock" && exit 1)
