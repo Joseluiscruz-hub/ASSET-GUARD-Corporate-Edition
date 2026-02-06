@@ -1,27 +1,36 @@
-name: Deploy to GitHub Pages
+name: Deploy to GitHub Pages (manual)
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch: {}
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - name: Use Node.js
-        uses: actions/setup-node@v4
+      # Step 1: Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Step 2: Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
           node-version: '20'
+
+      # Step 3: Install dependencies (disable husky during install)
       - name: Install dependencies
-        run: npm install --legacy-peer-deps
-      - name: Build
-        run: npm run build -- --base-href=/ASSET-GUARD-Corporate-Edition/
-      - name: Copy index to 404
-        run: cp dist/browser/index.html dist/browser/404.html
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
+        run: |
+          export HUSKY=0
+          npm install --legacy-peer-deps --ignore-scripts
+
+      # Step 4: Build the project
+      - name: Build project
+        run: npm run build
+
+      # Step 5: Deploy to GitHub Pages
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GH_PAGES_TOKEN }}
           publish_dir: ./dist

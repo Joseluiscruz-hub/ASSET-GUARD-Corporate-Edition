@@ -5,7 +5,6 @@ import { FormsModule } from '@angular/forms';
 import { DataService } from '../../services/data.service';
 import { GeminiService } from '../../services/gemini.service';
 import { Asset, FailureReport, AIInspectionResponse } from '../../types';
-import { jsPDF } from 'jspdf';
 
 @Component({
   selector: 'app-asset-detail',
@@ -525,7 +524,9 @@ export class AssetDetailComponent {
     this.aiLoading.set(false);
   }
 
-  exportPdf() {
+  async exportPdf() {
+    const jspdfMod: any = await import('jspdf');
+    const { jsPDF } = jspdfMod.default ?? jspdfMod;
     const doc = new jsPDF();
     const currentAsset = this.asset();
     if (!currentAsset) return;
