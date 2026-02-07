@@ -17,7 +17,8 @@
     "format:check": "prettier --check \"src/**/*.{ts,html,css,scss,json}\"",
     "prepare": "husky",
     "deploy": "ng build --output-path=dist --base-href /asset-guard-corporate-edition/ && npx angular-cli-ghpages --dir=dist",
-    "test:smoke": "playwright test smoke --project=chromium"
+    "test:smoke": "playwright test smoke --project=chromium",
+    "check:lock": "npm install --package-lock-only --silent && git diff --quiet package-lock.json || (echo 'error: package-lock.json is out of sync. Run \"npm install\" and commit changes.' >&2 && exit 1)"
   },
   "dependencies": {
     "@angular/animations": "^19.0.0",
