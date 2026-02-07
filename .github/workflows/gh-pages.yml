@@ -51,8 +51,8 @@ jobs:
       - name: Deploy to GitHub Pages (push to gh-pages)
         uses: peaceiris/actions-gh-pages@v4
         with:
-          # Prefer a Personal Access Token stored as GH_PAGES_TOKEN; fall back to GITHUB_TOKEN
-          personal_token: ${{ secrets.GH_PAGES_TOKEN || github.token }}
+          # Prefer a Personal Access Token stored as GH_PAGES_TOKEN3; fall back to GITHUB_TOKEN
+          personal_token: ${{ secrets.GH_PAGES_TOKEN3 || github.token }}
           publish_dir: ./dist/browser
           publish_branch: gh-pages
           keep_files: false
