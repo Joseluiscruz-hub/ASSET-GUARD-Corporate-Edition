@@ -39,7 +39,8 @@ jobs:
 
       - name: Install dependencies (npm ci)
         run: |
-          npm ci --silent
+          # Some environments run prepare scripts which may require husky/git. Skip install scripts in CI to avoid failures.
+          npm ci --silent --ignore-scripts
 
       - name: Run build
         run: |
@@ -66,7 +67,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm ci --silent
+          # Skip lifecycle scripts during CI install to avoid husky prepare errors when git isn't available in runners
+          npm ci --silent --ignore-scripts
 
       - name: Install Playwright browsers
         run: |
