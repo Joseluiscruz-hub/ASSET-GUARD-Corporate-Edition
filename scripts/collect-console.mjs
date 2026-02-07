@@ -1,7 +1,8 @@
 import { chromium } from 'playwright';
 
 (async () => {
-  const url = 'https://joseluiscruz-hub.github.io/ASSET-GUARD-Corporate-Edition/';
+  // Replace hardcoded URL with environment variable fallback
+  const url = process.env.TEST_URL || 'https://joseluiscruz-hub.github.io/asset-guard-corporate-edition/';
   const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
 
@@ -22,8 +23,8 @@ import { chromium } from 'playwright';
   try {
     console.log('Navigating to', url);
     await page.goto(url, { waitUntil: 'networkidle' });
-    // Wait a bit to let async console errors surface
-    await page.waitForTimeout(4000);
+    // Wait for the body to be visible instead of using a fixed timeout
+    await page.waitForSelector('body', { state: 'visible' });
   } catch (e) {
     console.error('NAV_ERROR', e);
   } finally {
