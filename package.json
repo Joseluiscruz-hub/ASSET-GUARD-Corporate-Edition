@@ -1,66 +1,68 @@
 {
-  "name": "asset-guard-cmms",
-  "version": "1.0.0",
-  "description": "AssetGuard CMMS - Zoneless Angular Application",
-  "type": "module",
-  "scripts": {
-    "start": "ng serve",
-    "dev": "ng serve",
-    "build": "ng build --output-path=dist --base-href /asset-guard-corporate-edition/",
-    "watch": "ng build --watch",
-    "test": "ng test --watch=false --browsers=ChromeHeadless",
-    "test:local": "ng test",
-    "build:gh-pages": "ng build --configuration=github-pages",
-    "preview": "ng serve --configuration=production",
-    "lint": "eslint src --ext .ts",
-    "lint:fix": "eslint src --ext .ts --fix",
-    "format": "prettier --write \"src/**/*.{ts,html,css,scss,json}\"",
-    "format:check": "prettier --check \"src/**/*.{ts,html,css,scss,json}\"",
-    "prepare": "husky",
-    "deploy": "ng build --output-path=dist --base-href /asset-guard-corporate-edition/ && npx angular-cli-ghpages --dir=dist",
-    "test:smoke": "playwright test smoke --project=chromium",
-    "check:lock": "npm install --package-lock-only --silent && git diff --quiet package-lock.json || (echo 'error: package-lock.json is out of sync. Run \"npm install\" and commit changes.' >&2 && exit 1)"
-  },
-  "dependencies": {
-    "@angular/animations": "^19.0.0",
-    "@angular/common": "^19.0.0",
-    "@angular/compiler": "^19.0.0",
-    "@angular/core": "^19.0.0",
-    "@angular/forms": "^19.0.0",
-    "@angular/platform-browser": "^19.0.0",
-    "@angular/router": "^19.0.0",
-    "@google/generative-ai": "^0.21.0",
-    "exceljs": "^4.4.0",
-    "firebase": "^12.8.0",
-    "jspdf": "^4.1.0",
-    "jspdf-autotable": "^5.0.7",
-    "rxjs": "^7.8.2",
-    "tslib": "^2.3.0",
-    "xlsx": "0.18.5",
-    "zone.js": "~0.15.0"
-  },
-  "devDependencies": {
-    "@angular-devkit/build-angular": "^19.0.0",
-    "@angular/build": "^19.0.0",
-    "@angular/cli": "^21.1.2",
-    "@angular/compiler-cli": "^19.0.0",
-    "@types/node": "^20.19.0",
-    "autoprefixer": "^10.4.19",
-    "playwright": "^1.58.1",
-    "postcss": "^8.4.38",
-    "tailwindcss": "^3.4.3",
-    "typescript": "~5.5.0",
-    "vite": "^7.3.1",
-    "vitest": "^4.0.18",
-    "husky": "^8.0.0"
-  },
-  "overrides": {
-    "xlsx": "0.18.5"
-  },
-  "lint-staged": {
-    "src/**/*.{ts}": [
-      "eslint --fix",
-      "prettier --write"
-    ]
-  }
+    "name": "asset-guard-cmms",
+      "version": "1.0.0",
+        "description": "AssetGuard CMMS - Zoneless Angular Application",
+          "type": "module",
+            "scripts": {
+                "start": "ng serve",
+                    "dev": "ng serve",
+                        "build": "ng build --output-path=dist --base-href /asset-guard-corporate-edition/",
+                            "watch": "ng build --watch",
+                                "test": "ng test --watch=false --browsers=ChromeHeadless",
+                                    "test:local": "ng test",
+                                        "build:gh-pages": "ng build --configuration=github-pages",
+                                            "preview": "ng serve --configuration=production",
+                                                "lint": "eslint src --ext .ts",
+                                                    "lint:fix": "eslint src --ext .ts --fix",
+                                                        "format": "prettier --write \"src/**/*.{ts,html,css,scss,json}\"",
+                                                            "format:check": "prettier --check \"src/**/*.{ts,html,css,scss,json}\"",
+                                                                "prepare": "husky",
+                                                                    "deploy": "ng build --output-path=dist --base-href /asset-guard-corporate-edition/ && npx angular-cli-ghpages --dir=dist",
+                                                                        "test:smoke": "playwright test smoke --project=chromium",
+                                                                            "check:lock": "npm install --package-lock-only --silent && git diff --quiet package-lock.json || (echo 'error: package-lock.json is out of sync. Run \"npm install\" and commit changes.' >&2 && exit 1)"
+                                                                              },
+                                                                                "dependencies": {
+                                                                                    "@angular/animations": "^19.0.0",
+                                                                                        "@angular/common": "^19.0.0",
+                                                                                            "@angular/compiler": "^19.0.0",
+                                                                                                "@angular/core": "^19.0.0",
+                                                                                                    "@angular/forms": "^19.0.0",
+                                                                                                        "@angular/platform-browser": "^19.0.0",
+                                                                                                            "@angular/router": "^19.0.0",
+                                                                                                                "@google/generative-ai": "^0.21.0",
+                                                                                                                    "exceljs": "^4.4.0",
+                                                                                                                        "firebase": "^12.8.0",
+                                                                                                                            "jspdf": "^4.1.0",
+                                                                                                                                "jspdf-autotable": "^5.0.7",
+                                                                                                                                    "rxjs": "^7.8.2",
+                                                                                                                                        "tslib": "^2.3.0",
+                                                                                                                                            "xlsx": "0.18.5",
+                                                                                                                                                "zone.js": "~0.15.0"
+                                                                                                                                                  },
+                                                                                                                                                    "devDependencies": {
+                                                                                                                                                        "@angular-devkit/build-angular": "^19.0.0",
+                                                                                                                                                            "@angular/build": "^19.0.0",
+                                                                                                                                                                "@angular/cli": "^21.1.2",
+                                                                                                                                                                    "@angular/compiler-cli": "^19.0.0",
+                                                                                                                                                                        "@types/node": "^20.19.0",
+                                                                                                                                                                            "autoprefixer": "^10.4.19",
+                                                                                                                                                                                "playwright": "^1.58.1",
+                                                                                                                                                                                    "postcss": "^8.4.38",
+                                                                                                                                                                                        "tailwindcss": "^3.4.3",
+                                                                                                                                                                                            "typescript": "~5.5.0",
+                                                                                                                                                                                                "vite": "^7.3.1",
+                                                                                                                                                                                                    "vitest": "^4.0.18",
+                                                                                                                                                                                                        "husky": "^8.0.0"
+                                                                                                                                                                                                          },
+                                                                                                                                                                                                            "overrides": {
+                                                                                                                                                                                                                "xlsx": "0.18.5"
+                                                                                                                                                                                                                  },
+                                                                                                                                                                                                                    "lint-staged": {
+                                                                                                                                                                                                                        "src/**/*.{ts}": [
+                                                                                                                                                                                                                              "eslint --fix",
+                                                                                                                                                                                                                                    "prettier --write"
+                                                                                                                                                                                                                                        ]
+                                                                                                                                                                                                                                          }
+                                                                                                                                                                                                                                          }
+                                                                                                                                                                                                                                          
 }
