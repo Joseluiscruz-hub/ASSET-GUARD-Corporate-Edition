@@ -86,6 +86,10 @@ jobs:
       - name: Install dependencies
         run: npm ci --ignore-scripts
 
+      - name: Verify @playwright/test is installed
+        run: |
+          node -e "require.resolve('@playwright/test')" || (echo "@playwright/test not found. Add it as a devDependency with: npm i -D @playwright/test" >&2; exit 1)
+
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
 
