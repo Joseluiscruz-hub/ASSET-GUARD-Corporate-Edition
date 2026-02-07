@@ -51,7 +51,8 @@ jobs:
       - name: Deploy to GitHub Pages (push to gh-pages)
         uses: peaceiris/actions-gh-pages@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          # Prefer a Personal Access Token stored as GH_PAGES_TOKEN; fall back to GITHUB_TOKEN
+          personal_token: ${{ secrets.GH_PAGES_TOKEN || github.token }}
           publish_dir: ./dist/browser
           publish_branch: gh-pages
           keep_files: false
@@ -90,5 +91,5 @@ jobs:
 
       - name: Run smoke tests (Playwright)
         env:
-          PLAYWRIGHT_TEST_BASE_URL: "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
+          PLAYWRIGHT_TEST_BASE_URL: 'https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/'
         run: npm run test:smoke --if-present --silent
