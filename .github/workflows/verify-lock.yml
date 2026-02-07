@@ -22,8 +22,9 @@ jobs:
 
       - name: Install package-lock only
         run: |
-          npm ci --silent || true
-          npm install --package-lock-only --silent
+          # Skip lifecycle scripts to avoid prepare/prepare hooks (e.g., husky) failing in CI
+          npm ci --silent --ignore-scripts || true
+          npm install --package-lock-only --silent --ignore-scripts
 
       - name: Check lockfile is up to date
         run: |
