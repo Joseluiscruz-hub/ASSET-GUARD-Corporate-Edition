@@ -43,4 +43,4 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          npx angular-cli-ghpages --dir=dist/asset-guard-corporate-edition --repo="https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}" --branch=gh-pages --message="ci: deploy via actions"
+          npx angular-cli-ghpages --dir=dist --repo="https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}" --branch=gh-pages --message="ci: deploy via actions"
