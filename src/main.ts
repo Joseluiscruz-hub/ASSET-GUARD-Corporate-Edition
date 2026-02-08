@@ -1,12 +1,15 @@
+import 'zone.js'; // añade esta línea
+
 import { bootstrapApplication } from '@angular/platform-browser';
 import { AppComponent } from './app.component';
 import { provideHttpClient } from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';
-import { provideExperimentalZonelessChangeDetection } from '@angular/core';
+// quita el zoneless experimental por ahora
+// import { provideExperimentalZonelessChangeDetection } from '@angular/core';
 
 bootstrapApplication(AppComponent, {
   providers: [
-    provideExperimentalZonelessChangeDetection(),
+    // provideExperimentalZonelessChangeDetection(), // comenta o elimina esta línea
     provideHttpClient(),
     provideAnimations()
   ]
