@@ -29,7 +29,3 @@ coverage/
 # Test and temporary artifacts
 test-results/
 tmp/
-
-test-results/
-
-tmp/
