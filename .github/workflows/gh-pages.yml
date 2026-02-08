@@ -6,15 +6,14 @@ on:
       - main
   workflow_dispatch: {}
 
-# Solo lectura global
 permissions:
+  pages: write
+  id-token: write
   contents: read
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
 
     steps:
       - name: Checkout repository
@@ -47,19 +46,8 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    permissions:
-      contents: write   # necesario para hacer push a gh-pages
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Download Pages artifact
-        uses: actions/download-pages-artifact@v3
-        with:
-          name: github-pages-dist
-          path: ./dist
-
       - name: Deploy to GitHub Pages (push to gh-pages)
         uses: peaceiris/actions-gh-pages@v4
         with:
@@ -72,8 +60,6 @@ jobs:
   smoke-test:
     needs: deploy
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
 
     steps:
       - name: Checkout repository
