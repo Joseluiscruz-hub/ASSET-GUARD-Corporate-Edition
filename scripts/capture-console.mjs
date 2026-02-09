@@ -39,7 +39,7 @@ async function run() {
     console.error('[REQUEST FAILED]', req.url(), req.failure() && req.failure().errorText);
   });
 
-  const url = 'http://127.0.0.1:5000/';
+  const url = process.env.DEV_SERVER_URL || 'http://127.0.0.1:3000/';
   console.log('Navigating to', url);
   await page.goto(url, { waitUntil: 'networkidle' });
 
