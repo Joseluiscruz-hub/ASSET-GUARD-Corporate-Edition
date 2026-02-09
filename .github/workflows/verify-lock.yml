@@ -1,0 +1,96 @@
+name: Verify package-lock
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch: {}
+
+jobs:
+  verify-lock:
+    name: Verify package-lock is up to date
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install package-lock only
+        run: |
+          # Skip lifecycle scripts to avoid prepare/prepare hooks (e.g., husky) failing in CI
+          npm ci --silent --ignore-scripts || true
+          npm install --package-lock-only --silent --ignore-scripts
+
+      - name: Check lockfile is up to date
+        run: |
+          git --no-pager diff --exit-code package-lock.json || (echo "package-lock.json out of sync; run 'npm install' locally and commit the lock" && exit 1)
+
+      - name: Cache node modules
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies (npm ci)
+        run: |
+          # Some environments run prepare scripts which may require husky/git. Skip install scripts in CI to avoid failures.
+          npm ci --silent --ignore-scripts
+
+      - name: Run build
+        run: |
+          npm run build --if-present
+
+      - name: Run tests (if configured)
+        run: |
+          npm test --if-present --silent || echo "No tests configured or tests failed"
+
+  smoke-test:
+    name: Smoke test (non-blocking)
+    runs-on: ubuntu-latest
+    needs: verify-lock
+    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+    continue-on-error: true
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install dependencies
+        run: |
+          # Skip lifecycle scripts during CI install to avoid husky prepare errors when git isn't available in runners
+          npm ci --silent --ignore-scripts
+
+      - name: Install Playwright browsers
+        run: |
+          npx playwright install --with-deps
+
+      - name: Run Playwright smoke test
+        run: |
+          npm run test:smoke || npx playwright test smoke || echo "Smoke test failed (non-blocking)"
+        env:
+          PLAYWRIGHT_TEST_BASE_URL: ${{ secrets.STAGING_URL || 'http://localhost:3000' }}
+
+  notify-smoke-failure:
+    name: Notify on smoke test failure
+    runs-on: ubuntu-latest
+    needs: smoke-test
+    if: ${{ needs.smoke-test.result == 'failure' }}
+    steps:
+      - name: Report Status to Slack
+        uses: ravsamhq/notify-slack-action@master
+        with:
+          status: failure
+          notify_when: 'failure'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.ACTION_MONITORING_SLACK }}

@@ -1,0 +1,57 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: |
+          # Build with dynamic base-href based on repository name
+          REPO_NAME=$(echo "${{ github.repository }}" | awk -F / '{print $2}')
+          echo "Building for base-href: /$REPO_NAME/"
+          # Override output path to ensure consistency
+          npm run build -- --output-path=dist --base-href=/$REPO_NAME/
+
+      - name: Configure Deployment
+        run: |
+          # Handle Angular SPA routing and folder structure
+          if [ -f dist/browser/index.html ]; then
+            cp dist/browser/index.html dist/browser/404.html
+            touch dist/browser/.nojekyll
+            echo "DEPLOY_DIR=dist/browser" >> $GITHUB_ENV
+          elif [ -f dist/index.html ]; then
+            cp dist/index.html dist/404.html
+            touch dist/.nojekyll
+            echo "DEPLOY_DIR=dist" >> $GITHUB_ENV
+          else
+            echo "Error: index.html not found in dist or dist/browser"
+            ls -R dist
+            exit 1
+          fi
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ${{ env.DEPLOY_DIR }}
