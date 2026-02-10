@@ -8,7 +8,7 @@
         "dev": "ng serve",
         "build": "ng build --output-path=dist --base-href /asset-guard-corporate-edition/",
         "watch": "ng build --watch",
-        "test": "ng test --watch=false --browsers=ChromeHeadless",
+        "test": "ng test",
         "test:local": "ng test",
         "build:gh-pages": "ng build --configuration=github-pages",
         "preview": "ng serve --configuration=production",
