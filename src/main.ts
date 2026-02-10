@@ -9,3 +9,4 @@ bootstrapApplication(AppComponent, {
     provideAnimations()
   ]
 }).catch(err => console.error(err));
+// Force rebuild with new hash
