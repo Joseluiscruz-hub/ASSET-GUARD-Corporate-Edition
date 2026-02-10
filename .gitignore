@@ -25,3 +25,7 @@ coverage/
 .vscode/
 .idea/
 *.iml
+
+# Test and temporary artifacts
+test-results/
+tmp/
