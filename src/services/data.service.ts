@@ -206,7 +206,6 @@ export class DataService {
         }
       },
       error => {
-        console.info('📴 Modo Offline activado - Usando datos locales de demostración.');
         this.connectionStatus.set('offline');
       }
     );
