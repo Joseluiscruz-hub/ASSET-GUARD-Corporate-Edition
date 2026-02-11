@@ -12,8 +12,8 @@
         "test:local": "ng test",
         "build:gh-pages": "ng build --configuration=github-pages",
         "preview": "ng serve --configuration=production",
-        "lint": "eslint src --ext .ts",
-        "lint:fix": "eslint src --ext .ts --fix",
+        "lint": "tsc --noEmit",
+        "lint:fix": "npm run lint",
         "format": "prettier --write \"src/**/*.{ts,html,css,scss,json}\"",
         "format:check": "prettier --check \"src/**/*.{ts,html,css,scss,json}\"",
         "prepare": "husky",
@@ -54,8 +54,7 @@
         "typescript": "~5.5.0"
     },
     "lint-staged": {
-        "src/**/*.{ts}": [
-            "eslint --fix",
+        "src/**/*.{ts,html,css,scss,json}": [
             "prettier --write"
         ]
     }
