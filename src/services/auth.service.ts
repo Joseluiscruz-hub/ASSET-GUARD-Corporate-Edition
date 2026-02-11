@@ -10,6 +10,7 @@ import {
   signInAnonymously
 } from 'firebase/auth';
 import { environment } from '../environments/environment';
+import { debug, info, warn, error } from '../utils/logger';
 
 export interface AuthUser {
   uid: string;
@@ -109,7 +110,7 @@ export class AuthService {
         this.currentUser.set(null);
       });
     } catch (err: any) {
-      console.error('Error al cerrar sesión:', err);
+      error('Error al cerrar sesión:', err);
     }
   }
 
@@ -129,7 +130,7 @@ export class AuthService {
       this.isLoading.set(false);
       return true;
     } catch (err: any) {
-      console.error('Error en acceso demo:', err);
+      error('Error en acceso demo:', err);
       // Fallback: usuario local si Firebase falla
       this.currentUser.set({
         uid: 'demo-user-local',

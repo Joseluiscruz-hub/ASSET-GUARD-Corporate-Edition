@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { FailureReport, Asset, KPIData, AIInspectionResponse } from '../types';
 import { environment } from '../environments/environment';
+import { debug, info, warn, error } from '../utils/logger';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +15,7 @@ export class GeminiService {
     if (apiKey && apiKey !== '') {
       this.ai = new GoogleGenerativeAI(apiKey);
     } else {
-      console.info(
+      info(
         'ℹ️ Modo Demo: Las funciones de IA están deshabilitadas. Para activarlas, configure la API Key de Gemini en environment.ts'
       );
       this.ai = new GoogleGenerativeAI('');
@@ -63,7 +64,7 @@ export class GeminiService {
 
       return response.text() || '<p>Datos insuficientes para predicción.</p>';
     } catch (error) {
-      console.error('Gemini Error:', error);
+      error('Gemini Error:', error);
       return '<p class="text-red-500">Error conectando con el servicio de IA.</p>';
     }
   }
@@ -113,7 +114,7 @@ export class GeminiService {
 
       return response.text() || 'No se pudo generar el reporte ejecutivo.';
     } catch (error) {
-      console.error('Gemini Error:', error);
+      error('Gemini Error:', error);
       return 'Error conectando con IA para el reporte.';
     }
   }
@@ -161,7 +162,7 @@ export class GeminiService {
   // --- PROMPT 2: INSPECCIÓN VISUAL MULTIMODAL ---
   async analyzeImageInspection(imageBase64: string): Promise<AIInspectionResponse | null> {
     if (!environment.geminiApiKey) {
-      console.warn('VITE_API_KEY not configured. Image analysis unavailable.');
+      warn('VITE_API_KEY not configured. Image analysis unavailable.');
       return null;
     }
     try {
@@ -217,7 +218,7 @@ export class GeminiService {
       }
       return null;
     } catch (error) {
-      console.error('Vision Error:', error);
+      error('Vision Error:', error);
       return null;
     }
   }
