@@ -22,6 +22,7 @@ import {
 } from 'firebase/database';
 import { hydrateRealAssets, REAL_FLEET_DATA } from '../data/real-fleet';
 import { environment } from '../environments/environment';
+import { debug, info, warn, error } from '../utils/logger';
 
 @Injectable({
   providedIn: 'root'
@@ -156,7 +157,7 @@ export class DataService {
         !this.firebaseConfig.databaseURL ||
         !this.firebaseConfig.projectId
       ) {
-        console.warn('Firebase configuration incomplete. Running in offline mode.');
+        warn('Firebase configuration incomplete. Running in offline mode.');
         this.connectionStatus.set('offline');
         return;
       }
@@ -176,7 +177,7 @@ export class DataService {
 
       this.setupListeners();
     } catch (e) {
-      console.error('Firebase init error:', e);
+      error('Firebase init error:', e);
       this.connectionStatus.set('offline');
     }
   }
@@ -206,7 +207,6 @@ export class DataService {
         }
       },
       error => {
-        console.info('📴 Modo Offline activado - Usando datos locales de demostración.');
         this.connectionStatus.set('offline');
       }
     );
@@ -303,7 +303,7 @@ export class DataService {
     this.forkliftFailures.update(list => list.map(f => (f.id === failureId ? updatedFailure : f)));
 
     if (this.connectionStatus() !== 'offline') {
-      update(ref(this.db, 'failures/' + failureId), updatedFailure).catch(console.error);
+      update(ref(this.db, 'failures/' + failureId), updatedFailure).catch(err => error(err));
     }
   }
 
@@ -328,7 +328,7 @@ export class DataService {
     );
 
     if (this.connectionStatus() !== 'offline') {
-      update(ref(this.db, 'failures/' + failureId), updates).catch(console.error);
+      update(ref(this.db, 'failures/' + failureId), updates).catch(err => error(err));
     }
   }
 
@@ -346,7 +346,7 @@ export class DataService {
     this.syncAssetsWithFailures(this.forkliftFailures());
 
     if (this.connectionStatus() !== 'offline') {
-      update(ref(this.db, 'failures/' + id), updatedFailure).catch(console.error);
+      update(ref(this.db, 'failures/' + id), updatedFailure).catch(err => error(err));
     }
   }
 

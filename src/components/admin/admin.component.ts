@@ -4,6 +4,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { DataService } from '../../services/data.service';
 import { GeminiService } from '../../services/gemini.service';
+import { debug, info, warn, error } from '../../utils/logger';
 
 @Component({
   selector: 'app-admin',
@@ -364,12 +365,12 @@ export class AdminComponent {
           alert(`Se procesaron ${data.length} registros exitosamente.`);
         } catch (error) {
           alert('Error al procesar el archivo Excel.');
-          console.error(error);
+          error(error);
         }
       };
       reader.readAsArrayBuffer(file);
     } catch (err) {
-      console.error('Import error', err);
+      error('Import error', err);
       alert('No se pudo iniciar la importación.');
     }
   }
