@@ -1,13 +1,5 @@
 import { Injectable, signal, computed, inject, NgZone } from '@angular/core';
-import {
-  getAuth,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-  updateProfile,
-  signInAnonymously
-} from 'firebase/auth';
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile, signInAnonymously } from 'firebase/auth';
 import { firebaseApp } from '../firebase-init';
 
 export interface AuthUser {
@@ -32,7 +24,7 @@ export class AuthService {
   readonly isAuthenticated = computed(() => this.currentUser() !== null);
 
   constructor() {
-    onAuthStateChanged(this.auth, user => {
+    onAuthStateChanged(this.auth, (user) => {
       this.ngZone.run(() => {
         if (user) {
           this.currentUser.set({
