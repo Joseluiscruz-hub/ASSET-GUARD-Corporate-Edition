@@ -21,7 +21,12 @@
             "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.json",
             "styles": ["src/index.css"],
-            "baseHref": "/ASSET-GUARD-Corporate-Edition/"
+            "baseHref": "/ASSET-GUARD-Corporate-Edition/",
+            "assets": [
+              "src/favicon.svg",
+              "src/favicon.ico",
+              "src/assets"
+            ]
           },
           "configurations": {
             "production": {
