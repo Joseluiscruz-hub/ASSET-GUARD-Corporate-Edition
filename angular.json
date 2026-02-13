@@ -20,7 +20,8 @@
             "browser": "src/main.ts",
             "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.json",
-            "styles": ["src/index.css"]
+            "styles": ["src/index.css"],
+            "baseHref": "/ASSET-GUARD-Corporate-Edition/"
           },
           "configurations": {
             "production": {
@@ -48,6 +49,18 @@
             }
           },
           "defaultConfiguration": "development"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "src/test.ts",
+            "polyfills": ["zone.js"],
+            "tsConfig": "tsconfig.json",
+            "karmaConfig": "karma.conf.cjs",
+            "styles": ["src/index.css"],
+            "scripts": [],
+            "assets": []
+          }
         }
       }
     }

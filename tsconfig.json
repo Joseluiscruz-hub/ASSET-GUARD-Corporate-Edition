@@ -15,10 +15,10 @@
     "declaration": false,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "importHelpers": true,
     "target": "ES2022",
-    "module": "ES2022",
+    "module": "ESNext",
     "lib": [
       "ES2022",
       "dom"
@@ -34,9 +34,7 @@
   },
   "include": [
     "src/**/*.ts",
-    "src/**/*.d.ts"
-  ],
-  "exclude": [
-    "**/*.spec.ts"
+    "src/**/*.d.ts",
+    "src/**/*.spec.ts"
   ]
 }

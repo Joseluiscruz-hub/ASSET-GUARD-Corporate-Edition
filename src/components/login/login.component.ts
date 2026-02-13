@@ -8,12 +8,18 @@ import { AuthService } from '../../services/auth.service';
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-red-900 flex items-center justify-center p-4">
-      <div class="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.15)_1px,transparent_0)] bg-[size:40px_40px]"></div>
+    <div
+      class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-red-900 flex items-center justify-center p-4"
+    >
+      <div
+        class="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.15)_1px,transparent_0)] bg-[size:40px_40px]"
+      ></div>
 
       <div class="relative w-full max-w-md">
         <div class="text-center mb-8">
-          <div class="inline-flex items-center justify-center w-20 h-20 bg-red-600 rounded-2xl mb-4 shadow-2xl shadow-red-600/30">
+          <div
+            class="inline-flex items-center justify-center w-20 h-20 bg-red-600 rounded-2xl mb-4 shadow-2xl shadow-red-600/30"
+          >
             <i class="fas fa-shield-alt text-4xl text-white"></i>
           </div>
           <h1 class="text-3xl font-black text-white tracking-tight">ASSET GUARD</h1>
@@ -24,18 +30,30 @@ import { AuthService } from '../../services/auth.service';
           <div class="flex gap-2 mb-6">
             <button
               (click)="isLoginMode.set(true)"
-              [class]="isLoginMode() ? 'flex-1 py-2.5 rounded-xl font-semibold text-white bg-red-600 shadow-lg' : 'flex-1 py-2.5 rounded-xl font-semibold text-slate-400 hover:text-white transition-colors'">
+              [class]="
+                isLoginMode()
+                  ? 'flex-1 py-2.5 rounded-xl font-semibold text-white bg-red-600 shadow-lg'
+                  : 'flex-1 py-2.5 rounded-xl font-semibold text-slate-400 hover:text-white transition-colors'
+              "
+            >
               Iniciar Sesión
             </button>
             <button
               (click)="isLoginMode.set(false)"
-              [class]="!isLoginMode() ? 'flex-1 py-2.5 rounded-xl font-semibold text-white bg-red-600 shadow-lg' : 'flex-1 py-2.5 rounded-xl font-semibold text-slate-400 hover:text-white transition-colors'">
+              [class]="
+                !isLoginMode()
+                  ? 'flex-1 py-2.5 rounded-xl font-semibold text-white bg-red-600 shadow-lg'
+                  : 'flex-1 py-2.5 rounded-xl font-semibold text-slate-400 hover:text-white transition-colors'
+              "
+            >
               Registrarse
             </button>
           </div>
 
           @if (authService.error()) {
-            <div class="mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded-xl flex items-center gap-2 text-red-300 text-sm">
+            <div
+              class="mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded-xl flex items-center gap-2 text-red-300 text-sm"
+            >
               <i class="fas fa-exclamation-circle"></i>
               {{ authService.error() }}
             </div>
@@ -44,23 +62,32 @@ import { AuthService } from '../../services/auth.service';
           <form (ngSubmit)="onSubmit()" class="space-y-4">
             @if (!isLoginMode()) {
               <div>
-                <label class="block text-sm font-medium text-slate-300 mb-1.5">Nombre Completo</label>
+                <label class="block text-sm font-medium text-slate-300 mb-1.5"
+                  >Nombre Completo</label
+                >
                 <div class="relative">
-                  <i class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                  <i
+                    class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                  ></i>
                   <input
                     type="text"
                     [(ngModel)]="displayName"
                     name="displayName"
                     placeholder="Tu nombre"
-                    class="w-full pl-11 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all">
+                    class="w-full pl-11 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                  />
                 </div>
               </div>
             }
 
             <div>
-              <label class="block text-sm font-medium text-slate-300 mb-1.5">Correo Electrónico</label>
+              <label class="block text-sm font-medium text-slate-300 mb-1.5"
+                >Correo Electrónico</label
+              >
               <div class="relative">
-                <i class="fas fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                <i
+                  class="fas fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                ></i>
                 <input
                   type="email"
                   [(ngModel)]="email"
@@ -68,7 +95,8 @@ import { AuthService } from '../../services/auth.service';
                   placeholder="tu@email.com"
                   required
                   autocomplete="email"
-                  class="w-full pl-11 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all">
+                  class="w-full pl-11 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                />
               </div>
             </div>
 
@@ -84,11 +112,13 @@ import { AuthService } from '../../services/auth.service';
                   required
                   minlength="6"
                   autocomplete="current-password"
-                  class="w-full pl-11 pr-12 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all">
+                  class="w-full pl-11 pr-12 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                />
                 <button
                   type="button"
                   (click)="showPassword.set(!showPassword())"
-                  class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors">
+                  class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
+                >
                   <i [class]="showPassword() ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
                 </button>
               </div>
@@ -97,7 +127,8 @@ import { AuthService } from '../../services/auth.service';
             <button
               type="submit"
               [disabled]="isSubmitting()"
-              class="w-full py-3.5 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white font-bold rounded-xl shadow-lg shadow-red-600/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+              class="w-full py-3.5 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white font-bold rounded-xl shadow-lg shadow-red-600/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
               @if (isSubmitting()) {
                 <i class="fas fa-circle-notch fa-spin"></i>
                 Procesando...
@@ -113,7 +144,8 @@ import { AuthService } from '../../services/auth.service';
             <button
               (click)="loginDemo()"
               [disabled]="isSubmitting()"
-              class="w-full py-2.5 bg-slate-700/50 hover:bg-slate-700 text-slate-300 hover:text-white font-medium rounded-xl transition-all flex items-center justify-center gap-2">
+              class="w-full py-2.5 bg-slate-700/50 hover:bg-slate-700 text-slate-300 hover:text-white font-medium rounded-xl transition-all flex items-center justify-center gap-2"
+            >
               <i class="fas fa-play-circle"></i>
               Acceso Demo
             </button>

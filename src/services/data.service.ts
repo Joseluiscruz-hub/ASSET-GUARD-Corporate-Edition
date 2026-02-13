@@ -8,7 +8,7 @@ import {
   FailureUpdate,
   MaintenanceTask
 } from '../types';
-import { initializeApp, getApps, getApp } from 'firebase/app';
+import { firebaseApp } from '../firebase-init';
 import {
   getDatabase,
   ref,
@@ -30,7 +30,7 @@ export class DataService {
   // --- FIREBASE CONFIGURATION ---
   private firebaseConfig = environment.firebase;
 
-  private app: any;
+  private app: any = firebaseApp;
   private db: any;
 
   // --- System State Signals ---
@@ -161,7 +161,7 @@ export class DataService {
         return;
       }
 
-      this.app = getApps().length > 0 ? getApp() : initializeApp(this.firebaseConfig);
+      // this.app = getApps().length > 0 ? getApp() : initializeApp(this.firebaseConfig);
       this.db = getDatabase(this.app);
 
       // Monitor connection state

@@ -29,3 +29,5 @@ coverage/
 # Test and temporary artifacts
 test-results/
 tmp/
+*.json
+package-lock.json

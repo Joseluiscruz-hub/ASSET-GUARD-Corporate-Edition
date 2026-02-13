@@ -1,4 +1,3 @@
-
 export interface Status {
   id: string;
   name: 'Operativo' | 'Taller' | 'Baja' | 'Preventivo';
@@ -30,17 +29,17 @@ export interface Asset {
   status: Status;
   statusSince: string; // ISO Date
   image?: string;
-  
+
   // New fields from architecture
   location: string; // Ubicacion (e.g. Pasillo 4)
   lastFailure?: string; // Description of last failure
   critical: boolean; // Priority flag
-  
+
   // Real Data Integration
   assignedOperators?: Operator[];
   supervisor?: string;
   operatingHours?: number;
-  
+
   // HACCP / Food Safety Integration
   cleanlinessStatus: 'Sanitized' | 'Pending' | 'Critical';
   lastSanitization?: string; // ISO Date
@@ -59,7 +58,14 @@ export interface FailureReport {
   partsUsed: string[];
   estimatedCost: number;
   technician: string;
-  type: 'Eléctrico' | 'Mecánico' | 'Hidráulico' | 'Operador' | 'Llantas' | 'Estructural' | 'Software';
+  type:
+    | 'Eléctrico'
+    | 'Mecánico'
+    | 'Hidráulico'
+    | 'Operador'
+    | 'Llantas'
+    | 'Estructural'
+    | 'Software';
 }
 
 export interface KPIData {
@@ -87,7 +93,7 @@ export interface ForkliftFailureEntry {
   prioridad: 'Alta' | 'Media' | 'Baja';
   estatus: 'Abierta' | 'En Proceso' | 'Cerrada';
   seguimiento: FailureUpdate[]; // Historial de interacción
-  
+
   // Toyota Management Fields
   ordenCompra?: string;
   estatusRefaccion?: 'N/A' | 'En Stock' | 'Pedida' | 'Por Recibir';
