@@ -75,8 +75,10 @@ View your app in AI Studio: https://ai.studio/apps/drive/1xmkKI_zwsDwh9od6bCatws
    ```
 
    3. Configura las variables en `.env.local`:
+
    - Clave API de Gemini (si la usas): obténla en https://ai.google.dev/
    - Configuración de Firebase (si usas Firebase): https://console.firebase.google.com/
+
    4. Ejecuta la app en modo desarrollo:
 
    ```bash
@@ -84,6 +86,7 @@ View your app in AI Studio: https://ai.studio/apps/drive/1xmkKI_zwsDwh9od6bCatws
    ```
 
    ## Construir y desplegar
+
    - Para construir para producción:
 
    ```bash
@@ -93,6 +96,7 @@ View your app in AI Studio: https://ai.studio/apps/drive/1xmkKI_zwsDwh9od6bCatws
    - El contenido de `dist/` puede desplegarse en cualquier host estático o integrarse en un backend.
 
    ## Cómo contribuir
+
    - Abrir issues para bugs o propuestas de mejora.
    - Crear pull requests con cambios pequeños y tests cuando corresponda.
 
@@ -116,3 +120,4 @@ Si necesitas ayuda o quieres colaborar, abre un issue en este repositorio.
 ---
 
 Si quieres, lo traduzco al inglés o añado instrucciones de despliegue específicas (Firebase, Vercel, Netlify).
+\n# husky test 02/13/2026 22:27:35
