@@ -6,7 +6,7 @@
     "scripts": {
         "start": "ng serve",
         "dev": "ng serve",
-        "build": "ng build --output-path=dist --base-href /asset-guard-corporate-edition/",
+        "build": "ng build --output-path=dist --base-href /ASSET-GUARD-Corporate-Edition/",
         "watch": "ng build --watch",
         "test": "ng test",
         "test:local": "ng test",
@@ -17,7 +17,7 @@
         "format": "prettier --write \"src/**/*.{ts,html,css,scss,json}\"",
         "format:check": "prettier --check \"src/**/*.{ts,html,css,scss,json}\"",
         "prepare": "husky",
-        "deploy": "ng build --output-path=dist --base-href /asset-guard-corporate-edition/ && npx angular-cli-ghpages --dir=dist",
+        "deploy": "ng build --output-path=dist --base-href /ASSET-GUARD-Corporate-Edition/ && npx angular-cli-ghpages --dir=dist",
         "test:smoke": "playwright test smoke --project=chromium",
         "check:lock": "npm install --package-lock-only --silent && git diff --quiet package-lock.json || (echo 'error: package-lock.json is out of sync. Run \"npm install\" and commit changes.' >&2 && exit 1)"
     },
