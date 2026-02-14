@@ -30,7 +30,9 @@
           },
           "configurations": {
             "production": {
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "baseHref": "/ASSET-GUARD-Corporate-Edition/",
+              "deployUrl": "/ASSET-GUARD-Corporate-Edition/"
             },
             "development": {
               "optimization": false,
