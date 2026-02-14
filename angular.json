@@ -1,76 +1,16 @@
 {
-  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
-  "version": 1,
-  "newProjectRoot": "",
   "projects": {
-    "app": {
-      "projectType": "application",
-      "root": "",
-      "sourceRoot": "src",
-      "prefix": "app",
+    "ASSET-GUARD-Corporate-Edition": {
       "architect": {
         "build": {
-          "builder": "@angular/build:application",
-          "options": {
-            "outputPath": {
-              "base": "./dist",
-              "browser": "."
-            },
-            "index": "src/index.html",
-            "browser": "src/main.ts",
-            "polyfills": ["zone.js"],
-            "tsConfig": "tsconfig.json",
-            "styles": ["src/index.css"],
-            "baseHref": "/ASSET-GUARD-Corporate-Edition/",
-            "assets": [
-              "src/favicon.svg",
-              "src/favicon.ico",
-              "src/assets"
-            ]
-          },
           "configurations": {
             "production": {
-              "outputHashing": "all"
-            },
-            "development": {
-              "optimization": false,
-              "extractLicenses": false,
-              "sourceMap": true
+              "baseHref": "/ASSET-GUARD-Corporate-Edition/",
+              "deployUrl": "/ASSET-GUARD-Corporate-Edition/"
             }
-          },
-          "defaultConfiguration": "production"
-        },
-        "serve": {
-          "builder": "@angular/build:dev-server",
-          "options": {
-            "port": 3000
-          },
-          "configurations": {
-            "production": {
-              "buildTarget": "app:build:production"
-            },
-            "development": {
-              "buildTarget": "app:build:development"
-            }
-          },
-          "defaultConfiguration": "development"
-        },
-        "test": {
-          "builder": "@angular-devkit/build-angular:karma",
-          "options": {
-            "main": "src/test.ts",
-            "polyfills": ["zone.js"],
-            "tsConfig": "tsconfig.json",
-            "karmaConfig": "karma.conf.cjs",
-            "styles": ["src/index.css"],
-            "scripts": [],
-            "assets": []
           }
         }
       }
     }
-  },
-  "cli": {
-    "analytics": false
   }
 }
