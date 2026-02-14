@@ -2,4 +2,4 @@
 . "$(dirname "$0")/_/husky.sh"
 
 # Ejecutar script local que lintera y formatea solo archivos staged
-node ./scripts/precommit.js
+node ./scripts/precommit.cjs
