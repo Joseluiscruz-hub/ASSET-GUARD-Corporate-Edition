@@ -1,4 +1,4 @@
-import { Component, inject, computed, signal, AfterViewInit, ViewChild, ElementRef, effect, OnDestroy } from '@angular/core';
+import { Component, AfterViewInit, ViewChild, ElementRef, effect, OnDestroy, inject, signal, computed } from '@angular/core';
 import { CommonModule, DatePipe, PercentPipe, UpperCasePipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DataService } from '../../services/data.service';
@@ -246,12 +246,20 @@ declare var Chart: any;
 export class MaintenanceComplianceComponent implements AfterViewInit, OnDestroy {
   @ViewChild('complianceChart') chartCanvas!: ElementRef<HTMLCanvasElement>;
 
-  dataService = inject(DataService);
   chartInstance: any;
 
   // State
   filterType = signal<string>('ALL');
   searchText = signal<string>('');
+
+  constructor(private dataService: DataService) {
+    effect(() => {
+       const stats = this.chartStats();
+       if (this.chartInstance) {
+          this.updateChart(stats);
+       }
+    });
+  }
 
   schedule = this.dataService.maintenanceSchedule;
   stats = this.dataService.complianceStats;
@@ -290,15 +298,6 @@ export class MaintenanceComplianceComponent implements AfterViewInit, OnDestroy 
         return matchesType && matchesText;
      });
   });
-
-  constructor() {
-    effect(() => {
-       const stats = this.chartStats();
-       if (this.chartInstance) {
-          this.updateChart(stats);
-       }
-    });
-  }
 
   ngAfterViewInit() {
      this.initChart();
