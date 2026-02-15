@@ -54,6 +54,53 @@
             }
           }
         }
+      },
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist",
+            "index": "index.html",
+            "main": "src/main.ts",
+            "polyfills": [],
+            "tsConfig": "tsconfig.json",
+            "assets": [
+              "src/favicon.ico",
+              "src/assets"
+            ],
+            "styles": [
+              "src/index.css"
+            ],
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "baseHref": "/ASSET-GUARD-Corporate-Edition/",
+              "deployUrl": "/ASSET-GUARD-Corporate-Edition/",
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false
+            },
+            "github-pages": {
+              "baseHref": "/ASSET-GUARD-Corporate-Edition/",
+              "deployUrl": "/ASSET-GUARD-Corporate-Edition/"
+            }
+          }
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "buildTarget": "ASSET-GUARD-Corporate-Edition:build"
+          },
+          "configurations": {
+            "production": {
+              "buildTarget": "ASSET-GUARD-Corporate-Edition:build:production"
+            }
+          }
+        }
       }
     }
   }
