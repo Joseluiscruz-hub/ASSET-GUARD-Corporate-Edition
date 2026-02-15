@@ -1,15 +1,15 @@
 import { Component, input, inject, signal, computed, effect } from '@angular/core';
-import { CommonModule, DatePipe, CurrencyPipe } from '@angular/common';
+import { CommonModule, CurrencyPipe } from '@angular/common';
 import { DomSanitizer } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { DataService } from '../../services/data.service';
 import { GeminiService } from '../../services/gemini.service';
-import { Asset, FailureReport, AIInspectionResponse } from '../../types';
+import { AIInspectionResponse } from '../../types';
 
 @Component({
   selector: 'app-asset-detail',
   standalone: true,
-  imports: [CommonModule, DatePipe, CurrencyPipe, FormsModule],
+  imports: [CommonModule, CurrencyPipe, FormsModule],
   template: `
     @if (asset()) {
       <div

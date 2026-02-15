@@ -1,12 +1,56 @@
 {
+  "version": 1,
   "projects": {
     "ASSET-GUARD-Corporate-Edition": {
-      "architect": {
+      "projectType": "application",
+      "root": "",
+      "sourceRoot": "src",
+      "targets": {
         "build": {
+          "executor": "@angular-devkit/build-angular:browser",
+          "outputs": [
+            "{options.outputPath}"
+          ],
+          "options": {
+            "outputPath": "dist",
+            "index": "index.html",
+            "main": "src/main.ts",
+            "polyfills": [],
+            "tsConfig": "tsconfig.json",
+            "assets": [
+              "src/favicon.ico",
+              "src/assets"
+            ],
+            "styles": [
+              "src/index.css"
+            ],
+            "scripts": []
+          },
           "configurations": {
             "production": {
               "baseHref": "/ASSET-GUARD-Corporate-Edition/",
+              "deployUrl": "/ASSET-GUARD-Corporate-Edition/",
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false
+            },
+            "github-pages": {
+              "baseHref": "/ASSET-GUARD-Corporate-Edition/",
               "deployUrl": "/ASSET-GUARD-Corporate-Edition/"
+            }
+          }
+        },
+        "serve": {
+          "executor": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "ASSET-GUARD-Corporate-Edition:build"
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "ASSET-GUARD-Corporate-Edition:build:production"
             }
           }
         }

@@ -1,5 +1,5 @@
 import { Component, signal, effect, inject, computed } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { DataService } from './services/data.service';
 import { GeminiService } from './services/gemini.service';

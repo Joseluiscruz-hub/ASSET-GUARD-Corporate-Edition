@@ -62,8 +62,8 @@ export class GeminiService {
       const response = await result.response;
 
       return response.text() || '<p>Datos insuficientes para predicción.</p>';
-    } catch (error) {
-      console.error('Gemini Error:', error);
+    } catch (_error) {
+      console.error('Gemini Error:', _error);
       return '<p class="text-red-500">Error conectando con el servicio de IA.</p>';
     }
   }
@@ -112,8 +112,8 @@ export class GeminiService {
       const response = await result.response;
 
       return response.text() || 'No se pudo generar el reporte ejecutivo.';
-    } catch (error) {
-      console.error('Gemini Error:', error);
+    } catch (_error) {
+      console.error('Gemini Error:', _error);
       return 'Error conectando con IA para el reporte.';
     }
   }
@@ -153,7 +153,7 @@ export class GeminiService {
       const response = await result.response;
 
       return response.text() || 'Error generando LOTO.';
-    } catch (error) {
+    } catch {
       return '<p>No disponible.</p>';
     }
   }
@@ -216,8 +216,8 @@ export class GeminiService {
         return JSON.parse(text) as AIInspectionResponse;
       }
       return null;
-    } catch (error) {
-      console.error('Vision Error:', error);
+    } catch (_error) {
+      console.error('Vision Error:', _error);
       return null;
     }
   }
@@ -226,7 +226,7 @@ export class GeminiService {
   async generateDailySummary(
     fleetData: any,
     activeFailures: any[],
-    history: any[]
+    _history: any[]
   ): Promise<string> {
     return this.generateExecutiveReport(
       { availability: fleetData.percentage, mttr: 4.5, totalCostMonth: 12500, budgetMonth: 15000 },

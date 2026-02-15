@@ -5,7 +5,6 @@ import {
   Status,
   KPIData,
   ForkliftFailureEntry,
-  FailureUpdate,
   MaintenanceTask
 } from '../types';
 import { firebaseApp } from '../firebase-init';
@@ -14,13 +13,9 @@ import {
   ref,
   onValue,
   set,
-  push,
-  update,
-  onDisconnect,
-  goOffline,
-  goOnline
+  update
 } from 'firebase/database';
-import { hydrateRealAssets, REAL_FLEET_DATA } from '../data/real-fleet';
+import { hydrateRealAssets } from '../data/real-fleet';
 import { environment } from '../environments/environment';
 
 @Injectable({
@@ -205,7 +200,7 @@ export class DataService {
           this.seedDatabase();
         }
       },
-      error => {
+      _error => {
         console.info('📴 Modo Offline activado - Usando datos locales de demostración.');
         this.connectionStatus.set('offline');
       }
@@ -350,7 +345,7 @@ export class DataService {
     }
   }
 
-  reportFailure(assetId: string, description: string, type: FailureReport['type']) {
+  reportFailure(assetId: string, description: string, _type?: FailureReport['type']) {
     this.addLiveFailure({
       economico: assetId,
       falla: description,
@@ -360,16 +355,7 @@ export class DataService {
     });
   }
 
-  completeRepair(assetId: string, diagnosis: string, cost: number, parts: string[]) {
-    const activeFailure = this.forkliftFailures().find(
-      f => f.economico === assetId && f.estatus !== 'Cerrada'
-    );
-    if (activeFailure) {
-      this.closeLiveFailure(activeFailure.id);
-    }
-  }
-
-  updateAssetsFromExcel(importedData: any[]) {
+  updateAssetsFromExcel(_importedData: any[]) {
     // Excel Import logic placeholder
   }
 
