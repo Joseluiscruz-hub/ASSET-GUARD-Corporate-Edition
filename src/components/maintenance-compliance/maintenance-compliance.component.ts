@@ -371,18 +371,18 @@ export class MaintenanceComplianceComponent implements AfterViewInit, OnDestroy 
 
     const head = [
         [
-            { content: 'Modelo', rowSpan: 2, styles: { halign: 'center', valign: 'middle' } },
-            { content: 'Serie', rowSpan: 2, styles: { halign: 'center', valign: 'middle' } },
-            { content: 'Economico', rowSpan: 2, styles: { halign: 'center', valign: 'middle' } },
-            { content: 'Supervisor', rowSpan: 2, styles: { halign: 'center', valign: 'middle' } },
-            { content: 'SMP', rowSpan: 2, styles: { halign: 'center', valign: 'middle' } },
-            { content: 'Fecha', colSpan: 2, styles: { halign: 'center' } },
-            { content: 'Duracion del SMP', rowSpan: 2, styles: { halign: 'center', valign: 'middle' } },
-            { content: 'Folio OT', rowSpan: 2, styles: { halign: 'center', valign: 'middle' } },
-            { content: 'Orden de Serv.', rowSpan: 2, styles: { halign: 'center', valign: 'middle' } },
-            { content: 'Horometro', rowSpan: 2, styles: { halign: 'center', valign: 'middle' } },
-            { content: 'Tecnico Real', rowSpan: 2, styles: { halign: 'center', valign: 'middle' } },
-            { content: 'Hora de ejecucion de SMP', rowSpan: 2, styles: { halign: 'center', valign: 'middle' } },
+            { content: 'Modelo', rowSpan: 2, styles: { halign: 'center' as const, valign: 'middle' as const } },
+            { content: 'Serie', rowSpan: 2, styles: { halign: 'center' as const, valign: 'middle' as const } },
+            { content: 'Economico', rowSpan: 2, styles: { halign: 'center' as const, valign: 'middle' as const } },
+            { content: 'Supervisor', rowSpan: 2, styles: { halign: 'center' as const, valign: 'middle' as const } },
+            { content: 'SMP', rowSpan: 2, styles: { halign: 'center' as const, valign: 'middle' as const } },
+            { content: 'Fecha', colSpan: 2, styles: { halign: 'center' as const } },
+            { content: 'Duracion del SMP', rowSpan: 2, styles: { halign: 'center' as const, valign: 'middle' as const } },
+            { content: 'Folio OT', rowSpan: 2, styles: { halign: 'center' as const, valign: 'middle' as const } },
+            { content: 'Orden de Serv.', rowSpan: 2, styles: { halign: 'center' as const, valign: 'middle' as const } },
+            { content: 'Horometro', rowSpan: 2, styles: { halign: 'center' as const, valign: 'middle' as const } },
+            { content: 'Tecnico Real', rowSpan: 2, styles: { halign: 'center' as const, valign: 'middle' as const } },
+            { content: 'Hora de ejecucion de SMP', rowSpan: 2, styles: { halign: 'center' as const, valign: 'middle' as const } },
         ],
         ['Programada', 'Real']
     ];
@@ -470,7 +470,8 @@ export class MaintenanceComplianceComponent implements AfterViewInit, OnDestroy 
         didDrawPage: (data) => {
             doc.setDrawColor(204, 0, 0);
             doc.setLineWidth(1.5);
-            const { x, y, width, height } = data.table;
+            const table = data.table as any;
+            const { x, y, width, height } = table;
             doc.rect(x, y, width, height);
         }
     });
