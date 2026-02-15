@@ -134,3 +134,21 @@ export interface AIInspectionResponse {
     image_quality_warning?: string;
   };
 }
+
+// Maintenance Schedule Interface for SMP Compliance
+export interface MaintenanceSchedule {
+  id: string;
+  smpType: 'REV' | 'X' | 'Y' | 'Z';
+  economico: string;
+  model: string;
+  serial: string;
+  supervisor: string;
+  scheduledDate: string; // ISO Date
+  realDate?: string; // ISO Date
+  duration: string; // e.g., "2h", "4h"
+  otFolio: string;
+  serviceOrder: string;
+  hourMeter?: number;
+  technician: string;
+  status: 'Programado' | 'En Proceso' | 'Completado' | 'Vencido';
+}

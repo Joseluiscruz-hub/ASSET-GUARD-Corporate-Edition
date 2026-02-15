@@ -11,8 +11,9 @@ import { AdminComponent } from './components/admin/admin.component';
 import { ServicePanelComponent } from './components/service-panel/service-panel.component';
 import { SolicitorPanelComponent } from './components/solicitor-panel/solicitor-panel.component';
 import { LoginComponent } from './components/login/login.component';
+import { MaintenanceComplianceComponent } from './components/maintenance-compliance/maintenance-compliance.component';
 
-type View = 'dashboard' | 'assets' | 'service' | 'solicitor' | 'settings';
+type View = 'dashboard' | 'assets' | 'service' | 'solicitor' | 'settings' | 'maintenance';
 
 @Component({
   selector: 'app-root',
@@ -25,7 +26,8 @@ type View = 'dashboard' | 'assets' | 'service' | 'solicitor' | 'settings';
     AdminComponent,
     ServicePanelComponent,
     SolicitorPanelComponent,
-    LoginComponent
+    LoginComponent,
+    MaintenanceComplianceComponent
   ],
   templateUrl: './app.component.html',
   styles: [
@@ -147,6 +149,8 @@ export class AppComponent {
         return 'Inventario de Flota';
       case 'service':
         return 'Gestión Técnica Toyota';
+      case 'maintenance':
+        return 'Programa SMP - Cumplimiento';
       case 'solicitor':
         return 'App Operador';
       case 'settings':

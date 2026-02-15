@@ -5,7 +5,8 @@ import {
   Status,
   KPIData,
   ForkliftFailureEntry,
-  MaintenanceTask
+  MaintenanceTask,
+  MaintenanceSchedule
 } from '../types';
 import { firebaseApp } from '../firebase-init';
 import {
@@ -127,6 +128,16 @@ export class DataService {
     { rank: 2, name: 'Turno 2 (Vespertino)', score: 94, pallets: 1320 },
     { rank: 3, name: 'Turno 3 (Nocturno)', score: 89, pallets: 1105 }
   ]);
+
+  // Maintenance Compliance Data
+  readonly maintenanceSchedule = signal<MaintenanceSchedule[]>(this.generateMaintenanceSchedule());
+  readonly complianceStats = computed(() => {
+    const schedule = this.maintenanceSchedule();
+    const total = schedule.length;
+    const completed = schedule.filter(s => s.status === 'Completado').length;
+    const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+    return { total, completed, percentage };
+  });
 
   constructor() {
     this.initFirebase();
@@ -463,5 +474,40 @@ export class DataService {
       seguimiento: []
     };
     return [demoFailure];
+  }
+
+  private generateMaintenanceSchedule(): MaintenanceSchedule[] {
+    const schedules: MaintenanceSchedule[] = [];
+    const assets = this.assetsSignal();
+
+    assets.forEach(asset => {
+      const smpTypes: ('REV' | 'X' | 'Y' | 'Z')[] = ['REV', 'X', 'Y', 'Z'];
+      const statuses: ('Programado' | 'En Proceso' | 'Completado' | 'Vencido')[] = ['Programado', 'En Proceso', 'Completado', 'Vencido'];
+      const technicians = ['Juan Pérez', 'María García', 'Carlos López', 'Ana Rodríguez'];
+
+      const scheduledDate = new Date();
+      scheduledDate.setDate(scheduledDate.getDate() + Math.floor(Math.random() * 30) - 15); // +/- 15 days
+
+      const realDate = Math.random() > 0.3 ? new Date(scheduledDate.getTime() + Math.random() * 7 * 24 * 60 * 60 * 1000) : undefined;
+
+      schedules.push({
+        id: 'SMP-' + asset.id + '-' + Math.floor(Math.random() * 1000),
+        smpType: smpTypes[Math.floor(Math.random() * smpTypes.length)],
+        economico: asset.id,
+        model: asset.model,
+        serial: asset.serial,
+        supervisor: asset.supervisor || 'Supervisor General',
+        scheduledDate: scheduledDate.toISOString(),
+        realDate: realDate?.toISOString(),
+        duration: Math.floor(Math.random() * 8) + 1 + 'h',
+        otFolio: 'OT-' + Math.floor(Math.random() * 10000),
+        serviceOrder: 'OS-' + Math.floor(Math.random() * 10000),
+        hourMeter: Math.floor(Math.random() * 5000),
+        technician: technicians[Math.floor(Math.random() * technicians.length)],
+        status: statuses[Math.floor(Math.random() * statuses.length)]
+      });
+    });
+
+    return schedules;
   }
 }

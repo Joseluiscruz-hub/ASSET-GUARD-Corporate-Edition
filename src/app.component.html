@@ -112,6 +112,27 @@
           </button>
 
           <button
+            (click)="setView('maintenance')"
+            class="w-full flex items-center p-3 rounded-lg transition-all group relative border-l-4"
+            [class.border-green-500]="currentView() === 'maintenance'"
+            [class.bg-slate-800]="currentView() === 'maintenance'"
+            [class.text-white]="currentView() === 'maintenance'"
+            [class.border-transparent]="currentView() !== 'maintenance'"
+            [class.hover:bg-slate-800]="currentView() !== 'maintenance'"
+          >
+            <i
+              class="fas fa-tools w-6 text-center"
+              [class.text-green-500]="currentView() === 'maintenance'"
+            ></i>
+            <span class="ml-3 text-sm font-bold hidden lg:block">Programa SMP</span>
+            <div
+              class="lg:hidden absolute left-14 bg-slate-900 text-white text-xs px-2 py-1 rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap border border-slate-700"
+            >
+              SMP
+            </div>
+          </button>
+
+          <button
             (click)="setView('solicitor')"
             class="w-full flex items-center p-3 rounded-lg transition-all group relative border-l-4"
             [class.border-slate-500]="currentView() === 'solicitor'"
@@ -245,6 +266,9 @@
             }
             @case ('assets') {
               <app-asset-list />
+            }
+            @case ('maintenance') {
+              <app-maintenance-compliance />
             }
             @case ('solicitor') {
               <app-solicitor-panel />
