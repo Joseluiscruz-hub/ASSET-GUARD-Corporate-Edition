@@ -37,7 +37,6 @@
         "jspdf-autotable": "^5.0.7",
         "rxjs": "^7.8.2",
         "tslib": "^2.3.0",
-        "xlsx": "^0.18.5",
         "zone.js": "~0.15.0"
     },
     "devDependencies": {
@@ -48,10 +47,7 @@
         "@playwright/test": "^1.58.1",
         "@types/jasmine": "^6.0.0",
         "@types/node": "^20.19.0",
-        "@typescript-eslint/eslint-plugin": "^8.55.0",
-        "@typescript-eslint/parser": "^8.55.0",
         "autoprefixer": "^10.4.19",
-        "eslint": "^9.39.2",
         "husky": "^8.0.0",
         "jasmine-core": "^6.0.1",
         "karma": "^6.4.4",

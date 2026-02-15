@@ -355,6 +355,31 @@ export class DataService {
     });
   }
 
+  completeRepair(assetId: string, diagnosis: string, cost: number, parts: string[]) {
+    const activeFailure = this.forkliftFailures().find(
+      f => f.economico === assetId && f.estatus !== 'Cerrada'
+    );
+    if (!activeFailure) return;
+
+    const updatedFailure = {
+      ...activeFailure,
+      estatus: 'Cerrada' as const,
+      diagnosis: diagnosis,
+      partsUsed: parts,
+      estimatedCost: cost,
+      fechaSalida: new Date().toISOString()
+    };
+
+    // Update local state
+    this.forkliftFailures.update(list => list.map(f => (f.id === activeFailure.id ? updatedFailure : f)));
+    this.syncAssetsWithFailures(this.forkliftFailures());
+
+    // Persist to remote DB if online
+    if (this.connectionStatus() !== 'offline') {
+      update(ref(this.db, 'failures/' + activeFailure.id), updatedFailure).catch(console.error);
+    }
+  }
+
   updateAssetsFromExcel(_importedData: any[]) {
     // Excel Import logic placeholder
   }
