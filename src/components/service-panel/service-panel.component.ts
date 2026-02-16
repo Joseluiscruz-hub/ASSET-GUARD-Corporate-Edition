@@ -62,6 +62,7 @@ const ESTADO_CONFIG = {
   standalone: true,
   imports: [CommonModule, DatePipe, FormsModule],
   template: `
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <div class="space-y-6">
       <!-- Header Stats -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
