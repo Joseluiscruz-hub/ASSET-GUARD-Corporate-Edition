@@ -350,7 +350,7 @@ const ESTADO_CONFIG = {
                   </div>
                 </div>
               </div>
-          } @empty {
+          &#125; @empty {
             <div class="py-20 text-center">
               <div
                 class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-slate-100 text-slate-300 mb-4"
