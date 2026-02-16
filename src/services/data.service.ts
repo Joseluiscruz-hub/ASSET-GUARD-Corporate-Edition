@@ -56,9 +56,9 @@ export class DataService {
   ];
 
   // --- Business Data Signals ---
-  private assetsSignal = signal<Asset[]>(this.loadRealFleet());
-  private reportsSignal = signal<FailureReport[]>(this.generateRealReports());
-  readonly forkliftFailures = signal<ForkliftFailureEntry[]>(this.generateRealLiveFailures());
+  private assetsSignal = signal<Asset[]>([]);
+  private reportsSignal = signal<FailureReport[]>([]);
+  readonly forkliftFailures = signal<ForkliftFailureEntry[]>([]);
 
   // --- Public Read-Only Signals ---
   readonly assets = this.assetsSignal.asReadonly();
@@ -141,6 +141,7 @@ export class DataService {
 
   constructor() {
     this.initFirebase();
+    this.initializeData();
     this.syncAssetsWithFailures(this.forkliftFailures());
 
     effect(() => {
@@ -151,6 +152,13 @@ export class DataService {
     // Connectivity Listeners
     window.addEventListener('online', () => this.updateConnectionStatus());
     window.addEventListener('offline', () => this.updateConnectionStatus());
+  }
+
+  private initializeData() {
+    // Initialize data after service is fully instantiated
+    this.assetsSignal.set(this.loadRealFleet());
+    this.reportsSignal.set(this.generateRealReports());
+    this.forkliftFailures.set(this.generateRealLiveFailures());
   }
 
   // --- Initialization ---
