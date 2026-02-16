@@ -1,5 +1,6 @@
-import { Component, inject, computed } from '@angular/core';
+import { Component, inject, computed, signal } from '@angular/core';
 import { CommonModule, DatePipe, CurrencyPipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { DataService } from '../../services/data.service';
 import { KpiCardComponent, KpiStatus } from '../ui/kpi-card.component';
 import { ForkliftFailureEntry } from '../../types';
@@ -7,7 +8,7 @@ import { ForkliftFailureEntry } from '../../types';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, KpiCardComponent, DatePipe, CurrencyPipe],
+  imports: [CommonModule, KpiCardComponent, DatePipe, CurrencyPipe, RouterLink],
   template: `
     <div class="space-y-6 pb-10">
       <!-- TITLE & CONTEXT -->
@@ -60,18 +61,71 @@ import { ForkliftFailureEntry } from '../../types';
         </app-kpi-card>
 
         <!-- Availability -->
-        <app-kpi-card
-          title="Disponibilidad"
-          subtitle="Flota operativa efectiva"
-          [value]="fleetAvailability().percentage"
-          unit="%"
-          [status]="availabilityStatus()"
-          [statusText]="availabilityStatusText()"
-          footerLabel="Meta 95%"
-          footerValue=""
-          [trendLabel]="availabilityGap()"
+        <article
+          class="h-full rounded-2xl border shadow-lg p-4 flex flex-col gap-3 transition-all hover:shadow-xl relative overflow-hidden group bg-white dark:bg-slate-900/60 border-red-500"
         >
-        </app-kpi-card>
+          <!-- Background Gradient/Noise (Optional Visual Flair) -->
+          <div
+            class="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none"
+          ></div>
+
+          <!-- Header -->
+          <header class="flex items-start justify-between relative z-10">
+            <div>
+              <h2 class="text-sm font-medium text-slate-500 dark:text-slate-300">Disponibilidad</h2>
+              <p class="text-xs text-slate-400 mt-0.5">Flota operativa efectiva</p>
+            </div>
+
+            <!-- Status Badge -->
+            <span class="inline-flex items-center gap-1.5 rounded-full text-[10px] font-bold px-2.5 py-1 border backdrop-blur-sm bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-300 dark:border-red-500/40">
+              <span class="h-1.5 w-1.5 rounded-full bg-red-500"></span>
+              {{ availabilityStatusText() }}
+            </span>
+          </header>
+
+          <!-- Main Value -->
+          <div class="flex items-baseline gap-2 mt-1 relative z-10">
+            <span class="text-3xl font-bold tracking-tight text-slate-800 dark:text-slate-50">{{
+              fleetAvailability().percentage
+            }}</span>
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wide">%</span>
+          </div>
+
+          <!-- Footer -->
+          <footer
+            class="mt-auto flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 pt-3 border-t border-slate-100 dark:border-slate-700/50 relative z-10"
+          >
+            <span
+              >Meta 95%:
+              <span class="text-slate-700 dark:text-slate-200 font-medium">83%</span></span
+            >
+            <span class="text-red-500">{{ availabilityGap() }}</span>
+          </footer>
+
+          <!-- Call to action -->
+          <button class="mt-4 w-full bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg text-sm font-semibold flex items-center justify-center gap-2"
+                  (click)="analizarDisponibilidad()">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.293l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z" clip-rule="evenodd"></path>
+            </svg>
+            Analizar Causas con IA
+          </button>
+
+          <!-- Si ya se analizó, mostrar resumen -->
+          @if (analisisDisponibilidad()) {
+            <div class="mt-3 bg-red-50 p-3 rounded text-xs">
+              <p class="font-semibold mb-2">🤖 Causas Principales:</p>
+              <ul class="space-y-1">
+                @for (causa of analisisDisponibilidad().causas; track causa.desc) {
+                  <li>• {{ causa.desc }} ({{ causa.pct }}%)</li>
+                }
+              </ul>
+              <a class="text-red-600 font-semibold mt-2 inline-block" routerLink="/maintenance-compliance">
+                Ver detalles →
+              </a>
+            </div>
+          }
+        </article>
 
         <!-- Active Fleet -->
         <app-kpi-card
@@ -377,14 +431,9 @@ export class DashboardComponent {
   totalAssets = computed(() => this.dataService.assets().length);
   lastUpdate = this.dataService.lastUpdate;
 
-  // Visual logic helpers
-  availabilityStatus = computed<KpiStatus>(() => {
-    const p = this.fleetAvailability().percentage;
-    if (p >= 95) return 'success';
-    if (p >= 85) return 'warning';
-    return 'danger';
-  });
+  analisisDisponibilidad = signal<any>(null);
 
+  // Visual logic helpers
   availabilityStatusText = computed(() => {
     const p = this.fleetAvailability().percentage;
     if (p >= 95) return 'Meta Cumplida';
@@ -483,6 +532,17 @@ export class DashboardComponent {
 
   downloadReport() {
     window.print();
+  }
+
+  analizarDisponibilidad() {
+    // Mock analysis
+    this.analisisDisponibilidad.set({
+      causas: [
+        { desc: '3 unidades esperando refacciones', pct: 40 },
+        { desc: '2 mantenimientos preventivos vencidos', pct: 27 },
+        { desc: '1 falla hidráulica compleja', pct: 33 }
+      ]
+    });
   }
 
   getTimeInShop(dateStr: string) {

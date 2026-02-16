@@ -15,149 +15,184 @@ import { AuthService } from '../../services/auth.service';
         class="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.15)_1px,transparent_0)] bg-[size:40px_40px]"
       ></div>
 
-      <div class="relative w-full max-w-md">
-        <div class="text-center mb-8">
-          <div
-            class="inline-flex items-center justify-center w-20 h-20 bg-red-600 rounded-2xl mb-4 shadow-2xl shadow-red-600/30"
-          >
-            <i class="fas fa-shield-alt text-4xl text-white"></i>
-          </div>
-          <h1 class="text-3xl font-black text-white tracking-tight">ASSET GUARD</h1>
-          <p class="text-slate-400 mt-1">Sistema de Gestión de Activos</p>
-        </div>
+      <div class="relative w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
 
-        <div class="bg-white/10 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/20">
-          <div class="flex gap-2 mb-6">
-            <button
-              (click)="isLoginMode.set(true)"
-              [class]="
-                isLoginMode()
-                  ? 'flex-1 py-2.5 rounded-xl font-semibold text-white bg-red-600 shadow-lg'
-                  : 'flex-1 py-2.5 rounded-xl font-semibold text-slate-400 hover:text-white transition-colors'
-              "
-            >
-              Iniciar Sesión
-            </button>
-            <button
-              (click)="isLoginMode.set(false)"
-              [class]="
-                !isLoginMode()
-                  ? 'flex-1 py-2.5 rounded-xl font-semibold text-white bg-red-600 shadow-lg'
-                  : 'flex-1 py-2.5 rounded-xl font-semibold text-slate-400 hover:text-white transition-colors'
-              "
-            >
-              Registrarse
-            </button>
-          </div>
-
-          @if (authService.error()) {
+        <!-- Login Form Section -->
+        <div class="w-full max-w-md mx-auto lg:mx-0">
+          <div class="text-center mb-8">
             <div
-              class="mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded-xl flex items-center gap-2 text-red-300 text-sm"
+              class="inline-flex items-center justify-center w-20 h-20 bg-red-600 rounded-2xl mb-4 shadow-2xl shadow-red-600/30"
             >
-              <i class="fas fa-exclamation-circle"></i>
-              {{ authService.error() }}
+              <i class="fas fa-shield-alt text-4xl text-white"></i>
             </div>
-          }
+            <h1 class="text-3xl font-black text-white tracking-tight">ASSET GUARD</h1>
+            <p class="text-slate-400 mt-1">Sistema de Gestión de Activos</p>
+          </div>
 
-          <form (ngSubmit)="onSubmit()" class="space-y-4">
-            @if (!isLoginMode()) {
+          <div class="bg-white/10 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/20">
+            <div class="flex gap-2 mb-6">
+              <button
+                (click)="isLoginMode.set(true)"
+                [class]="
+                  isLoginMode()
+                    ? 'flex-1 py-2.5 rounded-xl font-semibold text-white bg-red-600 shadow-lg'
+                    : 'flex-1 py-2.5 rounded-xl font-semibold text-slate-400 hover:text-white transition-colors'
+                "
+              >
+                Iniciar Sesión
+              </button>
+              <button
+                (click)="isLoginMode.set(false)"
+                [class]="
+                  !isLoginMode()
+                    ? 'flex-1 py-2.5 rounded-xl font-semibold text-white bg-red-600 shadow-lg'
+                    : 'flex-1 py-2.5 rounded-xl font-semibold text-slate-400 hover:text-white transition-colors'
+                "
+              >
+                Registrarse
+              </button>
+            </div>
+
+            @if (authService.error()) {
+              <div
+                class="mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded-xl flex items-center gap-2 text-red-300 text-sm"
+              >
+                <i class="fas fa-exclamation-circle"></i>
+                {{ authService.error() }}
+              </div>
+            }
+
+            <form (ngSubmit)="onSubmit()" class="space-y-4">
+              @if (!isLoginMode()) {
+                <div>
+                  <label class="block text-sm font-medium text-slate-300 mb-1.5"
+                    >Nombre Completo</label
+                  >
+                  <div class="relative">
+                    <i
+                      class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                    ></i>
+                    <input
+                      type="text"
+                      [(ngModel)]="displayName"
+                      name="displayName"
+                      placeholder="Tu nombre"
+                      class="w-full pl-11 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                    />
+                  </div>
+                </div>
+              }
+
               <div>
                 <label class="block text-sm font-medium text-slate-300 mb-1.5"
-                  >Nombre Completo</label
+                  >Correo Electrónico</label
                 >
                 <div class="relative">
                   <i
-                    class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                    class="fas fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
                   ></i>
                   <input
-                    type="text"
-                    [(ngModel)]="displayName"
-                    name="displayName"
-                    placeholder="Tu nombre"
+                    type="email"
+                    [(ngModel)]="email"
+                    name="email"
+                    placeholder="tu@email.com"
+                    required
+                    autocomplete="email"
                     class="w-full pl-11 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
                   />
                 </div>
               </div>
-            }
 
-            <div>
-              <label class="block text-sm font-medium text-slate-300 mb-1.5"
-                >Correo Electrónico</label
+              <div>
+                <label class="block text-sm font-medium text-slate-300 mb-1.5">Contraseña</label>
+                <div class="relative">
+                  <i class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                  <input
+                    [type]="showPassword() ? 'text' : 'password'"
+                    [(ngModel)]="password"
+                    name="password"
+                    placeholder="••••••••"
+                    required
+                    minlength="6"
+                    autocomplete="current-password"
+                    class="w-full pl-11 pr-12 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                  />
+                  <button
+                    type="button"
+                    (click)="showPassword.set(!showPassword())"
+                    class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
+                  >
+                    <i [class]="showPassword() ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                  </button>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                [disabled]="isSubmitting()"
+                class="w-full py-3.5 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white font-bold rounded-xl shadow-lg shadow-red-600/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
-              <div class="relative">
-                <i
-                  class="fas fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
-                ></i>
-                <input
-                  type="email"
-                  [(ngModel)]="email"
-                  name="email"
-                  placeholder="tu@email.com"
-                  required
-                  autocomplete="email"
-                  class="w-full pl-11 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
-                />
-              </div>
+                @if (isSubmitting()) {
+                  <i class="fas fa-circle-notch fa-spin"></i>
+                  Procesando...
+                } @else {
+                  <i [class]="isLoginMode() ? 'fas fa-sign-in-alt' : 'fas fa-user-plus'"></i>
+                  {{ isLoginMode() ? 'Iniciar Sesión' : 'Crear Cuenta' }}
+                }
+              </button>
+            </form>
+
+            <div class="mt-6 pt-6 border-t border-white/10">
+              <p class="text-center text-slate-400 text-sm mb-3">¿Solo quieres probar?</p>
+              <button
+                (click)="loginDemo()"
+                [disabled]="isSubmitting()"
+                class="w-full py-2.5 bg-slate-700/50 hover:bg-slate-700 text-slate-300 hover:text-white font-medium rounded-xl transition-all flex items-center justify-center gap-2"
+              >
+                <i class="fas fa-play-circle"></i>
+                Acceso Demo
+              </button>
             </div>
-
-            <div>
-              <label class="block text-sm font-medium text-slate-300 mb-1.5">Contraseña</label>
-              <div class="relative">
-                <i class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                <input
-                  [type]="showPassword() ? 'text' : 'password'"
-                  [(ngModel)]="password"
-                  name="password"
-                  placeholder="••••••••"
-                  required
-                  minlength="6"
-                  autocomplete="current-password"
-                  class="w-full pl-11 pr-12 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
-                />
-                <button
-                  type="button"
-                  (click)="showPassword.set(!showPassword())"
-                  class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
-                >
-                  <i [class]="showPassword() ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
-                </button>
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              [disabled]="isSubmitting()"
-              class="w-full py-3.5 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white font-bold rounded-xl shadow-lg shadow-red-600/30 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            >
-              @if (isSubmitting()) {
-                <i class="fas fa-circle-notch fa-spin"></i>
-                Procesando...
-              } @else {
-                <i [class]="isLoginMode() ? 'fas fa-sign-in-alt' : 'fas fa-user-plus'"></i>
-                {{ isLoginMode() ? 'Iniciar Sesión' : 'Crear Cuenta' }}
-              }
-            </button>
-          </form>
-
-          <div class="mt-6 pt-6 border-t border-white/10">
-            <p class="text-center text-slate-400 text-sm mb-3">¿Solo quieres probar?</p>
-            <button
-              (click)="loginDemo()"
-              [disabled]="isSubmitting()"
-              class="w-full py-2.5 bg-slate-700/50 hover:bg-slate-700 text-slate-300 hover:text-white font-medium rounded-xl transition-all flex items-center justify-center gap-2"
-            >
-              <i class="fas fa-play-circle"></i>
-              Acceso Demo
-            </button>
           </div>
         </div>
 
-        <p class="text-center text-slate-500 text-xs mt-6">
-          © 2024 Asset Guard Corporate Edition. Todos los derechos reservados.
-        </p>
+        <!-- Features Highlight Section -->
+        <div class="features-highlight bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg p-6 max-w-md mx-auto lg:mx-0">
+          <h3 class="text-lg font-bold text-gray-800 mb-4">
+            ¿Por qué AssetGuard?
+          </h3>
+          <ul class="space-y-3">
+            <li class="flex items-start">
+              <span class="text-2xl mr-3">🤖</span>
+              <div>
+                <p class="font-semibold">IA con Visión</p>
+                <p class="text-sm text-gray-600">Diagnóstico automático con fotos</p>
+              </div>
+            </li>
+            <li class="flex items-start">
+              <span class="text-2xl mr-3">🔒</span>
+              <div>
+                <p class="font-semibold">LOTO Automático</p>
+                <p class="text-sm text-gray-600">Procedimientos de seguridad al instante</p>
+              </div>
+            </li>
+            <li class="flex items-start">
+              <span class="text-2xl mr-3">💼</span>
+              <div>
+                <p class="font-semibold">Integración SAP</p>
+                <p class="text-sm text-gray-600">Import in 15 minutos</p>
+              </div>
+            </li>
+          </ul>
+        </div>
       </div>
+
+      <p class="text-center text-slate-500 text-xs mt-6 absolute bottom-4 left-1/2 transform -translate-x-1/2">
+        © {{ currentYear }} Asset Guard Corporate Edition. Todos los derechos reservados.
+      </p>
     </div>
-  `
+  `,
+  styles: []
 })
 export class LoginComponent {
   readonly authService = inject(AuthService);
@@ -169,6 +204,8 @@ export class LoginComponent {
   readonly isLoginMode = signal(true);
   readonly showPassword = signal(false);
   readonly isSubmitting = signal(false);
+
+  currentYear = new Date().getFullYear();
 
   async onSubmit() {
     if (!this.email || !this.password) return;

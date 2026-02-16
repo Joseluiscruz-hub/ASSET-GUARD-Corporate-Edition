@@ -25,7 +25,8 @@ export interface Asset {
   serial: string;
   sapCode?: string; // New: SAP Code
   acquisitionDate: string;
-  fuelType: 'Eléctrico' | 'Gas LP' | 'Diesel' | 'GLP/Gasolina Dual';
+  // Expanded for Industrial types
+  fuelType: 'Eléctrico' | 'Gas LP' | 'Diesel' | 'GLP/Gasolina Dual' | 'Eléctrico 440V' | 'Vapor/Gas' | 'Neumático' | 'Hidráulico';
   status: Status;
   statusSince: string; // ISO Date
   image?: string;
@@ -58,14 +59,7 @@ export interface FailureReport {
   partsUsed: string[];
   estimatedCost: number;
   technician: string;
-  type:
-    | 'Eléctrico'
-    | 'Mecánico'
-    | 'Hidráulico'
-    | 'Operador'
-    | 'Llantas'
-    | 'Estructural'
-    | 'Software';
+  type: 'Eléctrico' | 'Mecánico' | 'Hidráulico' | 'Operador' | 'Llantas' | 'Estructural' | 'Software' | 'Térmico' | 'Neumático';
 }
 
 export interface KPIData {
@@ -98,6 +92,24 @@ export interface ForkliftFailureEntry {
   ordenCompra?: string;
   estatusRefaccion?: 'N/A' | 'En Stock' | 'Pedida' | 'Por Recibir';
   fechaPromesa?: string; // ISO Date for expected parts
+}
+
+// New Interface for SMP Compliance (Excel Data)
+export interface MaintenanceSchedule {
+  id: string;
+  model: string;
+  serial: string;
+  economico: string;
+  supervisor: string;
+  smpType: 'REV' | 'X' | 'Y' | 'Z'; // The service levels
+  scheduledDate: string; // ISO Date
+  realDate?: string; // ISO Date or undefined
+  duration: string; // e.g., "2hrs"
+  otFolio: string;
+  serviceOrder: string;
+  hourMeter?: number;
+  technician: string;
+  status: 'Completado' | 'Programado' | 'Vencido' | 'En Proceso';
 }
 
 // AI Inspection Response Interface (Prompt 2)
@@ -133,22 +145,4 @@ export interface AIInspectionResponse {
     };
     image_quality_warning?: string;
   };
-}
-
-// Maintenance Schedule Interface for SMP Compliance
-export interface MaintenanceSchedule {
-  id: string;
-  smpType: 'REV' | 'X' | 'Y' | 'Z';
-  economico: string;
-  model: string;
-  serial: string;
-  supervisor: string;
-  scheduledDate: string; // ISO Date
-  realDate?: string; // ISO Date
-  duration: string; // e.g., "2h", "4h"
-  otFolio: string;
-  serviceOrder: string;
-  hourMeter?: number;
-  technician: string;
-  status: 'Programado' | 'En Proceso' | 'Completado' | 'Vencido';
 }

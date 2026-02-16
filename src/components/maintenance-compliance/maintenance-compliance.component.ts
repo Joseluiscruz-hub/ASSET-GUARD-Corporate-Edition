@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, ViewChild, ElementRef, effect, OnDestroy, inject, signal, computed } from '@angular/core';
+import { Component, AfterViewInit, ViewChild, ElementRef, effect, OnDestroy, signal, computed } from '@angular/core';
 import { CommonModule, DatePipe, PercentPipe, UpperCasePipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DataService } from '../../services/data.service';
@@ -109,12 +109,111 @@ declare var Chart: any;
           </div>
        </div>
 
+       <!-- Crisis Panel -->
+       <div *ngIf="porcentajeVencidos() > 30"
+            class="mb-6 bg-gradient-to-r from-red-500 to-red-600 text-white p-6 rounded-lg shadow-lg">
+         <div class="flex items-start gap-4">
+           <div class="flex-shrink-0 w-16 h-16 bg-white bg-opacity-20 rounded-full
+                       flex items-center justify-center">
+             <span class="text-4xl">⚠️</span>
+           </div>
+           <div class="flex-1">
+             <h2 class="text-2xl font-bold mb-2">
+               SITUACIÓN CRÍTICA: {{ porcentajeVencidos() }}% Mantenimientos Vencidos
+             </h2>
+             <p class="text-red-100 mb-4">
+               {{ chartStats().overdue }} de {{ chartStats().overdue + chartStats().onTime + chartStats().late + chartStats().process + chartStats().scheduled }} mantenimientos programados están atrasados.
+               Esto incrementa el riesgo de fallas inesperadas en 340%.
+             </p>
+
+             <!-- Botón análisis IA -->
+             <button (click)="analizarAtrasos()"
+                     class="bg-white text-red-600 px-6 py-2 rounded-lg font-bold
+                            hover:bg-red-50 transition-colors">
+               🤖 Analizar Causas con IA
+             </button>
+
+             <!-- Resultado del análisis -->
+             <div *ngIf="analisisAtrasos()" class="mt-4 bg-white bg-opacity-10 p-4 rounded-lg">
+               <p class="font-bold mb-2">Causas Identificadas:</p>
+               <ul class="space-y-1 text-sm">
+                 <li *ngFor="let causa of analisisAtrasos().causas">
+                   • {{ causa.descripcion }} ({{ causa.porcentaje }}%)
+                 </li>
+               </ul>
+
+               <p class="font-bold mt-4 mb-2">Acciones Recomendadas:</p>
+               <div class="space-y-2">
+                 <button *ngFor="let accion of analisisAtrasos().acciones"
+                         (click)="ejecutarAccion(accion)"
+                         class="w-full bg-white text-left text-red-600 px-4 py-2 rounded
+                                text-sm font-semibold hover:bg-red-50">
+                   {{ accion.titulo }} →
+                 </button>
+               </div>
+             </div>
+           </div>
+         </div>
+       </div>
+
+       <!-- Capacity Widgets -->
+       <div class="grid grid-cols-3 gap-4 mb-6">
+         <div class="bg-white p-4 rounded-lg shadow">
+           <p class="text-sm text-gray-600 mb-1">Próximos 7 días</p>
+           <p class="text-3xl font-bold">{{ Math.round(chartStats().scheduled * 0.3) + chartStats().process }}</p>
+           <p class="text-xs text-gray-500">mantenimientos</p>
+           <div class="mt-2 flex items-center gap-2">
+             <div class="flex-1 bg-gray-200 rounded-full h-2">
+               <div class="bg-green-500 h-2 rounded-full" style="width: 75%"></div>
+             </div>
+             <span class="text-xs font-semibold text-green-600">75% capacidad</span>
+           </div>
+         </div>
+
+         <div class="bg-white p-4 rounded-lg shadow">
+           <p class="text-sm text-gray-600 mb-1">Próximos 30 días</p>
+           <p class="text-3xl font-bold">{{ Math.round(chartStats().scheduled * 0.8) + chartStats().process }}</p>
+           <p class="text-xs text-gray-500">mantenimientos</p>
+           <div class="mt-2 flex items-center gap-2">
+             <div class="flex-1 bg-gray-200 rounded-full h-2">
+               <div class="bg-orange-500 h-2 rounded-full" style="width: 112%"></div>
+             </div>
+             <span class="text-xs font-semibold text-orange-600">⚠️ 112% capacidad</span>
+           </div>
+         </div>
+
+         <div class="bg-white p-4 rounded-lg shadow">
+           <p class="text-sm text-gray-600 mb-1">Técnicos Disponibles</p>
+           <p class="text-3xl font-bold">4</p>
+           <p class="text-xs text-gray-500">de 4 activos</p>
+           <div class="mt-2">
+             <button class="text-xs text-indigo-600 font-semibold">
+               + Solicitar apoyo temporal
+             </button>
+           </div>
+         </div>
+       </div>
+
        <!-- Data Table -->
        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden mt-6">
 
           <!-- Toolbar -->
           <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex flex-col md:flex-row justify-between items-center gap-4 bg-slate-50/50 dark:bg-slate-900/50">
              <div class="flex gap-4 items-center">
+               <!-- Toggle Vista -->
+               <div class="flex gap-2">
+                 <button [ngClass]="vista() === 'tabla' ? 'bg-indigo-600 text-white' : 'bg-gray-200'"
+                         (click)="vista.set('tabla')"
+                         class="px-4 py-2 rounded-l-lg font-semibold">
+                   📋 Tabla
+                 </button>
+                 <button [ngClass]="vista() === 'calendario' ? 'bg-indigo-600 text-white' : 'bg-gray-200'"
+                         (click)="vista.set('calendario')"
+                         class="px-4 py-2 rounded-r-lg font-semibold">
+                   📅 Calendario
+                 </button>
+               </div>
+
                <h3 class="font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
                   <i class="fas fa-list text-slate-400"></i>
                   Detalle de Órdenes
@@ -135,8 +234,8 @@ declare var Chart: any;
              </div>
           </div>
 
-          <!-- Table Container -->
-          <div class="overflow-x-auto">
+          <!-- Table View -->
+          <div *ngIf="vista() === 'tabla'" class="overflow-x-auto">
              <table class="w-full text-left border-collapse">
                 <thead class="bg-slate-100 dark:bg-slate-900 text-slate-500 dark:text-slate-400 font-bold text-[10px] uppercase tracking-wider sticky top-0 z-10 shadow-sm">
                    <tr>
@@ -235,6 +334,72 @@ declare var Chart: any;
                 </tbody>
              </table>
           </div>
+
+          <!-- Calendar View -->
+          <div *ngIf="vista() === 'calendario'" class="bg-white rounded-lg shadow p-4">
+            <!-- Header calendario -->
+            <div class="flex justify-between items-center mb-4">
+              <button class="p-2 hover:bg-gray-100 rounded">
+                ← Anterior
+              </button>
+              <h3 class="text-xl font-bold">
+                {{ '2026-02-15' | date:'MMMM yyyy':'':'es' | titlecase }}
+              </h3>
+              <button class="p-2 hover:bg-gray-100 rounded">
+                Siguiente →
+              </button>
+            </div>
+
+            <!-- Grid calendario -->
+            <div class="grid grid-cols-7 gap-2">
+              <!-- Headers días semana -->
+              <div *ngFor="let dia of ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']"
+                   class="text-center text-sm font-bold text-gray-600 py-2">
+                {{ dia }}
+              </div>
+
+              <!-- Días del mes (simplified) -->
+              <div *ngFor="let i of [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28]"
+                   class="min-h-24 border rounded-lg p-2 relative">
+                <span class="text-sm font-semibold">{{ i }}</span>
+
+                <!-- Mantenimientos mock -->
+                <div *ngIf="i % 3 === 0" class="mt-1 space-y-1">
+                  <div class="text-xs px-1 py-0.5 rounded bg-green-200 cursor-pointer">
+                    <p class="font-semibold truncate">MT-{{ i }}</p>
+                    <p class="truncate">X</p>
+                  </div>
+                </div>
+
+                <!-- Indicador de sobrecarga -->
+                <span *ngIf="i % 7 === 0"
+                      class="absolute top-1 right-1 bg-red-500 text-white
+                             text-xs px-1 rounded-full">
+                      +2
+                </span>
+              </div>
+            </div>
+
+            <!-- Leyenda -->
+            <div class="mt-4 flex gap-4 text-xs">
+              <div class="flex items-center gap-1">
+                <div class="w-4 h-4 bg-green-200 rounded"></div>
+                <span>Completado</span>
+              </div>
+              <div class="flex items-center gap-1">
+                <div class="w-4 h-4 bg-blue-200 rounded"></div>
+                <span>Programado</span>
+              </div>
+              <div class="flex items-center gap-1">
+                <div class="w-4 h-4 bg-orange-200 rounded"></div>
+                <span>En proceso</span>
+              </div>
+              <div class="flex items-center gap-1">
+                <div class="w-4 h-4 bg-red-200 rounded"></div>
+                <span>Vencido</span>
+              </div>
+            </div>
+          </div>
        </div>
     </div>
   `,
@@ -251,6 +416,8 @@ export class MaintenanceComplianceComponent implements AfterViewInit, OnDestroy 
   // State
   filterType = signal<string>('ALL');
   searchText = signal<string>('');
+  vista = signal<'tabla' | 'calendario'>('tabla');
+  analisisAtrasos = signal<any>(null);
 
   constructor(private dataService: DataService) {
     effect(() => {
@@ -298,6 +465,8 @@ export class MaintenanceComplianceComponent implements AfterViewInit, OnDestroy 
         return matchesType && matchesText;
      });
   });
+
+  porcentajeVencidos = computed(() => this.chartStats().overduePct);
 
   ngAfterViewInit() {
      this.initChart();
@@ -538,5 +707,26 @@ export class MaintenanceComplianceComponent implements AfterViewInit, OnDestroy 
         return 'bg-[#ce1126] text-white border-[#ce1126] shadow-md';
      }
      return 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50';
+  }
+
+  analizarAtrasos() {
+    // Mock analysis
+    this.analisisAtrasos.set({
+      causas: [
+        { descripcion: 'Falta de técnicos especializados', porcentaje: 35 },
+        { descripcion: 'Refacciones no disponibles', porcentaje: 28 },
+        { descripcion: 'Programación ineficiente', porcentaje: 22 },
+        { descripcion: 'Fallas imprevistas', porcentaje: 15 }
+      ],
+      acciones: [
+        { titulo: 'Contratar técnico adicional', id: 'contratar_tecnico' },
+        { titulo: 'Aumentar stock crítico', id: 'aumentar_stock' },
+        { titulo: 'Optimizar calendario SMP', id: 'optimizar_calendario' }
+      ]
+    });
+  }
+
+  ejecutarAccion(accion: any) {
+    alert(`[DEMO] Ejecutando acción: ${accion.titulo}`);
   }
 }

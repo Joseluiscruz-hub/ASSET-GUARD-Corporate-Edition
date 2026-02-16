@@ -3,6 +3,60 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DataService } from '../../services/data.service';
 
+enum EstadoRefaccion {
+  NO_APLICA = 'N/A',
+  EN_STOCK = 'EN_STOCK',
+  COTIZANDO = 'COTIZANDO',
+  APROBACION_PENDIENTE = 'APROBACION_PENDIENTE',
+  ORDENADA = 'ORDENADA',
+  EN_TRANSITO = 'EN_TRANSITO',
+  RECIBIDA = 'RECIBIDA',
+  ENTREGADA_TECNICO = 'ENTREGADA_TECNICO'
+}
+
+const ESTADO_CONFIG = {
+  [EstadoRefaccion.NO_APLICA]: {
+    label: 'N/A (Solo M.O.)',
+    color: 'gray',
+    icon: '➖'
+  },
+  [EstadoRefaccion.EN_STOCK]: {
+    label: 'En Stock',
+    color: 'green',
+    icon: '✅'
+  },
+  [EstadoRefaccion.COTIZANDO]: {
+    label: 'Cotizando',
+    color: 'yellow',
+    icon: '💰'
+  },
+  [EstadoRefaccion.APROBACION_PENDIENTE]: {
+    label: 'Esperando Aprobación',
+    color: 'orange',
+    icon: '⏸️'
+  },
+  [EstadoRefaccion.ORDENADA]: {
+    label: 'Pedida a Proveedor',
+    color: 'blue',
+    icon: '📦'
+  },
+  [EstadoRefaccion.EN_TRANSITO]: {
+    label: 'En Tránsito',
+    color: 'blue',
+    icon: '🚚'
+  },
+  [EstadoRefaccion.RECIBIDA]: {
+    label: 'Recibida en Almacén',
+    color: 'purple',
+    icon: '📥'
+  },
+  [EstadoRefaccion.ENTREGADA_TECNICO]: {
+    label: 'En Poder del Técnico',
+    color: 'green',
+    icon: '🔧'
+  }
+};
+
 @Component({
   selector: 'app-service-panel',
   standalone: true,
@@ -94,6 +148,29 @@ import { DataService } from '../../services/data.service';
                   >
                     {{ f.falla }}
                   </div>
+
+                  <!-- SLA Countdown -->
+                  <div class="mt-4">
+                    <p class="text-xs font-bold text-slate-400 uppercase mb-2">SLA Activo</p>
+                    <div [ngClass]="getSLAClasses(f.sla)"
+                         class="text-center px-4 py-2 rounded-lg">
+                      <p class="text-xs font-semibold uppercase">
+                        {{ f.sla?.estado || 'En Tiempo' }}
+                      </p>
+                      <p class="text-2xl font-bold">
+                        {{ f.sla?.tiempoRestante || '24h' }}
+                      </p>
+                      <p class="text-xs">
+                        Límite: {{ f.sla?.horaLimite ? (f.sla.horaLimite | date:'HH:mm') : '18:00' }}
+                      </p>
+                      <div class="w-24 h-1 bg-gray-200 rounded-full mt-2">
+                        <div class="h-1 rounded-full transition-all"
+                             [ngClass]="getSLAProgressColor(f.sla)"
+                             [style.width.%]="f.sla?.porcentajeTranscurrido || 50"></div>
+                      </div>
+                    </div>
+                  </div>
+
                   <div class="mt-4">
                     <p class="text-xs font-bold text-slate-400 uppercase mb-2">Historial Técnico</p>
                     <div class="space-y-2 max-h-32 overflow-y-auto custom-scroll text-xs">
@@ -113,6 +190,120 @@ import { DataService } from '../../services/data.service';
                     <i class="fas fa-box-open"></i> Logística de Refacciones
                   </h5>
 
+                  <!-- Estado Refacción -->
+                  <div class="mb-4">
+                    <label class="block text-sm font-medium mb-1">Estado Refacción</label>
+                    <select [(ngModel)]="f.estatusRefaccion"
+                            [ngClass]="getEstadoClasses(f.estatusRefaccion)"
+                            class="w-full rounded px-3 py-2">
+                      <option *ngFor="let estado of estadosRefaccion"
+                              [value]="estado">
+                        {{ estadoConfig[estado].icon }} {{ estadoConfig[estado].label }}
+                      </option>
+                    </select>
+
+                    <!-- Información adicional según estado -->
+                    <div *ngIf="f.estatusRefaccion === 'EN_TRANSITO'"
+                         class="mt-2 p-2 bg-blue-50 rounded text-sm">
+                      <div class="flex items-center justify-between">
+                        <span class="text-gray-700">Fecha estimada llegada:</span>
+                        <input type="date"
+                               [(ngModel)]="f.fechaEstimadaLlegada"
+                               class="text-sm border rounded px-2 py-1">
+                      </div>
+                      <p class="text-xs text-gray-500 mt-1">
+                        {{ calcularDiasRestantes(f.fechaEstimadaLlegada) }} días restantes
+                      </p>
+                    </div>
+
+                    <div *ngIf="f.estatusRefaccion === 'APROBACION_PENDIENTE'"
+                         class="mt-2 p-2 bg-orange-50 rounded text-sm">
+                      <p class="text-orange-800 font-medium mb-2">
+                        Esperando aprobación de compra
+                      </p>
+                      <div class="flex gap-2">
+                        <button class="flex-1 bg-green-500 text-white px-3 py-1 rounded text-xs"
+                                (click)="aprobarCompra(f)">
+                          ✓ Aprobar
+                        </button>
+                        <button class="flex-1 bg-red-500 text-white px-3 py-1 rounded text-xs"
+                                (click)="rechazarCompra(f)">
+                          ✕ Rechazar
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Refacción específica -->
+                  <div class="refaccion-section mt-4">
+                    <label class="block text-sm font-medium mb-1">Refacción Requerida</label>
+
+                    <!-- Autocomplete con búsqueda -->
+                    <div class="relative">
+                      <input type="text"
+                             [(ngModel)]="busquedaRefaccion"
+                             (input)="buscarRefacciones($event)"
+                             placeholder="Buscar por código o descripción..."
+                             class="w-full border rounded px-3 py-2 pr-10">
+                      <svg class="absolute right-3 top-3 w-4 h-4 text-gray-400">
+                        <path fill="currentColor" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"/>
+                      </svg>
+
+                      <!-- Resultados autocomplete -->
+                      <div *ngIf="resultadosBusqueda.length > 0"
+                           class="absolute z-10 w-full mt-1 bg-white border rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                        <div *ngFor="let refaccion of resultadosBusqueda"
+                             (click)="seleccionarRefaccion(f, refaccion)"
+                             class="px-3 py-2 hover:bg-gray-50 cursor-pointer border-b">
+                          <div class="flex justify-between items-start">
+                            <div>
+                              <p class="font-semibold text-sm">{{ refaccion.codigo }}</p>
+                              <p class="text-xs text-gray-600">{{ refaccion.descripcion }}</p>
+                            </div>
+                            <div class="text-right">
+                              <p class="text-sm font-bold text-green-600">
+                                {{ '$' }}{{ refaccion.precio }}
+                              </p>
+                              <p class="text-xs" [ngClass]="refaccion.stock > 0 ? 'text-green-600' : 'text-red-600'">
+                                {{ refaccion.stock > 0 ? 'En stock: ' + refaccion.stock : 'Agotado' }}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Refacciones seleccionadas -->
+                    <div *ngIf="f.refacciones && f.refacciones.length > 0" class="mt-3 space-y-2">
+                      <div *ngFor="let ref of f.refacciones; let i = index"
+                           class="bg-gray-50 p-3 rounded flex justify-between items-center">
+                        <div class="flex-1">
+                          <p class="font-semibold text-sm">{{ ref.codigo }}</p>
+                          <p class="text-xs text-gray-600">{{ ref.descripcion }}</p>
+                          <div class="flex gap-4 mt-1">
+                            <span class="text-xs">Cant: {{ ref.cantidad }}</span>
+                            <span class="text-xs">Precio: {{ '$' }}{{ ref.precio }}</span>
+                            <span class="text-xs font-bold">Total: {{ '$' }}{{ ref.cantidad * ref.precio }}</span>
+                          </div>
+                        </div>
+                        <button (click)="eliminarRefaccion(f, i)"
+                                class="text-red-500 hover:text-red-700 ml-2">
+                          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                          </svg>
+                        </button>
+                      </div>
+
+                      <!-- Total -->
+                      <div class="bg-indigo-50 p-3 rounded flex justify-between items-center">
+                        <span class="font-bold">TOTAL REFACCIONES:</span>
+                        <span class="text-xl font-bold text-indigo-600">
+                          {{ '$' }}{{ calcularTotalRefacciones(f) }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div>
                       <label class="text-xs font-bold text-slate-400 uppercase"
@@ -124,21 +315,6 @@ import { DataService } from '../../services/data.service';
                         [value]="f.ordenCompra || ''"
                         class="w-full mt-1 p-2 rounded border border-slate-300 text-sm focus:ring-2 focus:ring-orange-500"
                       />
-                    </div>
-                    <div>
-                      <label class="text-xs font-bold text-slate-400 uppercase"
-                        >Estatus Refacción</label
-                      >
-                      <select
-                        #status
-                        [value]="f.estatusRefaccion || 'N/A'"
-                        class="w-full mt-1 p-2 rounded border border-slate-300 text-sm bg-white"
-                      >
-                        <option value="N/A">N/A (Solo Mano de Obra)</option>
-                        <option value="En Stock">En Stock</option>
-                        <option value="Pedida">Pedida a Planta</option>
-                        <option value="Por Recibir">En Tránsito</option>
-                      </select>
                     </div>
                   </div>
 
@@ -160,7 +336,7 @@ import { DataService } from '../../services/data.service';
 
                   <div class="flex gap-3 mt-4 pt-4 border-t border-slate-200">
                     <button
-                      (click)="saveLogistics(f.id, po.value, status.value)"
+                      (click)="saveLogistics(f.id, po.value, f.estatusRefaccion)"
                       class="flex-1 py-2 bg-slate-800 text-white rounded font-bold text-xs uppercase hover:bg-slate-900 transition"
                     >
                       Guardar Cambios
@@ -174,7 +350,6 @@ import { DataService } from '../../services/data.service';
                   </div>
                 </div>
               </div>
-            </div>
           } @empty {
             <div class="py-20 text-center">
               <div
@@ -220,5 +395,110 @@ export class ServicePanelComponent {
     if (confirm('¿Confirmar liberación de equipo?')) {
       this.dataService.closeLiveFailure(id);
     }
+  }
+
+  get estadosRefaccion() {
+    return Object.values(EstadoRefaccion);
+  }
+
+  get estadoConfig() {
+    return ESTADO_CONFIG;
+  }
+
+  busquedaRefaccion = '';
+  resultadosBusqueda: any[] = [];
+
+  // Mock catálogo de refacciones
+  catalogoRefacciones = [
+    { codigo: 'FLT-001', descripcion: 'Filtro de aceite hidráulico', precio: 45.50, stock: 12 },
+    { codigo: 'FLT-002', descripcion: 'Filtro de combustible', precio: 32.00, stock: 8 },
+    { codigo: 'BRK-001', descripcion: 'Pastillas de freno delantero', precio: 85.00, stock: 0 },
+    { codigo: 'BRK-002', descripcion: 'Disco de freno', precio: 120.00, stock: 5 },
+    { codigo: 'BAT-001', descripcion: 'Batería 12V 100Ah', precio: 180.00, stock: 3 }
+  ];
+
+  buscarRefacciones(event: any) {
+    const query = event.target.value.toLowerCase();
+    if (query.length < 2) {
+      this.resultadosBusqueda = [];
+      return;
+    }
+    this.resultadosBusqueda = this.catalogoRefacciones.filter(ref =>
+      ref.codigo.toLowerCase().includes(query) ||
+      ref.descripcion.toLowerCase().includes(query)
+    );
+  }
+
+  seleccionarRefaccion(failure: any, refaccion: any) {
+    if (!failure.refacciones) failure.refacciones = [];
+    const existing = failure.refacciones.find((r: any) => r.codigo === refaccion.codigo);
+    if (existing) {
+      existing.cantidad += 1;
+    } else {
+      failure.refacciones.push({
+        ...refaccion,
+        cantidad: 1
+      });
+    }
+    this.busquedaRefaccion = '';
+    this.resultadosBusqueda = [];
+  }
+
+  eliminarRefaccion(failure: any, index: number) {
+    failure.refacciones.splice(index, 1);
+  }
+
+  calcularTotalRefacciones(failure: any): number {
+    if (!failure.refacciones) return 0;
+    return failure.refacciones.reduce((total: number, ref: any) => total + (ref.cantidad * ref.precio), 0);
+  }
+
+  calcularDiasRestantes(fecha: string): number {
+    if (!fecha) return 0;
+    const hoy = new Date();
+    const llegada = new Date(fecha);
+    const diff = llegada.getTime() - hoy.getTime();
+    return Math.ceil(diff / (1000 * 60 * 60 * 24));
+  }
+
+  aprobarCompra(failure: any) {
+    failure.estatusRefaccion = EstadoRefaccion.ORDENADA;
+    alert('[DEMO] Compra aprobada');
+  }
+
+  rechazarCompra(failure: any) {
+    failure.estatusRefaccion = EstadoRefaccion.COTIZANDO;
+    alert('[DEMO] Compra rechazada');
+  }
+
+  getEstadoClasses(estado: string): string {
+    const config = ESTADO_CONFIG[estado as EstadoRefaccion];
+    if (!config) return 'border-gray-300';
+    switch (config.color) {
+      case 'green': return 'border-green-300 bg-green-50';
+      case 'yellow': return 'border-yellow-300 bg-yellow-50';
+      case 'orange': return 'border-orange-300 bg-orange-50';
+      case 'blue': return 'border-blue-300 bg-blue-50';
+      case 'purple': return 'border-purple-300 bg-purple-50';
+      default: return 'border-gray-300';
+    }
+  }
+
+  getSLAClasses(sla: any): string {
+    if (!sla) return 'bg-green-100 border-2 border-green-500 text-green-800';
+    if (sla.porcentajeTranscurrido >= 100) {
+      return 'bg-red-100 border-2 border-red-500 text-red-800';
+    }
+    if (sla.porcentajeTranscurrido >= 80) {
+      return 'bg-orange-100 border-2 border-orange-500 text-orange-800';
+    }
+    return 'bg-green-100 border-2 border-green-500 text-green-800';
+  }
+
+  getSLAProgressColor(sla: any): string {
+    if (!sla) return 'bg-green-500';
+    if (sla.porcentajeTranscurrido >= 100) return 'bg-red-500';
+    if (sla.porcentajeTranscurrido >= 80) return 'bg-orange-500';
+    return 'bg-green-500';
   }
 }
