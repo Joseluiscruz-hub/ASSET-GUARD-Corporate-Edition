@@ -419,6 +419,9 @@ export class MaintenanceComplianceComponent implements AfterViewInit, OnDestroy 
   vista = signal<'tabla' | 'calendario'>('tabla');
   analisisAtrasos = signal<any>(null);
 
+  // Make Math available in template
+  public Math = Math;
+
   constructor(private dataService: DataService) {
     effect(() => {
        const stats = this.chartStats();
