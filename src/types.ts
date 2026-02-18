@@ -92,6 +92,22 @@ export interface ForkliftFailureEntry {
   ordenCompra?: string;
   estatusRefaccion?: 'N/A' | 'En Stock' | 'Pedida' | 'Por Recibir';
   fechaPromesa?: string; // ISO Date for expected parts
+
+  // New fields for SLA and parts
+  sla?: {
+    estado?: string;
+    tiempoRestante?: string;
+    horaLimite?: string;
+    porcentajeTranscurrido?: number;
+  };
+  fechaEstimadaLlegada?: string;
+  refacciones?: Array<{
+    codigo: string;
+    descripcion: string;
+    cantidad: number;
+    precio: number;
+    stock?: number;
+  }>;
 }
 
 // New Interface for SMP Compliance (Excel Data)

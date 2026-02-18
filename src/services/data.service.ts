@@ -155,10 +155,19 @@ export class DataService {
   }
 
   private initializeData() {
-    // Initialize data after service is fully instantiated
-    this.assetsSignal.set(this.loadRealFleet());
-    this.reportsSignal.set(this.generateRealReports());
-    this.forkliftFailures.set(this.generateRealLiveFailures());
+    // Inicializa datos después de instanciar el servicio
+    const assets = this.loadRealFleet();
+    this.assetsSignal.set(assets);
+    const reports = this.generateRealReports();
+    this.reportsSignal.set(reports);
+    // Inicializa las fallas con propiedades por defecto
+    const failures = this.generateRealLiveFailures().map(f => ({
+      ...f,
+      sla: f.sla || {},
+      fechaEstimadaLlegada: f.fechaEstimadaLlegada || '',
+      refacciones: f.refacciones || []
+    }));
+    this.forkliftFailures.set(failures);
   }
 
   // --- Initialization ---
@@ -405,7 +414,14 @@ export class DataService {
 
   // --- Sync Helpers ---
   private syncAssetsWithFailures(failures: ForkliftFailureEntry[]) {
-    const activeFailures = failures.filter(f => f.estatus !== 'Cerrada');
+    // Refuerza la inicialización de propiedades
+    const normalizedFailures = failures.map(f => ({
+      ...f,
+      sla: f.sla || {},
+      fechaEstimadaLlegada: f.fechaEstimadaLlegada || '',
+      refacciones: f.refacciones || []
+    }));
+    const activeFailures = normalizedFailures.filter(f => f.estatus !== 'Cerrada');
     const activeIds = new Set(activeFailures.map(f => f.economico));
     const activeFailureMap = new Map(activeFailures.map(f => [f.economico, f]));
 
@@ -479,7 +495,8 @@ export class DataService {
       fechaIngreso: new Date().toISOString(),
       prioridad: 'Alta',
       estatus: 'Abierta',
-      seguimiento: []
+      seguimiento: [],
+      estatusRefaccion: 'N/A'
     };
     return [demoFailure];
   }

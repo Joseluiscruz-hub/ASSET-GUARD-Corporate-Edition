@@ -100,8 +100,7 @@ const ESTADO_CONFIG = {
         </div>
 
         <div class="divide-y divide-slate-100">
-          @for (f of openFailures(); track f.id) {
-            <div class="p-6 hover:bg-slate-50 transition-colors">
+          <div *ngFor="let f of openFailures(); let i = index; track by f.id" class="p-6 hover:bg-slate-50 transition-colors">
               <!-- Top Row: ID + Status -->
               <div
                 class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4"
@@ -153,21 +152,28 @@ const ESTADO_CONFIG = {
                   <!-- SLA Countdown -->
                   <div class="mt-4">
                     <p class="text-xs font-bold text-slate-400 uppercase mb-2">SLA Activo</p>
-                    <div [ngClass]="getSLAClasses(f.sla)"
-                         class="text-center px-4 py-2 rounded-lg">
+                    <div *ngIf="f?.sla" [ngClass]="getSLAClasses(f.sla)" class="text-center px-4 py-2 rounded-lg">
                       <p class="text-xs font-semibold uppercase">
-                        {{ f.sla?.estado || 'En Tiempo' }}
+                        {{ f.sla.estado || 'En Tiempo' }}
                       </p>
                       <p class="text-2xl font-bold">
-                        {{ f.sla?.tiempoRestante || '24h' }}
+                        {{ f.sla.tiempoRestante || '24h' }}
                       </p>
                       <p class="text-xs">
-                        Límite: {{ f.sla?.horaLimite ? (f.sla.horaLimite | date:'HH:mm') : '18:00' }}
+                        Límite: {{ f.sla.horaLimite ? (f.sla.horaLimite | date:'HH:mm') : '18:00' }}
                       </p>
                       <div class="w-24 h-1 bg-gray-200 rounded-full mt-2">
                         <div class="h-1 rounded-full transition-all"
                              [ngClass]="getSLAProgressColor(f.sla)"
-                             [style.width.%]="f.sla?.porcentajeTranscurrido || 50"></div>
+                             [style.width.%]="f.sla.porcentajeTranscurrido || 50"></div>
+                      </div>
+                    </div>
+                    <div *ngIf="!f?.sla" class="text-center px-4 py-2 rounded-lg bg-green-100 border-2 border-green-500 text-green-800">
+                      <p class="text-xs font-semibold uppercase">En Tiempo</p>
+                      <p class="text-2xl font-bold">24h</p>
+                      <p class="text-xs">Límite: 18:00</p>
+                      <div class="w-24 h-1 bg-gray-200 rounded-full mt-2">
+                        <div class="h-1 rounded-full transition-all bg-green-500" [style.width.%]="50"></div>
                       </div>
                     </div>
                   </div>
@@ -175,12 +181,10 @@ const ESTADO_CONFIG = {
                   <div class="mt-4">
                     <p class="text-xs font-bold text-slate-400 uppercase mb-2">Historial Técnico</p>
                     <div class="space-y-2 max-h-32 overflow-y-auto custom-scroll text-xs">
-                      @for (msg of f.seguimiento; track msg.fecha) {
-                        <div class="p-2 rounded bg-slate-50 border border-slate-100">
-                          <span class="font-bold text-orange-600">{{ msg.usuario }}:</span>
-                          {{ msg.mensaje }}
-                        </div>
-                      }
+                      <div *ngFor="let msg of f.seguimiento; track by msg.fecha" class="p-2 rounded bg-slate-50 border border-slate-100">
+                        <span class="font-bold text-orange-600">{{ msg.usuario }}:</span>
+                        {{ msg.mensaje }}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -208,7 +212,7 @@ const ESTADO_CONFIG = {
                          class="mt-2 p-2 bg-blue-50 rounded text-sm">
                       <div class="flex items-center justify-between">
                         <span class="text-gray-700">Fecha estimada llegada:</span>
-                        <input type="date"
+                        <input *ngIf="f?.fechaEstimadaLlegada !== undefined" type="date"
                                [(ngModel)]="f.fechaEstimadaLlegada"
                                class="text-sm border rounded px-2 py-1">
                       </div>
@@ -246,16 +250,10 @@ const ESTADO_CONFIG = {
                              (input)="buscarRefacciones($event)"
                              placeholder="Buscar por código o descripción..."
                              class="w-full border rounded px-3 py-2 pr-10">
-                      <svg class="absolute right-3 top-3 w-4 h-4 text-gray-400">
-                        <path fill="currentColor" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"/>
-                      </svg>
 
                       <!-- Resultados autocomplete -->
-                      <div *ngIf="resultadosBusqueda.length > 0"
-                           class="absolute z-10 w-full mt-1 bg-white border rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                        <div *ngFor="let refaccion of resultadosBusqueda"
-                             (click)="seleccionarRefaccion(f, refaccion)"
-                             class="px-3 py-2 hover:bg-gray-50 cursor-pointer border-b">
+                      <div *ngIf="resultadosBusqueda.length > 0" class="absolute z-10 w-full mt-1 bg-white border rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                        <div *ngFor="let refaccion of resultadosBusqueda" (click)="seleccionarRefaccion(f, refaccion)" class="px-3 py-2 hover:bg-gray-50 cursor-pointer border-b">
                           <div class="flex justify-between items-start">
                             <div>
                               <p class="font-semibold text-sm">{{ refaccion.codigo }}</p>
@@ -276,8 +274,7 @@ const ESTADO_CONFIG = {
 
                     <!-- Refacciones seleccionadas -->
                     <div *ngIf="f.refacciones && f.refacciones.length > 0" class="mt-3 space-y-2">
-                      <div *ngFor="let ref of f.refacciones; let i = index"
-                           class="bg-gray-50 p-3 rounded flex justify-between items-center">
+                      <div *ngFor="let ref of f.refacciones; let i = index" class="bg-gray-50 p-3 rounded flex justify-between items-center">
                         <div class="flex-1">
                           <p class="font-semibold text-sm">{{ ref.codigo }}</p>
                           <p class="text-xs text-gray-600">{{ ref.descripcion }}</p>
@@ -287,21 +284,19 @@ const ESTADO_CONFIG = {
                             <span class="text-xs font-bold">Total: {{ '$' }}{{ ref.cantidad * ref.precio }}</span>
                           </div>
                         </div>
-                        <button (click)="eliminarRefaccion(f, i)"
-                                class="text-red-500 hover:text-red-700 ml-2">
-                          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
-                          </svg>
+                        <button (click)="eliminarRefaccion(f, i)" class="text-red-500 hover:text-red-700 ml-2">
+                          Eliminar
                         </button>
                       </div>
-
-                      <!-- Total -->
                       <div class="bg-indigo-50 p-3 rounded flex justify-between items-center">
                         <span class="font-bold">TOTAL REFACCIONES:</span>
                         <span class="text-xl font-bold text-indigo-600">
                           {{ '$' }}{{ calcularTotalRefacciones(f) }}
                         </span>
                       </div>
+                    </div>
+                    <div *ngIf="!f.refacciones || f.refacciones.length === 0" class="mt-3 p-3 bg-gray-50 rounded">
+                      <p class="text-center text-sm text-gray-500">Sin refacciones seleccionadas. Utiliza la búsqueda para agregar refacciones.</p>
                     </div>
                   </div>
 
@@ -351,17 +346,17 @@ const ESTADO_CONFIG = {
                   </div>
                 </div>
               </div>
-          &#125; @empty {
-            <div class="py-20 text-center">
-              <div
-                class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-slate-100 text-slate-300 mb-4"
-              >
-                <i class="fas fa-check text-4xl"></i>
-              </div>
-              <h3 class="font-bold text-slate-600">Todo limpio</h3>
-              <p class="text-slate-400 text-sm">No hay unidades pendientes en taller.</p>
+          </div>
+
+          <div *ngIf="openFailures().length === 0" class="py-20 text-center">
+            <div
+              class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-slate-100 text-slate-300 mb-4"
+            >
+              <i class="fas fa-check text-4xl"></i>
             </div>
-          }
+            <h3 class="font-bold text-slate-600">Todo limpio</h3>
+            <p class="text-slate-400 text-sm">No hay unidades pendientes en taller.</p>
+          </div>
         </div>
       </div>
     </div>
@@ -370,7 +365,14 @@ const ESTADO_CONFIG = {
 export class ServicePanelComponent {
   dataService = inject(DataService);
 
-  openFailures = this.dataService.forkliftFailures;
+  openFailures = computed(() =>
+  this.dataService.forkliftFailures().map(f => ({
+    ...f,
+    sla: f.sla || {},
+    fechaEstimadaLlegada: f.fechaEstimadaLlegada || '',
+    refacciones: f.refacciones || []
+  }))
+);
 
   pendingParts = computed(
     () => this.dataService.forkliftFailures().filter(f => f.estatusRefaccion === 'Pedida').length
@@ -398,12 +400,12 @@ export class ServicePanelComponent {
     }
   }
 
+  // Exponer EstadoRefaccion y estadoConfig como propiedades públicas
+  public EstadoRefaccion = EstadoRefaccion;
+  public estadoConfig = ESTADO_CONFIG;
+
   get estadosRefaccion() {
     return Object.values(EstadoRefaccion);
-  }
-
-  get estadoConfig() {
-    return ESTADO_CONFIG;
   }
 
   busquedaRefaccion = '';
@@ -472,17 +474,11 @@ export class ServicePanelComponent {
     alert('[DEMO] Compra rechazada');
   }
 
-  getEstadoClasses(estado: string): string {
-    const config = ESTADO_CONFIG[estado as EstadoRefaccion];
-    if (!config) return 'border-gray-300';
-    switch (config.color) {
-      case 'green': return 'border-green-300 bg-green-50';
-      case 'yellow': return 'border-yellow-300 bg-yellow-50';
-      case 'orange': return 'border-orange-300 bg-orange-50';
-      case 'blue': return 'border-blue-300 bg-blue-50';
-      case 'purple': return 'border-purple-300 bg-purple-50';
-      default: return 'border-gray-300';
-    }
+  // Corrijo el método getEstadoClasses para castear el estado a keyof typeof ESTADO_CONFIG
+  getEstadoClasses(estado: string | undefined) {
+    return estado && this.estadoConfig[estado as keyof typeof ESTADO_CONFIG]?.color
+      ? this.estadoConfig[estado as keyof typeof ESTADO_CONFIG].color
+      : 'bg-gray-200';
   }
 
   getSLAClasses(sla: any): string {

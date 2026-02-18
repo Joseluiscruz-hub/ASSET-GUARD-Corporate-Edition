@@ -63,6 +63,7 @@ export class AppComponent {
   currentView = signal<View>('dashboard');
   selectedAssetId = signal<string | null>(null);
   showAiPanel = signal(false);
+  errorMessage = signal<string | null>(null);
 
   // Data Signals
   connectionStatus = this.dataService.connectionStatus;
@@ -99,6 +100,14 @@ export class AppComponent {
     // Custom Events
     window.addEventListener('asset-selected', (e: any) => this.selectedAssetId.set(e.detail));
     window.addEventListener('asset-closed', () => this.selectedAssetId.set(null));
+
+    // Manejo de errores globales
+    window.addEventListener('error', (e: any) => {
+      this.errorMessage.set('Error crítico: ' + (e.message || 'Desconocido'));
+    });
+    window.addEventListener('unhandledrejection', (e: any) => {
+      this.errorMessage.set('Error de promesa: ' + (e.reason?.message || 'Desconocido'));
+    });
   }
 
   // Navigation Logic

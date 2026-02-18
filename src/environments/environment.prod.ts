@@ -1,14 +1,13 @@
 export const environment = {
   production: true,
   firebase: {
-    apiKey: 'AIzaSyArMDaPtSCgzz0QUlJhnUhhq5cRTY8G7RJ',
-    authDomain: 'miproyectoindicadores.firebaseapp.com',
-    databaseURL: 'https://miproyectoindicadores-default-rtdb.firebaseio.com',
-    projectId: 'miproyectoindicadores',
-    storageBucket: 'miproyectoindicadores.appspot.com', // Corregido
-    messagingSenderId: '572003613740',
-    appId: '1:572003613740:web:4001cae49871f7f4672589',
-    measurementId: 'G-9RN0X15CCP'
+    apiKey: 'AIzaSyCQkT-TQy-rtKr_bmTWJS78HghTh97x3eE', // Usar la misma clave que en desarrollo para pruebas
+    authDomain: 'asset-guard-demo.firebaseapp.com',
+    databaseURL: 'https://asset-guard-demo-default-rtdb.firebaseio.com',
+    projectId: 'asset-guard-demo',
+    storageBucket: 'asset-guard-demo.firebasestorage.app',
+    messagingSenderId: '730419123254',
+    appId: '1:730419123254:web:74de062f3e9e0851087497'
   },
-  geminiApiKey: ''
+  geminiApiKey: 'AIzaSyDg8fHddzzerQlkBfNr49q51ZZoo1fvlM08'
 };
