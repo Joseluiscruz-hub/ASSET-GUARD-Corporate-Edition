@@ -2,17 +2,7 @@ import { Component, inject, computed } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DataService } from '../../services/data.service';
-
-enum EstadoRefaccion {
-  NO_APLICA = 'N/A',
-  EN_STOCK = 'EN_STOCK',
-  COTIZANDO = 'COTIZANDO',
-  APROBACION_PENDIENTE = 'APROBACION_PENDIENTE',
-  ORDENADA = 'ORDENADA',
-  EN_TRANSITO = 'EN_TRANSITO',
-  RECIBIDA = 'RECIBIDA',
-  ENTREGADA_TECNICO = 'ENTREGADA_TECNICO'
-}
+import { EstadoRefaccion } from '../../types';
 
 const ESTADO_CONFIG = {
   [EstadoRefaccion.NO_APLICA]: {
@@ -100,7 +90,7 @@ const ESTADO_CONFIG = {
         </div>
 
         <div class="divide-y divide-slate-100">
-          <div *ngFor="let f of openFailures(); let i = index; track by f.id" class="p-6 hover:bg-slate-50 transition-colors">
+          <div *ngFor="let f of openFailures(); let i = index; trackBy: trackById" class="p-6 hover:bg-slate-50 transition-colors">
               <!-- Top Row: ID + Status -->
               <div
                 class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4"
@@ -181,7 +171,7 @@ const ESTADO_CONFIG = {
                   <div class="mt-4">
                     <p class="text-xs font-bold text-slate-400 uppercase mb-2">Historial Técnico</p>
                     <div class="space-y-2 max-h-32 overflow-y-auto custom-scroll text-xs">
-                      <div *ngFor="let msg of f.seguimiento; track by msg.fecha" class="p-2 rounded bg-slate-50 border border-slate-100">
+                      <div *ngFor="let msg of f.seguimiento; trackBy: trackByMsgFecha" class="p-2 rounded bg-slate-50 border border-slate-100">
                         <span class="font-bold text-orange-600">{{ msg.usuario }}:</span>
                         {{ msg.mensaje }}
                       </div>
@@ -208,7 +198,7 @@ const ESTADO_CONFIG = {
                     </select>
 
                     <!-- Información adicional según estado -->
-                    <div *ngIf="f.estatusRefaccion === 'EN_TRANSITO'"
+                    <div *ngIf="f.estatusRefaccion === EstadoRefaccion.EN_TRANSITO"
                          class="mt-2 p-2 bg-blue-50 rounded text-sm">
                       <div class="flex items-center justify-between">
                         <span class="text-gray-700">Fecha estimada llegada:</span>
@@ -221,7 +211,7 @@ const ESTADO_CONFIG = {
                       </p>
                     </div>
 
-                    <div *ngIf="f.estatusRefaccion === 'APROBACION_PENDIENTE'"
+                    <div *ngIf="f.estatusRefaccion === EstadoRefaccion.APROBACION_PENDIENTE"
                          class="mt-2 p-2 bg-orange-50 rounded text-sm">
                       <p class="text-orange-800 font-medium mb-2">
                         Esperando aprobación de compra
@@ -253,7 +243,7 @@ const ESTADO_CONFIG = {
 
                       <!-- Resultados autocomplete -->
                       <div *ngIf="resultadosBusqueda.length > 0" class="absolute z-10 w-full mt-1 bg-white border rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                        <div *ngFor="let refaccion of resultadosBusqueda" (click)="seleccionarRefaccion(f, refaccion)" class="px-3 py-2 hover:bg-gray-50 cursor-pointer border-b">
+                        <div *ngFor="let refaccion of resultadosBusqueda; trackBy: trackByRefaccion" (click)="seleccionarRefaccion(f, refaccion)" class="px-3 py-2 hover:bg-gray-50 cursor-pointer border-b">
                           <div class="flex justify-between items-start">
                             <div>
                               <p class="font-semibold text-sm">{{ refaccion.codigo }}</p>
@@ -274,7 +264,7 @@ const ESTADO_CONFIG = {
 
                     <!-- Refacciones seleccionadas -->
                     <div *ngIf="f.refacciones && f.refacciones.length > 0" class="mt-3 space-y-2">
-                      <div *ngFor="let ref of f.refacciones; let i = index" class="bg-gray-50 p-3 rounded flex justify-between items-center">
+                      <div *ngFor="let ref of f.refacciones; trackBy: trackByRefIndex; let i = index" class="bg-gray-50 p-3 rounded flex justify-between items-center">
                         <div class="flex-1">
                           <p class="font-semibold text-sm">{{ ref.codigo }}</p>
                           <p class="text-xs text-gray-600">{{ ref.descripcion }}</p>
@@ -375,7 +365,7 @@ export class ServicePanelComponent {
 );
 
   pendingParts = computed(
-    () => this.dataService.forkliftFailures().filter(f => f.estatusRefaccion === 'Pedida').length
+    () => this.dataService.forkliftFailures().filter(f => f.estatusRefaccion === EstadoRefaccion.ORDENADA).length
   );
 
   criticalCount = computed(
@@ -497,5 +487,21 @@ export class ServicePanelComponent {
     if (sla.porcentajeTranscurrido >= 100) return 'bg-red-500';
     if (sla.porcentajeTranscurrido >= 80) return 'bg-orange-500';
     return 'bg-green-500';
+  }
+
+  trackById(index: number, item: any): string {
+    return item.id;
+  }
+
+  trackByMsgFecha(index: number, item: any): string {
+    return item.fecha;
+  }
+
+  trackByRefaccion(index: number, item: any): string {
+    return item.codigo;
+  }
+
+  trackByRefIndex(index: number, item: any): number {
+    return index;
   }
 }

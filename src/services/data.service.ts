@@ -6,7 +6,8 @@ import {
   KPIData,
   ForkliftFailureEntry,
   MaintenanceTask,
-  MaintenanceSchedule
+  MaintenanceSchedule,
+  EstadoRefaccion
 } from '../types';
 import { firebaseApp } from '../firebase-init';
 import {
@@ -496,7 +497,7 @@ export class DataService {
       prioridad: 'Alta',
       estatus: 'Abierta',
       seguimiento: [],
-      estatusRefaccion: 'N/A'
+      estatusRefaccion: EstadoRefaccion.NO_APLICA
     };
     return [demoFailure];
   }

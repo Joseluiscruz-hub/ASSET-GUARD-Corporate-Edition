@@ -1,3 +1,14 @@
+export enum EstadoRefaccion {
+  NO_APLICA = 'N/A',
+  EN_STOCK = 'EN_STOCK',
+  COTIZANDO = 'COTIZANDO',
+  APROBACION_PENDIENTE = 'APROBACION_PENDIENTE',
+  ORDENADA = 'ORDENADA',
+  EN_TRANSITO = 'EN_TRANSITO',
+  RECIBIDA = 'RECIBIDA',
+  ENTREGADA_TECNICO = 'ENTREGADA_TECNICO'
+}
+
 export interface Status {
   id: string;
   name: 'Operativo' | 'Taller' | 'Baja' | 'Preventivo';
@@ -90,7 +101,7 @@ export interface ForkliftFailureEntry {
 
   // Toyota Management Fields
   ordenCompra?: string;
-  estatusRefaccion?: 'N/A' | 'En Stock' | 'Pedida' | 'Por Recibir';
+  estatusRefaccion?: EstadoRefaccion;
   fechaPromesa?: string; // ISO Date for expected parts
 
   // New fields for SLA and parts
