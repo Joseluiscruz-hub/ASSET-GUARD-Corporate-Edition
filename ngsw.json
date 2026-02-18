@@ -1,0 +1,68 @@
+{
+  "configVersion": 1,
+  "timestamp": 1771418314786,
+  "index": "/ASSET-GUARD-Corporate-Edition/index.html",
+  "assetGroups": [
+    {
+      "name": "app",
+      "installMode": "prefetch",
+      "updateMode": "prefetch",
+      "cacheQueryOptions": {
+        "ignoreVary": true
+      },
+      "urls": [
+        "/ASSET-GUARD-Corporate-Edition/239.16e71bb365f8ecf0.js",
+        "/ASSET-GUARD-Corporate-Edition/627.4307bb1e3ccbac6f.js",
+        "/ASSET-GUARD-Corporate-Edition/842.62b4e135055b16a2.js",
+        "/ASSET-GUARD-Corporate-Edition/887.259070bb324a39b0.js",
+        "/ASSET-GUARD-Corporate-Edition/favicon.ico",
+        "/ASSET-GUARD-Corporate-Edition/index.html",
+        "/ASSET-GUARD-Corporate-Edition/main.b728189d6ec5caf4.js",
+        "/ASSET-GUARD-Corporate-Edition/runtime.07c230f04a31c2ba.js",
+        "/ASSET-GUARD-Corporate-Edition/styles.d99620c8cc310344.css"
+      ],
+      "patterns": []
+    },
+    {
+      "name": "assets",
+      "installMode": "lazy",
+      "updateMode": "prefetch",
+      "cacheQueryOptions": {
+        "ignoreVary": true
+      },
+      "urls": [],
+      "patterns": []
+    }
+  ],
+  "dataGroups": [],
+  "hashTable": {
+    "/ASSET-GUARD-Corporate-Edition/239.16e71bb365f8ecf0.js": "ff5cea4383f9ee4d985dc2e7b30d0184d662e5c1",
+    "/ASSET-GUARD-Corporate-Edition/627.4307bb1e3ccbac6f.js": "4e294492dc530a258f24802a9c49fa91b96608ec",
+    "/ASSET-GUARD-Corporate-Edition/842.62b4e135055b16a2.js": "aaac105cb06e6e40910d326b5a178b3266df85da",
+    "/ASSET-GUARD-Corporate-Edition/887.259070bb324a39b0.js": "f54696abc57c614b5e821e06e1bf43ac4895faba",
+    "/ASSET-GUARD-Corporate-Edition/favicon.ico": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
+    "/ASSET-GUARD-Corporate-Edition/index.html": "651d817eb9d4f85cf7c6382431390a68c67871f2",
+    "/ASSET-GUARD-Corporate-Edition/main.b728189d6ec5caf4.js": "23aaa1bc12c9fbdb3e69f83cd705e937b1a8e1de",
+    "/ASSET-GUARD-Corporate-Edition/runtime.07c230f04a31c2ba.js": "202b891880f533edba6bfc8ffe0d2b7a5919c017",
+    "/ASSET-GUARD-Corporate-Edition/styles.d99620c8cc310344.css": "1a68628f018e1d21a43c78a08ec04322b0a7ed69"
+  },
+  "navigationUrls": [
+    {
+      "positive": true,
+      "regex": "^\\/.*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*\\.[^/]*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*__[^/]*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*__[^/]*\\/.*$"
+    }
+  ],
+  "navigationRequestStrategy": "performance"
+}
