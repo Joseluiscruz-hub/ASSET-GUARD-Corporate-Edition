@@ -30,4 +30,5 @@ coverage/
 test-results/
 tmp/
 *.json
+!ngsw-config.json
 package-lock.json
