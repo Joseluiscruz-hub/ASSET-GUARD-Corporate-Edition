@@ -23,7 +23,7 @@ jobs:
       - name: Build
         run: npm run build --if-present
       - name: Run tests
-        run: npm test --if-present
+        run: npx ng test ASSET-GUARD-Corporate-Edition --watch=false --browsers=ChromeHeadless
       - name: Audit
         run: npm audit --audit-level=moderate || true
 
