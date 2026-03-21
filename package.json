@@ -24,8 +24,8 @@
   "dependencies": {
     "@angular/animations": "^19.0.0",
     "@angular/common": "^19.0.0",
-    "@angular/compiler": "^19.0.0",
-    "@angular/core": "^19.0.0",
+    "@angular/compiler": "^21.2.5",
+    "@angular/core": "^19.2.20",
     "@angular/forms": "^19.0.0",
     "@angular/platform-browser": "^19.0.0",
     "@angular/platform-browser-dynamic": "^19.2.18",
@@ -34,14 +34,14 @@
     "@google/generative-ai": "^0.21.0",
     "exceljs": "^4.4.0",
     "firebase": "^12.8.0",
-    "jspdf": "^4.1.0",
+    "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.7",
     "rxjs": "^7.8.2",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^19.0.0",
+    "@angular-devkit/build-angular": "^21.2.3",
     "@angular/build": "^19.0.0",
     "@angular/cli": "^21.1.2",
     "@angular/compiler-cli": "^19.0.0",
