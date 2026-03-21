@@ -15,7 +15,7 @@
     "declaration": false,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "importHelpers": true,
     "target": "ES2022",
     "module": "ESNext",
@@ -33,8 +33,13 @@
     "strictStandalone": true
   },
   "include": [
-    "src/**/*.ts",
-    "src/**/*.d.ts",
-    "src/**/*.spec.ts"
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "src/environments/environment.example.ts",
+    "src/environments/environment.prod.ts",
+    "src/**/*.spec.ts",
+    "src/test.ts",
+    "src/example.spec.ts"
   ]
 }

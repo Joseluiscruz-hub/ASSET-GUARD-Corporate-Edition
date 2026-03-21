@@ -218,10 +218,10 @@
           <!-- User Profile -->
           <div class="flex items-center gap-3 text-right hidden sm:flex">
             <div>
-              <p class="text-xs font-bold text-slate-700 dark:text-white">Ing. Sergio Guadarrama</p>
+              <p class="text-xs font-bold text-slate-700 dark:text-white">{{ currentUser()?.displayName || 'Usuario' }}</p>
               <span
                 class="inline-block bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider"
-                >Supervisor Operaciones</span
+                >{{ currentUser()?.email || 'Sin email' }}</span
               >
             </div>
             <div
@@ -436,16 +436,22 @@
   </div>
 }
 
-<!-- Error Global -->
+<!-- Error Global (Dismissible Toast) -->
 @if (errorMessage()) {
-  <div class="min-h-screen bg-red-900 flex items-center justify-center">
-    <div class="text-center">
-      <div class="inline-flex items-center justify-center w-24 h-24 bg-red-600 rounded-2xl mb-6 shadow-2xl shadow-red-600/30">
-        <i class="fas fa-exclamation-triangle text-5xl text-white"></i>
+  <div class="fixed bottom-4 right-4 z-[100] bg-red-600 text-white px-6 py-4 rounded-lg shadow-2xl flex items-start gap-4 max-w-md animate-fade-in">
+    <div class="flex-1">
+      <div class="flex items-center gap-2 font-bold mb-1">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span>Error Crítico</span>
       </div>
-      <h1 class="text-4xl font-black text-white tracking-tight mb-2">Error Crítico</h1>
-      <div class="text-slate-200 text-lg">{{ errorMessage() }}</div>
-      <div class="mt-4 text-slate-400 text-sm">Por favor, recarga la página o contacta soporte.</div>
+      <div class="text-sm opacity-90">{{ errorMessage() }}</div>
     </div>
+    <button
+      (click)="errorMessage.set(null)"
+      class="text-white/70 hover:text-white transition-colors"
+      title="Cerrar"
+    >
+      <i class="fas fa-times"></i>
+    </button>
   </div>
 }

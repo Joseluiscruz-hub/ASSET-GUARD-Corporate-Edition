@@ -1,4 +1,4 @@
-import { Component, Input, computed } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 export type KpiStatus = 'success' | 'warning' | 'danger' | 'info' | 'neutral';
@@ -20,23 +20,23 @@ export type KpiStatus = 'success' | 'warning' | 'danger' | 'info' | 'neutral';
       <!-- Header -->
       <header class="flex items-start justify-between relative z-10">
         <div>
-          <h2 class="text-sm font-medium text-slate-500 dark:text-slate-300">{{ title }}</h2>
-          <p class="text-xs text-slate-400 mt-0.5">{{ subtitle }}</p>
+          <h2 class="text-sm font-medium text-slate-500 dark:text-slate-300">{{ title() }}</h2>
+          <p class="text-xs text-slate-400 mt-0.5">{{ subtitle() }}</p>
         </div>
 
         <!-- Status Badge -->
         <span [class]="badgeClasses()">
           <span [class]="'h-1.5 w-1.5 rounded-full ' + dotColor()"></span>
-          {{ statusText }}
+          {{ statusText() }}
         </span>
       </header>
 
       <!-- Main Value -->
       <div class="flex items-baseline gap-2 mt-1 relative z-10">
         <span class="text-3xl font-bold tracking-tight text-slate-800 dark:text-slate-50">{{
-          value
+          value()
         }}</span>
-        <span class="text-xs font-bold text-slate-400 uppercase tracking-wide">{{ unit }}</span>
+        <span class="text-xs font-bold text-slate-400 uppercase tracking-wide">{{ unit() }}</span>
       </div>
 
       <!-- Footer -->
@@ -44,27 +44,27 @@ export type KpiStatus = 'success' | 'warning' | 'danger' | 'info' | 'neutral';
         class="mt-auto flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 pt-3 border-t border-slate-100 dark:border-slate-700/50 relative z-10"
       >
         <span
-          >{{ footerLabel }}:
+          >{{ footerLabel() }}:
           <span class="text-slate-700 dark:text-slate-200 font-medium">{{
-            footerValue
+            footerValue()
           }}</span></span
         >
-        <span [class]="trendClass()">{{ trendLabel }}</span>
+        <span [class]="trendClass()">{{ trendLabel() }}</span>
       </footer>
     </article>
   `
 })
 export class KpiCardComponent {
-  @Input() title = '';
-  @Input() subtitle = '';
-  @Input() value: string | number = '';
-  @Input() unit = '';
-  @Input() status: KpiStatus = 'neutral';
-  @Input() statusText = '';
+  title = input('');
+  subtitle = input('');
+  value = input<string | number>('');
+  unit = input('');
+  status = input<KpiStatus>('neutral');
+  statusText = input('');
 
-  @Input() footerLabel = '';
-  @Input() footerValue = '';
-  @Input() trendLabel = '';
+  footerLabel = input('');
+  footerValue = input('');
+  trendLabel = input('');
 
   // Computed styles based on status
   containerClasses = computed(() => {
@@ -75,7 +75,7 @@ export class KpiCardComponent {
   badgeClasses = computed(() => {
     const base =
       'inline-flex items-center gap-1.5 rounded-full text-[10px] font-bold px-2.5 py-1 border backdrop-blur-sm ';
-    switch (this.status) {
+    switch (this.status()) {
       case 'success':
         return (
           base +
@@ -105,7 +105,7 @@ export class KpiCardComponent {
   });
 
   dotColor = computed(() => {
-    switch (this.status) {
+    switch (this.status()) {
       case 'success':
         return 'bg-emerald-500';
       case 'warning':
@@ -120,13 +120,11 @@ export class KpiCardComponent {
   });
 
   trendClass = computed(() => {
-    // Heuristic: if label contains "-" or "bajo", treat as good for cost/bad for metrics depending on context
-    // Ideally this should be an explicit input, simplified here for robustness
-    if (this.trendLabel.includes('+') && this.status === 'success')
+    if (this.trendLabel().includes('+') && this.status() === 'success')
       return 'text-emerald-600 dark:text-emerald-400 font-medium';
-    if (this.trendLabel.includes('-') && this.status === 'danger')
+    if (this.trendLabel().includes('-') && this.status() === 'danger')
       return 'text-red-600 dark:text-red-400 font-medium';
-    if (this.status === 'warning') return 'text-amber-600 dark:text-amber-400 font-medium';
+    if (this.status() === 'warning') return 'text-amber-600 dark:text-amber-400 font-medium';
     return 'text-emerald-600 dark:text-emerald-400 font-medium';
   });
 }

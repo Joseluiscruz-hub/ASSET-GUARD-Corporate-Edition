@@ -5,15 +5,12 @@
       "projectType": "application",
       "root": "",
       "sourceRoot": "src",
-      "targets": {
+      "architect": {
         "build": {
-          "executor": "@angular-devkit/build-angular:browser",
-          "outputs": [
-            "{options.outputPath}"
-          ],
+          "builder": "@angular-devkit/build-angular:browser",
           "options": {
             "outputPath": "dist",
-            "index": "index.html",
+            "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": [],
             "tsConfig": "tsconfig.json",
@@ -29,7 +26,6 @@
           "configurations": {
             "production": {
               "baseHref": "/ASSET-GUARD-Corporate-Edition/",
-              "deployUrl": "/ASSET-GUARD-Corporate-Edition/",
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
@@ -39,55 +35,12 @@
             },
             "github-pages": {
               "baseHref": "/ASSET-GUARD-Corporate-Edition/",
-              "deployUrl": "/ASSET-GUARD-Corporate-Edition/"
-            }
-          }
-        },
-        "serve": {
-          "executor": "@angular-devkit/build-angular:dev-server",
-          "options": {
-            "browserTarget": "ASSET-GUARD-Corporate-Edition:build"
-          },
-          "configurations": {
-            "production": {
-              "browserTarget": "ASSET-GUARD-Corporate-Edition:build:production"
-            }
-          }
-        }
-      },
-      "architect": {
-        "build": {
-          "builder": "@angular-devkit/build-angular:browser",
-          "options": {
-            "outputPath": "dist",
-            "index": "index.html",
-            "main": "src/main.ts",
-            "polyfills": [],
-            "tsConfig": "tsconfig.json",
-            "assets": [
-              "src/favicon.ico",
-              "src/assets"
-            ],
-            "styles": [
-              "src/index.css"
-            ],
-            "scripts": [],
-            "serviceWorker": false
-          },
-          "configurations": {
-            "production": {
-              "baseHref": "/ASSET-GUARD-Corporate-Edition/",
-              "deployUrl": "/ASSET-GUARD-Corporate-Edition/",
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
               "namedChunks": false,
-              "extractLicenses": true,
+              "extractLicents": true,
               "vendorChunk": false
-            },
-            "github-pages": {
-              "baseHref": "/ASSET-GUARD-Corporate-Edition/",
-              "deployUrl": "/ASSET-GUARD-Corporate-Edition/"
             }
           }
         },

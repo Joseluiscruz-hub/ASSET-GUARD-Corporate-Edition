@@ -2,7 +2,7 @@ import { Component, inject, computed } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DataService } from '../../services/data.service';
-import { EstadoRefaccion } from '../../types';
+import { EstadoRefaccion, ForkliftFailureEntry } from '../../types';
 
 const ESTADO_CONFIG = {
   [EstadoRefaccion.NO_APLICA]: {
@@ -322,7 +322,7 @@ const ESTADO_CONFIG = {
 
                   <div class="flex gap-3 mt-4 pt-4 border-t border-slate-200">
                     <button
-                      (click)="saveLogistics(f.id, po.value, f.estatusRefaccion)"
+                      (click)="saveLogistics(f.id, po.value, f.estatusRefaccion || EstadoRefaccion.NO_APLICA)"
                       class="flex-1 py-2 bg-slate-800 text-white rounded font-bold text-xs uppercase hover:bg-slate-900 transition"
                     >
                       Guardar Cambios
@@ -356,12 +356,14 @@ export class ServicePanelComponent {
   dataService = inject(DataService);
 
   openFailures = computed(() =>
-  this.dataService.forkliftFailures().map(f => ({
-    ...f,
-    sla: f.sla || {},
-    fechaEstimadaLlegada: f.fechaEstimadaLlegada || '',
-    refacciones: f.refacciones || []
-  }))
+  this.dataService.forkliftFailures()
+    .filter(f => f.estatus !== 'Cerrada')
+    .map(f => ({
+      ...f,
+      sla: f.sla || {},
+      fechaEstimadaLlegada: f.fechaEstimadaLlegada || '',
+      refacciones: f.refacciones || []
+    }))
 );
 
   pendingParts = computed(
@@ -375,7 +377,7 @@ export class ServicePanelComponent {
         .filter(f => f.prioridad === 'Alta' && f.estatus !== 'Cerrada').length
   );
 
-  saveLogistics(id: string, po: string, status: any) {
+  saveLogistics(id: string, po: string, status: EstadoRefaccion) {
     this.dataService.updateToyotaLogistics(id, po, status);
   }
 
@@ -399,7 +401,7 @@ export class ServicePanelComponent {
   }
 
   busquedaRefaccion = '';
-  resultadosBusqueda: any[] = [];
+  resultadosBusqueda: Array<{ codigo: string; descripcion: string; precio: number; stock: number }> = [];
 
   // Mock catálogo de refacciones
   catalogoRefacciones = [
@@ -410,8 +412,9 @@ export class ServicePanelComponent {
     { codigo: 'BAT-001', descripcion: 'Batería 12V 100Ah', precio: 180.00, stock: 3 }
   ];
 
-  buscarRefacciones(event: any) {
-    const query = event.target.value.toLowerCase();
+  buscarRefacciones(event: Event) {
+    const target = event.target as HTMLInputElement;
+    const query = target.value.toLowerCase();
     if (query.length < 2) {
       this.resultadosBusqueda = [];
       return;
@@ -422,9 +425,9 @@ export class ServicePanelComponent {
     );
   }
 
-  seleccionarRefaccion(failure: any, refaccion: any) {
+  seleccionarRefaccion(failure: ForkliftFailureEntry, refaccion: { codigo: string; descripcion: string; precio: number; stock: number }) {
     if (!failure.refacciones) failure.refacciones = [];
-    const existing = failure.refacciones.find((r: any) => r.codigo === refaccion.codigo);
+    const existing = failure.refacciones.find((r: { codigo: string }) => r.codigo === refaccion.codigo);
     if (existing) {
       existing.cantidad += 1;
     } else {
@@ -437,13 +440,14 @@ export class ServicePanelComponent {
     this.resultadosBusqueda = [];
   }
 
-  eliminarRefaccion(failure: any, index: number) {
+  eliminarRefaccion(failure: ForkliftFailureEntry, index: number) {
+    if (!failure.refacciones) return;
     failure.refacciones.splice(index, 1);
   }
 
-  calcularTotalRefacciones(failure: any): number {
+  calcularTotalRefacciones(failure: ForkliftFailureEntry): number {
     if (!failure.refacciones) return 0;
-    return failure.refacciones.reduce((total: number, ref: any) => total + (ref.cantidad * ref.precio), 0);
+    return failure.refacciones.reduce((total: number, ref: { cantidad: number; precio: number }) => total + (ref.cantidad * ref.precio), 0);
   }
 
   calcularDiasRestantes(fecha: string): number {
@@ -454,12 +458,12 @@ export class ServicePanelComponent {
     return Math.ceil(diff / (1000 * 60 * 60 * 24));
   }
 
-  aprobarCompra(failure: any) {
+  aprobarCompra(failure: ForkliftFailureEntry) {
     failure.estatusRefaccion = EstadoRefaccion.ORDENADA;
     alert('[DEMO] Compra aprobada');
   }
 
-  rechazarCompra(failure: any) {
+  rechazarCompra(failure: ForkliftFailureEntry) {
     failure.estatusRefaccion = EstadoRefaccion.COTIZANDO;
     alert('[DEMO] Compra rechazada');
   }
@@ -471,37 +475,37 @@ export class ServicePanelComponent {
       : 'bg-gray-200';
   }
 
-  getSLAClasses(sla: any): string {
+  getSLAClasses(sla: { porcentajeTranscurrido?: number } | null): string {
     if (!sla) return 'bg-green-100 border-2 border-green-500 text-green-800';
-    if (sla.porcentajeTranscurrido >= 100) {
+    if (sla.porcentajeTranscurrido && sla.porcentajeTranscurrido >= 100) {
       return 'bg-red-100 border-2 border-red-500 text-red-800';
     }
-    if (sla.porcentajeTranscurrido >= 80) {
+    if (sla.porcentajeTranscurrido && sla.porcentajeTranscurrido >= 80) {
       return 'bg-orange-100 border-2 border-orange-500 text-orange-800';
     }
     return 'bg-green-100 border-2 border-green-500 text-green-800';
   }
 
-  getSLAProgressColor(sla: any): string {
+  getSLAProgressColor(sla: { porcentajeTranscurrido?: number } | null): string {
     if (!sla) return 'bg-green-500';
-    if (sla.porcentajeTranscurrido >= 100) return 'bg-red-500';
-    if (sla.porcentajeTranscurrido >= 80) return 'bg-orange-500';
+    if (sla.porcentajeTranscurrido && sla.porcentajeTranscurrido >= 100) return 'bg-red-500';
+    if (sla.porcentajeTranscurrido && sla.porcentajeTranscurrido >= 80) return 'bg-orange-500';
     return 'bg-green-500';
   }
 
-  trackById(index: number, item: any): string {
+  trackById(index: number, item: ForkliftFailureEntry): string {
     return item.id;
   }
 
-  trackByMsgFecha(index: number, item: any): string {
+  trackByMsgFecha(index: number, item: { fecha: string }): string {
     return item.fecha;
   }
 
-  trackByRefaccion(index: number, item: any): string {
+  trackByRefaccion(index: number, item: { codigo: string }): string {
     return item.codigo;
   }
 
-  trackByRefIndex(index: number, item: any): number {
-    return index;
+  trackByRefIndex(_index: number, _item: any): number {
+    return _index;
   }
 }

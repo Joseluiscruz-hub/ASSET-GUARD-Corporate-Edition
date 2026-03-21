@@ -1,17 +1,16 @@
 import { Component, AfterViewInit, ViewChild, ElementRef, effect, OnDestroy, signal, computed } from '@angular/core';
-import { CommonModule, DatePipe, PercentPipe, UpperCasePipe, DecimalPipe } from '@angular/common';
+import { CommonModule, DatePipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DataService } from '../../services/data.service';
 import { MaintenanceSchedule } from '../../types';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
-
-declare var Chart: any;
+import Chart from 'chart.js/auto';
 
 @Component({
   selector: 'app-maintenance-compliance',
   standalone: true,
-  imports: [CommonModule, DatePipe, PercentPipe, UpperCasePipe, DecimalPipe, FormsModule],
+  imports: [CommonModule, DatePipe, DecimalPipe, FormsModule],
   template: `
     <div class="space-y-6 pb-12 animate-fade-in">
 
@@ -160,7 +159,7 @@ declare var Chart: any;
        <div class="grid grid-cols-3 gap-4 mb-6">
          <div class="bg-white p-4 rounded-lg shadow">
            <p class="text-sm text-gray-600 mb-1">Próximos 7 días</p>
-           <p class="text-3xl font-bold">{{ Math.round(chartStats().scheduled * 0.3) + chartStats().process }}</p>
+           <p class="text-3xl font-bold">{{ capacity7Days() }}</p>
            <p class="text-xs text-gray-500">mantenimientos</p>
            <div class="mt-2 flex items-center gap-2">
              <div class="flex-1 bg-gray-200 rounded-full h-2">
@@ -172,7 +171,7 @@ declare var Chart: any;
 
          <div class="bg-white p-4 rounded-lg shadow">
            <p class="text-sm text-gray-600 mb-1">Próximos 30 días</p>
-           <p class="text-3xl font-bold">{{ Math.round(chartStats().scheduled * 0.8) + chartStats().process }}</p>
+           <p class="text-3xl font-bold">{{ capacity30Days() }}</p>
            <p class="text-xs text-gray-500">mantenimientos</p>
            <div class="mt-2 flex items-center gap-2">
              <div class="flex-1 bg-gray-200 rounded-full h-2">
@@ -339,15 +338,20 @@ declare var Chart: any;
           <div *ngIf="vista() === 'calendario'" class="bg-white rounded-lg shadow p-4">
             <!-- Header calendario -->
             <div class="flex justify-between items-center mb-4">
-              <button class="p-2 hover:bg-gray-100 rounded">
+              <button (click)="previousMonth()" class="p-2 hover:bg-gray-100 rounded">
                 ← Anterior
               </button>
               <h3 class="text-xl font-bold">
-                {{ '2026-02-15' | date:'MMMM yyyy':'':'es' | titlecase }}
+                {{ calendarMonthName() }} {{ calendarYear() }}
               </h3>
-              <button class="p-2 hover:bg-gray-100 rounded">
-                Siguiente →
-              </button>
+              <div class="flex gap-2">
+                <button (click)="goToToday()" class="p-2 hover:bg-gray-100 rounded text-sm">
+                  Hoy
+                </button>
+                <button (click)="nextMonth()" class="p-2 hover:bg-gray-100 rounded">
+                  Siguiente →
+                </button>
+              </div>
             </div>
 
             <!-- Grid calendario -->
@@ -358,24 +362,27 @@ declare var Chart: any;
                 {{ dia }}
               </div>
 
-              <!-- Días del mes (simplified) -->
-              <div *ngFor="let i of [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28]"
-                   class="min-h-24 border rounded-lg p-2 relative">
-                <span class="text-sm font-semibold">{{ i }}</span>
+              <!-- Días del mes (dinámico) -->
+              <div *ngFor="let day of calendarDays()"
+                   class="min-h-24 border rounded-lg p-2 relative"
+                   [class.bg-gray-50]="day === 0">
+                <span class="text-sm font-semibold">{{ day || '' }}</span>
 
-                <!-- Mantenimientos mock -->
-                <div *ngIf="i % 3 === 0" class="mt-1 space-y-1">
-                  <div class="text-xs px-1 py-0.5 rounded bg-green-200 cursor-pointer">
-                    <p class="font-semibold truncate">MT-{{ i }}</p>
-                    <p class="truncate">X</p>
+                <!-- Mantenimientos del día -->
+                <div *ngIf="day > 0" class="mt-1 space-y-1">
+                  <div *ngFor="let m of getMaintenanceForDay(day)"
+                       class="text-xs px-1 py-0.5 rounded bg-green-200 cursor-pointer"
+                       [title]="m.smpType + ' - ' + m.economico">
+                    <p class="font-semibold truncate">{{ m.smpType }}</p>
+                    <p class="truncate">{{ m.economico }}</p>
                   </div>
                 </div>
 
                 <!-- Indicador de sobrecarga -->
-                <span *ngIf="i % 7 === 0"
+                <span *ngIf="day > 0 && getMaintenanceForDay(day).length > 2"
                       class="absolute top-1 right-1 bg-red-500 text-white
                              text-xs px-1 rounded-full">
-                      +2
+                      +{{ getMaintenanceForDay(day).length - 1 }}
                 </span>
               </div>
             </div>
@@ -415,12 +422,37 @@ export class MaintenanceComplianceComponent implements AfterViewInit, OnDestroy 
 
   // State
   filterType = signal<string>('ALL');
-  searchText = signal<string>('');
+  searchText = '';
   vista = signal<'tabla' | 'calendario'>('tabla');
   analisisAtrasos = signal<any>(null);
+  currentCalendarDate = signal<Date>(new Date());
 
-  // Make Math available in template
-  public Math = Math;
+  // Make Math available in template - REMOVED: Use computed signals instead
+  // public Math = Math;
+
+  // Calendar computed properties
+  calendarYear = computed(() => this.currentCalendarDate().getFullYear());
+  calendarMonth = computed(() => this.currentCalendarDate().getMonth());
+  calendarMonthName = computed(() => {
+    const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    return months[this.calendarMonth()];
+  });
+  calendarDaysInMonth = computed(() => {
+    return new Date(this.calendarYear(), this.calendarMonth() + 1, 0).getDate();
+  });
+  calendarFirstDay = computed(() => {
+    return new Date(this.calendarYear(), this.calendarMonth(), 1).getDay();
+  });
+  calendarDays = computed(() => {
+    const days: number[] = [];
+    for (let i = 0; i < this.calendarFirstDay(); i++) {
+      days.push(0); // Empty cells for days before month starts
+    }
+    for (let i = 1; i <= this.calendarDaysInMonth(); i++) {
+      days.push(i);
+    }
+    return days;
+  });
 
   constructor(private dataService: DataService) {
     effect(() => {
@@ -454,9 +486,13 @@ export class MaintenanceComplianceComponent implements AfterViewInit, OnDestroy 
      };
   });
 
+  // Computed capacity forecasts
+  capacity7Days = computed(() => Math.round(this.chartStats().scheduled * 0.3) + this.chartStats().process);
+  capacity30Days = computed(() => Math.round(this.chartStats().scheduled * 0.8) + this.chartStats().process);
+
   filteredSchedule = computed(() => {
      const type = this.filterType();
-     const text = this.searchText().toLowerCase();
+     const text = this.searchText.toLowerCase();
 
      return this.schedule().filter(item => {
         const matchesType = type === 'ALL' || item.smpType === type;
@@ -481,10 +517,40 @@ export class MaintenanceComplianceComponent implements AfterViewInit, OnDestroy 
      }
   }
 
+  previousMonth() {
+    const current = this.currentCalendarDate();
+    this.currentCalendarDate.set(new Date(current.getFullYear(), current.getMonth() - 1, 1));
+  }
+
+  nextMonth() {
+    const current = this.currentCalendarDate();
+    this.currentCalendarDate.set(new Date(current.getFullYear(), current.getMonth() + 1, 1));
+  }
+
+  goToToday() {
+    this.currentCalendarDate.set(new Date());
+  }
+
+  getMaintenanceForDay(day: number) {
+    if (day === 0) return [];
+    const schedule = this.schedule();
+    const currentYear = this.calendarYear();
+    const currentMonth = this.calendarMonth();
+    
+    return schedule.filter(item => {
+      const itemDate = new Date(item.scheduledDate);
+      return itemDate.getFullYear() === currentYear && 
+             itemDate.getMonth() === currentMonth && 
+             itemDate.getDate() === day;
+    });
+  }
+
   initChart() {
      if (!this.chartCanvas || typeof Chart === 'undefined') return;
 
      const ctx = this.chartCanvas.nativeElement.getContext('2d');
+     if (!ctx) return;
+     
      const s = this.chartStats();
 
      this.chartInstance = new Chart(ctx, {

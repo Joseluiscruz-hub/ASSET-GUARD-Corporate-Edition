@@ -24,11 +24,9 @@ import { environment } from '../environments/environment';
   providedIn: 'root'
 })
 export class DataService {
-  // --- FIREBASE CONFIGURATION ---
+  private app = firebaseApp;
+  private db: ReturnType<typeof getDatabase> | null = null;
   private firebaseConfig = environment.firebase;
-
-  private app: any = firebaseApp;
-  private db: any;
 
   // --- System State Signals ---
   readonly connectionStatus = signal<'online' | 'offline' | 'syncing'>('syncing');
@@ -36,7 +34,7 @@ export class DataService {
   readonly plantMode = signal<boolean>(false); // Dark/Light Theme
   readonly isKioskMode = signal<boolean>(false);
   readonly activeSlide = signal<number>(0);
-  private kioskInterval: any;
+  private kioskInterval: ReturnType<typeof setInterval> | null = null;
 
   // --- Master Catalogs ---
   readonly statuses: Status[] = [
@@ -130,8 +128,8 @@ export class DataService {
     { rank: 3, name: 'Turno 3 (Nocturno)', score: 89, pallets: 1105 }
   ]);
 
-  // Maintenance Compliance Data
-  readonly maintenanceSchedule = signal<MaintenanceSchedule[]>(this.generateMaintenanceSchedule());
+  // Maintenance Compliance Data - computed after assets are loaded
+  readonly maintenanceSchedule = computed<MaintenanceSchedule[]>(() => this.generateMaintenanceSchedule());
   readonly complianceStats = computed(() => {
     const schedule = this.maintenanceSchedule();
     const total = schedule.length;
@@ -143,7 +141,11 @@ export class DataService {
   constructor() {
     this.initFirebase();
     this.initializeData();
-    this.syncAssetsWithFailures(this.forkliftFailures());
+
+    // Reactive sync when failures change
+    effect(() => {
+      this.syncAssetsWithFailures(this.forkliftFailures());
+    });
 
     effect(() => {
       if (this.isKioskMode()) this.startKioskRotation();
@@ -189,7 +191,7 @@ export class DataService {
       this.db = getDatabase(this.app);
 
       // Monitor connection state
-      const connectedRef = ref(this.db, '.info/connected');
+      const connectedRef = ref(this.db!, '.info/connected');
       onValue(connectedRef, snap => {
         if (snap.val() === true) {
           this.connectionStatus.set('online');
@@ -210,6 +212,8 @@ export class DataService {
   }
 
   private setupListeners() {
+    if (!this.db) return;
+    
     // Listen for Failures
     const failuresRef = ref(this.db, 'failures');
     onValue(
@@ -236,7 +240,7 @@ export class DataService {
     );
 
     // Listen for Settings
-    const kioskRef = ref(this.db, 'settings/kioskMode');
+    const kioskRef = ref(this.db!, 'settings/kioskMode');
     onValue(kioskRef, snapshot => {
       const val = snapshot.val();
       if (val !== null && this.isKioskMode() !== val) this.isKioskMode.set(val);
@@ -244,22 +248,26 @@ export class DataService {
   }
 
   private seedDatabase() {
+    if (!this.db) return;
+    
     const updates: any = {};
     const initialFailures = this.forkliftFailures();
     initialFailures.forEach(f => {
       updates['failures/' + f.id] = f;
     });
     updates['settings/kioskMode'] = false;
-    update(ref(this.db), updates).catch(() => {});
+    update(ref(this.db!), updates).catch(() => {});
   }
 
   // --- Logic & Actions ---
 
   toggleKioskMode() {
+    if (!this.db) return;
+    
     const newValue = !this.isKioskMode();
     this.isKioskMode.set(newValue);
     if (this.connectionStatus() === 'online') {
-      set(ref(this.db, 'settings/kioskMode'), newValue).catch(() => {});
+      set(ref(this.db!, 'settings/kioskMode'), newValue).catch(() => {});
     }
   }
 
@@ -299,13 +307,17 @@ export class DataService {
       seguimiento: []
     };
 
+    // Store previous connection status before changing to syncing
+    const wasOffline = this.connectionStatus() === 'offline';
+    
     // Optimistic Update
     this.connectionStatus.set('syncing');
     this.forkliftFailures.update(list => [newEntry, ...list]);
     this.syncAssetsWithFailures(this.forkliftFailures());
 
-    if (this.connectionStatus() !== 'offline') {
-      set(ref(this.db, 'failures/' + newEntry.id), newEntry)
+    // Use the stored status to determine if we should sync
+    if (!wasOffline && this.db) {
+      set(ref(this.db!, 'failures/' + newEntry.id), newEntry)
         .then(() => this.connectionStatus.set('online'))
         .catch(() => this.connectionStatus.set('offline'));
     }
@@ -313,7 +325,7 @@ export class DataService {
 
   addFailureUpdate(failureId: string, message: string, user: string) {
     const failure = this.forkliftFailures().find(f => f.id === failureId);
-    if (!failure) return;
+    if (!failure || !this.db) return;
 
     const updatedFailure = {
       ...failure,
@@ -326,8 +338,8 @@ export class DataService {
 
     this.forkliftFailures.update(list => list.map(f => (f.id === failureId ? updatedFailure : f)));
 
-    if (this.connectionStatus() !== 'offline') {
-      update(ref(this.db, 'failures/' + failureId), updatedFailure).catch(console.error);
+    if (this.connectionStatus() !== 'offline' && this.db) {
+      update(ref(this.db!, 'failures/' + failureId), updatedFailure).catch(console.error);
     }
   }
 
@@ -351,8 +363,8 @@ export class DataService {
       })
     );
 
-    if (this.connectionStatus() !== 'offline') {
-      update(ref(this.db, 'failures/' + failureId), updates).catch(console.error);
+    if (this.connectionStatus() !== 'offline' && this.db) {
+      update(ref(this.db!, 'failures/' + failureId), updates).catch(console.error);
     }
   }
 
@@ -369,8 +381,8 @@ export class DataService {
     this.forkliftFailures.update(list => list.map(f => (f.id === id ? updatedFailure : f)));
     this.syncAssetsWithFailures(this.forkliftFailures());
 
-    if (this.connectionStatus() !== 'offline') {
-      update(ref(this.db, 'failures/' + id), updatedFailure).catch(console.error);
+    if (this.connectionStatus() !== 'offline' && this.db) {
+      update(ref(this.db!, 'failures/' + id), updatedFailure).catch(console.error);
     }
   }
 
@@ -404,8 +416,8 @@ export class DataService {
     this.syncAssetsWithFailures(this.forkliftFailures());
 
     // Persist to remote DB if online
-    if (this.connectionStatus() !== 'offline') {
-      update(ref(this.db, 'failures/' + activeFailure.id), updatedFailure).catch(console.error);
+    if (this.connectionStatus() !== 'offline' && this.db) {
+      update(ref(this.db!, 'failures/' + activeFailure.id), updatedFailure).catch(console.error);
     }
   }
 

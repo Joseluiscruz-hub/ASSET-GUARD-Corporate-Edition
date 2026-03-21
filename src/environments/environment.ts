@@ -1,11 +1,11 @@
-// NOTE: These credentials are for a public demo Firebase project and are safe to commit.
-// For production use, consider using environment variables or build-time secrets.
-// See: https://angular.dev/guide/build#configure-environment-specific-defaults
+// WARNING: Never commit API keys to version control!
+// Use environment variables or a secrets manager in production.
+// This file is for local development only.
 
 export const environment = {
   production: false,
   firebase: {
-    apiKey: 'AIzaSyCQkT-TQy-rtKr_bmTWJS78HghTh97x3eE',
+    apiKey: typeof window !== 'undefined' ? (window as any)['FIREBASE_API_KEY'] : undefined,
     authDomain: 'asset-guard-demo.firebaseapp.com',
     databaseURL: 'https://asset-guard-demo-default-rtdb.firebaseio.com',
     projectId: 'asset-guard-demo',
@@ -13,5 +13,5 @@ export const environment = {
     messagingSenderId: '730419123254',
     appId: '1:730419123254:web:74de062f3e9e0851087497'
   },
-  geminiApiKey: 'AIzaSyDg8fHddzzerQlkBfNr49q51ZZoo1fvlM08'
+  geminiApiKey: typeof window !== 'undefined' ? (window as any)['GEMINI_API_KEY'] : undefined
 };

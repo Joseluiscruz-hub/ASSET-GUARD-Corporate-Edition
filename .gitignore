@@ -26,9 +26,28 @@ coverage/
 .idea/
 *.iml
 
+# Environment files (keep secrets out of version control)
+.env
+.env.local
+.env.*.local
+
+# Binary files and large artifacts
+*.exe
+*.sarif
+qodana.*
+
 # Test and temporary artifacts
 test-results/
 tmp/
+
+# Ignore most JSON files but keep essential config files
 *.json
+!package.json
+!angular.json
+!tsconfig.json
+!metadata.json
 !ngsw-config.json
-package-lock.json
+!package-lock.json
+!eslint.config.cjs
+!playwright.config.ts
+!.prettierrc

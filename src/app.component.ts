@@ -1,6 +1,7 @@
 import { Component, signal, effect, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import DOMPurify from 'dompurify';
 import { DataService } from './services/data.service';
 import { GeminiService } from './services/gemini.service';
 import { AuthService } from './services/auth.service';
@@ -100,6 +101,11 @@ export class AppComponent {
     // Custom Events
     window.addEventListener('asset-selected', (e: any) => this.selectedAssetId.set(e.detail));
     window.addEventListener('asset-closed', () => this.selectedAssetId.set(null));
+    window.addEventListener('navigate', (e: any) => {
+      if (e.detail === 'maintenance-compliance') {
+        this.currentView.set('maintenance');
+      }
+    });
 
     // Manejo de errores globales
     window.addEventListener('error', (e: any) => {
@@ -133,7 +139,8 @@ export class AppComponent {
     const active = this.failures().filter(f => f.estatus !== 'Cerrada');
 
     const summary = await this.geminiService.generateExecutiveReport(kpi, active, availability);
-    this.aiInsights.set(this.sanitizer.bypassSecurityTrustHtml(summary));
+    const cleanHtml = DOMPurify.sanitize(summary);
+    this.aiInsights.set(this.sanitizer.bypassSecurityTrustHtml(cleanHtml));
     this.aiLoading.set(false);
   }
 

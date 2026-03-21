@@ -1,6 +1,5 @@
 import { Component, inject, computed, signal } from '@angular/core';
 import { CommonModule, DatePipe, CurrencyPipe } from '@angular/common';
-import { RouterLink } from '@angular/router';
 import { DataService } from '../../services/data.service';
 import { KpiCardComponent, KpiStatus } from '../ui/kpi-card.component';
 import { ForkliftFailureEntry } from '../../types';
@@ -8,7 +7,7 @@ import { ForkliftFailureEntry } from '../../types';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, KpiCardComponent, DatePipe, CurrencyPipe, RouterLink],
+  imports: [CommonModule, KpiCardComponent, DatePipe, CurrencyPipe],
   template: `
     <div class="space-y-6 pb-10">
       <!-- TITLE & CONTEXT -->
@@ -120,9 +119,12 @@ import { ForkliftFailureEntry } from '../../types';
                   <li>• {{ causa.desc }} ({{ causa.pct }}%)</li>
                 }
               </ul>
-              <a class="text-red-600 font-semibold mt-2 inline-block" routerLink="/maintenance-compliance">
+              <button 
+                (click)="navigateToMaintenance()"
+                class="text-red-600 font-semibold mt-2 inline-block hover:text-red-700"
+              >
                 Ver detalles →
-              </a>
+              </button>
             </div>
           }
         </article>
@@ -600,5 +602,10 @@ export class DashboardComponent {
     if (p === 'Media')
       return 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-900/20 dark:text-amber-300 dark:border-amber-800';
     return 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800';
+  }
+
+  navigateToMaintenance() {
+    // Dispatch custom event to notify parent component
+    window.dispatchEvent(new CustomEvent('navigate', { detail: 'maintenance-compliance' }));
   }
 }

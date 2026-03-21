@@ -1,6 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DomSanitizer } from '@angular/platform-browser';
+import DOMPurify from 'dompurify';
 import { FormsModule } from '@angular/forms';
 import { DataService } from '../../services/data.service';
 import { GeminiService } from '../../services/gemini.service';
@@ -317,7 +318,8 @@ export class AdminComponent {
       history
     );
 
-    this.aiReport.set(reportHtml);
+    const cleanHtml = DOMPurify.sanitize(reportHtml);
+    this.aiReport.set(cleanHtml);
     this.isAnalyzing.set(false);
   }
 

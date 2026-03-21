@@ -1,6 +1,7 @@
 import { Component, input, inject, signal, computed, effect } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { DomSanitizer } from '@angular/platform-browser';
+import DOMPurify from 'dompurify';
 import { FormsModule } from '@angular/forms';
 import { DataService } from '../../services/data.service';
 import { GeminiService } from '../../services/gemini.service';
@@ -487,10 +488,10 @@ export class AssetDetailComponent {
   printLoto() {
     const printWindow = window.open('', '', 'height=600,width=800');
     if (printWindow && this.lotoResult()) {
+      const cleanHtml = DOMPurify.sanitize(this.lotoResult()!);
       printWindow.document.write('<html><head><title>LOTO</title>');
-      printWindow.document.write('<script src="https://cdn.tailwindcss.com"></script>');
       printWindow.document.write('</head><body class="p-8">');
-      printWindow.document.write(this.lotoResult()!);
+      printWindow.document.write(cleanHtml);
       printWindow.document.write('</body></html>');
       printWindow.document.close();
       setTimeout(() => printWindow.print(), 500);
@@ -579,40 +580,7 @@ export class AssetDetailComponent {
     doc.save(`historial_${currentAsset.id}.pdf`);
   }
 
-  sendEmail() {
-    const currentAsset = this.asset();
-    if (!currentAsset) return;
-
-    const subject = encodeURIComponent(
-      `Seguimiento de Activo ${currentAsset.id} - ${currentAsset.status.name}`
-    );
-    const bodyText = `
-Hola,
-
-Adjunto el seguimiento para el equipo:
-ID: ${currentAsset.id}
-Marca: ${currentAsset.brand}
-Modelo: ${currentAsset.model}
-Serie: ${currentAsset.serial}
-
-Estatus Actual: ${currentAsset.status.name}
-Última Falla Registrada: ${currentAsset.lastFailure || 'N/A'}
-
-Favor de revisar el historial en el sistema para más detalles.
-
-Saludos,
-AssetGuard System
-    `.trim();
-
-    const body = encodeURIComponent(bodyText);
-    window.location.href = `mailto:?subject=${subject}&body=${body}`;
-  }
-
   close() {
     window.dispatchEvent(new CustomEvent('asset-closed'));
-  }
-
-  printReport() {
-    window.print();
   }
 }
