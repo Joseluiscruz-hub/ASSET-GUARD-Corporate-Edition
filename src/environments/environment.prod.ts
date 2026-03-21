@@ -1,8 +1,8 @@
-// Production environment - API keys should be injected at build time
+// Production environment
 export const environment = {
   production: true,
   firebase: {
-    apiKey: typeof window !== 'undefined' ? (window as any)['FIREBASE_API_KEY'] : undefined,
+    apiKey: 'AIzaSyCQkT-TQy-rtKr_bmTWJS78HghTh97x3eE',
     authDomain: 'asset-guard-demo.firebaseapp.com',
     databaseURL: 'https://asset-guard-demo-default-rtdb.firebaseio.com',
     projectId: 'asset-guard-demo',
