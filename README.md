@@ -2,35 +2,33 @@
 <img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
 </div>
 
-# Run and deploy your AI Studio app
+# ASSET-GUARD — Corporate Edition
 
-This contains everything you need to run your app locally.
+<div align="center">
 
-View your app in AI Studio: https://ai.studio/apps/drive/1xmkKI_zwsDwh9od6bCatws2LFEmEikNi
+[![Security Status](https://img.shields.io/badge/Security-Protected-brightgreen)](SECURITY_VERIFICATION.md)
+[![Firebase Rules](https://img.shields.io/badge/Firebase-Rules%20Applied-success)](database.rules.json)
+[![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen)]()
+[![Angular](https://img.shields.io/badge/Angular-19-red)](https://angular.io/)
 
-## Run Locally
+**Estado de Seguridad:** ✅ Protegido | ✅ Firebase Rules Activas | ✅ XSS Previnido
 
-**Prerequisites:** Node.js
+</div>
 
-1. Install dependencies:
-   `npm install`
-2. Create a `.env.local` file by copying `.env.local.example`:
+Aplicación web empresarial para gestión y monitorización de activos corporativos con seguridad mejorada, autenticación Firebase, AI integration y paneles en tiempo real.
 
-   ````bash
-   cp .env.local.example .env.local
-   <div align="center">
-   <img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-   </div>
+## 🔒 Seguridad Implementada
 
-   # ASSET-GUARD — Corporate Edition
+- ✅ **Firebase Security Rules** activas y configuradas
+- ✅ **API Keys protegidas** con variables de entorno
+- ✅ **XSS Prevention** con DOMPurify en todo contenido AI
+- ✅ **Auth Guards** para protección de rutas
+- ✅ **Validación de datos** en tiempo real
+- ✅ **Índices de rendimiento** configurados
 
-   Aplicación web para la gestión y monitorización de activos corporativos. Provee paneles administrativos, listas y detalles de activos, paneles para servicios y solicitantes, y métricas KPI en tiempo real.
+Ver [SECURITY_VERIFICATION.md](SECURITY_VERIFICATION.md) para detalles completos.
 
-   Ver la app en AI Studio: https://ai.studio/apps/drive/1xmkKI_zwsDwh9od6bCatws2LFEmEikNi
-
-   **Resumen rápido:** contiene todo lo necesario para ejecutar la app localmente, conectarla a servicios (Firebase, API de Gemini) y desplegarla.
-
-   ## Funciones y características
+## Funciones y características
 
    - Gestión de activos: listado (`asset-list`) y vista detallada (`asset-detail`) de cada activo.
    - Panel de control (dashboard) con tarjetas KPI y métricas clave.
