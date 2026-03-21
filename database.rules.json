@@ -1,0 +1,49 @@
+{
+  "rules": {
+    ".read": "auth !== null",
+    ".write": "auth !== null",
+    
+    "assets": {
+      ".read": "auth !== null",
+      ".write": "auth !== null",
+      "$assetId": {
+        ".validate": "auth !== null && newData.hasChildren(['id', 'status'])"
+      }
+    },
+    
+    "failures": {
+      ".read": "auth !== null",
+      ".write": "auth !== null",
+      "$failureId": {
+        ".validate": "auth !== null && newData.hasChildren(['economico', 'falla', 'reporta'])",
+        "estatus": {
+          ".validate": "newData.val() === 'Abierta' || newData.val() === 'En Proceso' || newData.val() === 'Cerrada'"
+        },
+        "prioridad": {
+          ".validate": "newData.val() === 'Alta' || newData.val() === 'Media' || newData.val() === 'Baja'"
+        }
+      },
+      ".indexOn": ["estatus", "prioridad", "economico", "fechaIngreso"]
+    },
+    
+    "reports": {
+      ".read": "auth !== null",
+      ".write": "auth !== null",
+      "$reportId": {
+        ".validate": "auth !== null && newData.hasChildren(['assetId', 'entryDate'])"
+      }
+    },
+    
+    "settings": {
+      ".read": "auth !== null",
+      ".write": "auth !== null",
+      "kioskMode": {
+        ".validate": "newData.isBoolean()"
+      }
+    },
+    
+    "assets": {
+      ".indexOn": ["status", "id"]
+    }
+  }
+}
