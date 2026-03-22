@@ -51,3 +51,9 @@ tmp/
 !eslint.config.cjs
 !playwright.config.ts
 !.prettierrc
+
+# Sensible/secret files - agregado por Copilot
+*.key
+*.secret
+secrets.yml
+credentials.json
