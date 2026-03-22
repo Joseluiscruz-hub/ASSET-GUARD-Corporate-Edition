@@ -7,7 +7,16 @@
     <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
     <link rel="manifest" href="assets/manifest.webmanifest">
-        <script>
+    <script>
+      (function() {
+        const params = new URLSearchParams(location.search);
+        const path = params.get('path');
+        if (path) {
+          window.history.replaceState(null, null, '/' + path);
+        }
+      })();
+    </script>
+    <script>
       window.FIREBASE_API_KEY = 'AIzaSyCQkT-TQy-rtKr_bmTWJS78HghTh97x3eE';
     </script>
 </head>

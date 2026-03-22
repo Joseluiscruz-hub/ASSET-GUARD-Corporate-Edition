@@ -1,6 +1,13 @@
 module.exports = [
   {
-    ignores: ["dist/**", "node_modules/**"]
+    ignores: [
+      "dist/**",
+      "node_modules/**",
+      "src/environments/environment.example.ts",
+      "src/environments/environment.prod.ts",
+      "src/example.spec.ts",
+      "src/test.ts"
+    ]
   },
   {
     files: ["**/*.ts"],

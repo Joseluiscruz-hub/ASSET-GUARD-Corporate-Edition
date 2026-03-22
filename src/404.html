@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Redirigiendo...</title>
+    <script>
+      const path = location.pathname;
+      const repoName = path.startsWith('/') ? path.split('/')[1] : '';
+      const redirectUrl = `/${repoName}/?path=${path.substring(1 + repoName.length)}`;
+      location.replace(redirectUrl);
+    </script>
+  </head>
+  <body>
+  </body>
+</html>
