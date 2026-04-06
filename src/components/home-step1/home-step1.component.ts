@@ -19,7 +19,7 @@ export interface ZoneSelection {
       <div class="w-full max-w-3xl bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
 
         <!-- Red top accent line -->
-        <div class="h-1 w-full" style="background-color: ${FEMSA_RED};"></div>
+        <div class="h-1 w-full" [style.background-color]="FEMSA_RED"></div>
 
         <!-- Panel Body -->
         <div class="p-6 md:p-10">
@@ -27,12 +27,10 @@ export interface ZoneSelection {
           <!-- Step Badge -->
           <div class="mb-5">
             <span
-              class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest"
-              style="background-color: #fef2f2; color: ${FEMSA_RED}; border: 1px solid #fecaca;"
+              class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest bg-red-50 text-red-700 border border-red-200"
             >
               <span
-                class="w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-black text-white"
-                style="background-color: ${FEMSA_RED};"
+                class="w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-black text-white bg-red-700"
               >1</span>
               Paso 1 de 5
             </span>
@@ -50,7 +48,7 @@ export interface ZoneSelection {
           <ul class="flex flex-col sm:flex-row gap-3 mb-8">
             @for (b of microBenefits; track b.label) {
               <li class="flex items-start gap-2 text-xs text-slate-500">
-                <i [class]="b.icon + ' text-[' + FEMSA_RED + '] mt-0.5 shrink-0'" style="color: ${FEMSA_RED};"></i>
+                <i [class]="b.icon + ' mt-0.5 shrink-0'" [style.color]="FEMSA_RED"></i>
                 <span>{{ b.label }}</span>
               </li>
             }
@@ -65,10 +63,7 @@ export interface ZoneSelection {
                 class="group relative text-left rounded-xl border-2 p-4 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
                 [class.border-slate-200]="!isSelected(zone.name)"
                 [class.bg-white]="!isSelected(zone.name)"
-                [class.hover:border-red-200]="!isSelected(zone.name)"
-                [class.hover:bg-red-50]="!isSelected(zone.name)"
                 [class.shadow-sm]="!isSelected(zone.name)"
-                [class.shadow-none]="isSelected(zone.name)"
                 [style.border-color]="isSelected(zone.name) ? FEMSA_RED : ''"
                 [style.background-color]="isSelected(zone.name) ? '#fef2f2' : ''"
                 [attr.aria-pressed]="isSelected(zone.name)"
@@ -77,7 +72,7 @@ export interface ZoneSelection {
                 @if (isSelected(zone.name)) {
                   <span
                     class="absolute top-3 right-3 w-5 h-5 rounded-full flex items-center justify-center text-white text-[10px]"
-                    style="background-color: ${FEMSA_RED};"
+                    [style.background-color]="FEMSA_RED"
                   >
                     <i class="fas fa-check"></i>
                   </span>
@@ -128,11 +123,12 @@ export interface ZoneSelection {
               type="button"
               (click)="compareZones()"
               [disabled]="selectedZones().length === 0"
-              class="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-bold text-white transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
-              [style.background-color]="selectedZones().length > 0 ? FEMSA_RED : ''"
-              [class.bg-slate-300]="selectedZones().length === 0"
-              [class.hover:opacity-90]="selectedZones().length > 0"
+              class="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
+              [class.text-white]="selectedZones().length > 0"
               [class.shadow-md]="selectedZones().length > 0"
+              [class.bg-slate-300]="selectedZones().length === 0"
+              [class.text-slate-500]="selectedZones().length === 0"
+              [style.background-color]="selectedZones().length > 0 ? FEMSA_RED : ''"
             >
               <i class="fas fa-chart-bar text-sm"></i>
               Comparar zonas
@@ -235,3 +231,4 @@ export class HomeStep1Component {
     this.compareSelected.emit({ zones: this.selectedZones() });
   }
 }
+
