@@ -154,7 +154,7 @@ export interface ZoneSelection {
 
       <!-- Zone count summary -->
       <p class="mt-4 text-xs text-slate-400 text-center">
-        {{ zones().length }} zona{{ zones().length !== 1 ? 's' : '' }} operativa{{ zones().length !== 1 ? 's' : '' }} disponible{{ zones().length !== 1 ? 's' : '' }}
+        {{ zones().length }} zona{{ zones().length !== 1 ? 's' : '' }} operativa{{ zones().length !== 1 ? 's' : '' }} disponibles
       </p>
 
     </div>
@@ -168,6 +168,7 @@ export class HomeStep1Component {
 
   compareSelected = output<ZoneSelection>();
 
+  /** Feature highlights displayed below the subtitle to communicate the value of zone analysis. */
   readonly microBenefits = [
     { icon: 'fas fa-bolt', label: 'Disponibilidad en tiempo real por zona' },
     { icon: 'fas fa-shield-alt', label: 'Detección temprana de fallas críticas' },
