@@ -147,6 +147,27 @@
             ></i>
             <span class="ml-3 text-sm font-bold hidden lg:block">App Operador</span>
           </button>
+
+          <button
+            (click)="setView('home')"
+            class="w-full flex items-center p-3 rounded-lg transition-all group relative border-l-4"
+            [class.border-[#ce1126]]="currentView() === 'home'"
+            [class.bg-slate-800]="currentView() === 'home'"
+            [class.text-white]="currentView() === 'home'"
+            [class.border-transparent]="currentView() !== 'home'"
+            [class.hover:bg-slate-800]="currentView() !== 'home'"
+          >
+            <i
+              class="fas fa-map-marked-alt w-6 text-center"
+              [class.text-[#ce1126]]="currentView() === 'home'"
+            ></i>
+            <span class="ml-3 text-sm font-bold hidden lg:block">Análisis por Zona</span>
+            <div
+              class="lg:hidden absolute left-14 bg-slate-900 text-white text-xs px-2 py-1 rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap border border-slate-700"
+            >
+              Zonas
+            </div>
+          </button>
         </nav>
       </div>
 
@@ -272,6 +293,9 @@
             }
             @case ('solicitor') {
               <app-solicitor-panel />
+            }
+            @case ('home') {
+              <app-home-step1 />
             }
             @case ('settings') {
               <app-admin />
