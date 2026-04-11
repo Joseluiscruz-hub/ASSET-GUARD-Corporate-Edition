@@ -13,8 +13,9 @@ import { ServicePanelComponent } from './components/service-panel/service-panel.
 import { SolicitorPanelComponent } from './components/solicitor-panel/solicitor-panel.component';
 import { LoginComponent } from './components/login/login.component';
 import { MaintenanceComplianceComponent } from './components/maintenance-compliance/maintenance-compliance.component';
+import { HomeStep1Component } from './components/home-step1/home-step1.component';
 
-type View = 'dashboard' | 'assets' | 'service' | 'solicitor' | 'settings' | 'maintenance';
+type View = 'dashboard' | 'assets' | 'service' | 'solicitor' | 'settings' | 'maintenance' | 'home';
 
 @Component({
   selector: 'app-root',
@@ -28,7 +29,8 @@ type View = 'dashboard' | 'assets' | 'service' | 'solicitor' | 'settings' | 'mai
     ServicePanelComponent,
     SolicitorPanelComponent,
     LoginComponent,
-    MaintenanceComplianceComponent
+    MaintenanceComplianceComponent,
+    HomeStep1Component
   ],
   templateUrl: './app.component.html',
   styles: [
@@ -159,6 +161,8 @@ export class AppComponent {
 
   get viewTitle(): string {
     switch (this.currentView()) {
+      case 'home':
+        return 'Análisis por Zona';
       case 'dashboard':
         return 'Centro de Monitoreo (NOC)';
       case 'assets':
