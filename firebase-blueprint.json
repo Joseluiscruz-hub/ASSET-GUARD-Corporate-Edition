@@ -1,0 +1,94 @@
+{
+  "entities": {
+    "Asset": {
+      "title": "Asset",
+      "description": "An industrial asset like a forklift.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Economic ID" },
+        "brand": { "type": "string" },
+        "model": { "type": "string" },
+        "serial": { "type": "string" },
+        "sapCode": { "type": "string" },
+        "acquisitionDate": { "type": "string", "format": "date" },
+        "fuelType": { "type": "string", "enum": ["Eléctrico", "Gas LP", "Diesel", "GLP/Gasolina Dual", "Eléctrico 440V", "Vapor/Gas", "Neumático", "Hidráulico"] },
+        "status": { "type": "object" },
+        "statusSince": { "type": "string", "format": "date-time" },
+        "location": { "type": "string" },
+        "critical": { "type": "boolean" },
+        "operatingHours": { "type": "number" },
+        "cleanlinessStatus": { "type": "string", "enum": ["Sanitized", "Pending", "Critical"] },
+        "lastSanitization": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "brand", "model", "serial", "fuelType", "status", "statusSince", "location", "critical"]
+    },
+    "FailureReport": {
+      "title": "FailureReport",
+      "description": "Historical report of a failure.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "assetId": { "type": "string" },
+        "entryDate": { "type": "string", "format": "date-time" },
+        "exitDate": { "type": "string", "format": "date-time" },
+        "failureDescription": { "type": "string" },
+        "diagnosis": { "type": "string" },
+        "partsUsed": { "type": "array", "items": { "type": "string" } },
+        "estimatedCost": { "type": "number" },
+        "technician": { "type": "string" },
+        "type": { "type": "string", "enum": ["Eléctrico", "Mecánico", "Hidráulico", "Operador", "Llantas", "Estructural", "Software", "Térmico", "Neumático"] }
+      },
+      "required": ["id", "assetId", "entryDate", "failureDescription", "estimatedCost", "technician", "type"]
+    },
+    "ForkliftFailureEntry": {
+      "title": "ForkliftFailureEntry",
+      "description": "Active or recently closed failure entry for tracking.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "economico": { "type": "string" },
+        "falla": { "type": "string" },
+        "reporta": { "type": "string" },
+        "fechaIngreso": { "type": "string", "format": "date-time" },
+        "fechaSalida": { "type": "string", "format": "date-time" },
+        "prioridad": { "type": "string", "enum": ["Alta", "Media", "Baja"] },
+        "estatus": { "type": "string", "enum": ["Abierta", "En Proceso", "Cerrada"] },
+        "seguimiento": { "type": "array" },
+        "ordenCompra": { "type": "string" },
+        "estatusRefaccion": { "type": "string", "enum": ["N/A", "En Stock", "Pedida", "Por Recibir"] },
+        "fechaPromesa": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "economico", "falla", "reporta", "fechaIngreso", "prioridad", "estatus"]
+    },
+    "MaintenanceSchedule": {
+      "title": "MaintenanceSchedule",
+      "description": "Scheduled maintenance tasks.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "model": { "type": "string" },
+        "serial": { "type": "string" },
+        "economico": { "type": "string" },
+        "supervisor": { "type": "string" },
+        "smpType": { "type": "string", "enum": ["REV", "X", "Y", "Z"] },
+        "scheduledDate": { "type": "string", "format": "date-time" },
+        "realDate": { "type": "string", "format": "date-time" },
+        "duration": { "type": "string" },
+        "otFolio": { "type": "string" },
+        "serviceOrder": { "type": "string" },
+        "hourMeter": { "type": "number" },
+        "technician": { "type": "string" },
+        "status": { "type": "string", "enum": ["Completado", "Programado", "Vencido", "En Proceso"] },
+        "history": { "type": "array" },
+        "comments": { "type": "string" }
+      },
+      "required": ["id", "model", "serial", "economico", "supervisor", "smpType", "scheduledDate", "otFolio", "serviceOrder", "technician", "status"]
+    }
+  },
+  "firestore": {
+    "/assets/{assetId}": { "schema": "Asset", "description": "Collection of industrial assets." },
+    "/failureReports/{reportId}": { "schema": "FailureReport", "description": "Historical failure reports." },
+    "/activeFailures/{failureId}": { "schema": "ForkliftFailureEntry", "description": "Active failure tracking entries." },
+    "/maintenanceSchedule/{scheduleId}": { "schema": "MaintenanceSchedule", "description": "Maintenance schedule records." }
+  }
+}

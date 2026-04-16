@@ -1,49 +1,53 @@
 {
   "rules": {
-    ".read": "auth !== null",
-    ".write": "auth !== null",
-    
-    "assets": {
-      ".read": "auth !== null",
-      ".write": "auth !== null",
-      "$assetId": {
-        ".validate": "auth !== null && newData.hasChildren(['id', 'status'])"
-      }
-    },
-    
     "failures": {
-      ".read": "auth !== null",
-      ".write": "auth !== null",
+      ".read": true,
+      ".write": true,
       "$failureId": {
-        ".validate": "auth !== null && newData.hasChildren(['economico', 'falla', 'reporta'])",
-        "estatus": {
-          ".validate": "newData.val() === 'Abierta' || newData.val() === 'En Proceso' || newData.val() === 'Cerrada'"
+        ".validate": "newData.hasChildren(['economico', 'falla', 'estatus', 'fechaIngreso'])",
+        "economico": {
+          ".validate": "newData.isString() && newData.val().length > 0"
+        },
+        "falla": {
+          ".validate": "newData.isString() && newData.val().length > 0"
         },
         "prioridad": {
           ".validate": "newData.val() === 'Alta' || newData.val() === 'Media' || newData.val() === 'Baja'"
+        },
+        "estatus": {
+          ".validate": "newData.val() === 'Abierta' || newData.val() === 'En Proceso' || newData.val() === 'Cerrada'"
+        },
+        "estatusRefaccion": {
+          ".validate": "!newData.exists() || newData.val() === 'N/A' || newData.val() === 'En Stock' || newData.val() === 'Pedida' || newData.val() === 'Por Recibir'"
+        },
+        "fechaIngreso": {
+          ".validate": "newData.isString()"
+        },
+        "seguimiento": {
+          "$msgId": {
+            ".validate": "newData.hasChildren(['usuario', 'mensaje', 'fecha'])",
+            "usuario": {
+              ".validate": "newData.isString()"
+            },
+            "mensaje": {
+              ".validate": "newData.isString()"
+            }
+          }
+        },
+        "$other": {
+          ".validate": true
         }
-      },
-      ".indexOn": ["estatus", "prioridad", "economico", "fechaIngreso"]
-    },
-    
-    "reports": {
-      ".read": "auth !== null",
-      ".write": "auth !== null",
-      "$reportId": {
-        ".validate": "auth !== null && newData.hasChildren(['assetId', 'entryDate'])"
       }
     },
-    
     "settings": {
-      ".read": "auth !== null",
-      ".write": "auth !== null",
+      ".read": true,
+      ".write": true,
       "kioskMode": {
         ".validate": "newData.isBoolean()"
+      },
+      "$other": {
+        ".validate": true
       }
-    },
-    
-    "assets": {
-      ".indexOn": ["status", "id"]
     }
   }
 }
