@@ -1,5 +1,1 @@
-#!/usr/bin/env sh
-. "$(dirname "$0")/_/husky.sh"
-
-# Ejecutar script local que lintera y formatea solo archivos staged
-node ./scripts/precommit.cjs
+npm run lint:fix

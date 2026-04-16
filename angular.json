@@ -21,7 +21,7 @@
             "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.json",
             "styles": ["src/index.css"],
-            "baseHref": "/ASSET-GUARD-Corporate-Edition/",
+            "baseHref": "/",
             "assets": [
               "src/favicon.svg",
               "src/favicon.ico",
@@ -31,8 +31,7 @@
           "configurations": {
             "production": {
               "outputHashing": "all",
-              "baseHref": "/ASSET-GUARD-Corporate-Edition/",
-              "deployUrl": "/ASSET-GUARD-Corporate-Edition/"
+              "baseHref": "/ASSET-GUARD-Corporate-Edition/"
             },
             "development": {
               "optimization": false,
