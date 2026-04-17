@@ -552,9 +552,9 @@ export class DashboardComponent {
     const now = new Date().getTime();
     const diffHrs = Math.floor((now - start) / (1000 * 60 * 60));
 
-    let text = '';
-    let label = '';
-    let color = '';
+    let text: string;
+    let label: string;
+    let color: string;
 
     if (diffHrs < 1) {
       text = '< 1h';
