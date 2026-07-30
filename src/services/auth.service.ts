@@ -1,6 +1,16 @@
 import { Injectable, signal, computed, NgZone } from '@angular/core';
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile, signInAnonymously } from 'firebase/auth';
+import {
+  Auth,
+  getAuth,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+  updateProfile,
+  signInAnonymously
+} from 'firebase/auth';
 import { firebaseApp } from '../firebase-init';
+import { environment } from '../environments/environment';
 
 export interface AuthUser {
   uid: string;
@@ -14,7 +24,7 @@ export interface AuthUser {
 })
 export class AuthService {
   private app = firebaseApp;
-  private auth = getAuth(this.app);
+  private auth: Auth | null = null;
 
   readonly currentUser = signal<AuthUser | null>(null);
   readonly isLoading = signal<boolean>(true);
@@ -23,6 +33,20 @@ export class AuthService {
   readonly isAuthenticated = computed(() => this.currentUser() !== null);
 
   constructor(private ngZone: NgZone) {
+    if (!environment.firebase.apiKey) {
+      console.warn('Firebase Auth API key missing. Running auth in offline demo mode.');
+      this.isLoading.set(false);
+      return;
+    }
+
+    try {
+      this.auth = getAuth(this.app);
+    } catch (err) {
+      console.warn('Firebase Auth unavailable. Running auth in offline demo mode.', err);
+      this.isLoading.set(false);
+      return;
+    }
+
     onAuthStateChanged(this.auth, (user) => {
       this.ngZone.run(() => {
         if (user) {
@@ -42,6 +66,12 @@ export class AuthService {
 
   async login(email: string, password: string): Promise<boolean> {
     this.error.set(null);
+
+    if (!this.auth) {
+      this.error.set('Autenticación Firebase no configurada. Usa Acceso Demo.');
+      return false;
+    }
+
     this.isLoading.set(true);
 
     try {
@@ -67,6 +97,12 @@ export class AuthService {
 
   async register(email: string, password: string, displayName: string): Promise<boolean> {
     this.error.set(null);
+
+    if (!this.auth) {
+      this.error.set('Autenticación Firebase no configurada. Usa Acceso Demo.');
+      return false;
+    }
+
     this.isLoading.set(true);
 
     try {
@@ -94,7 +130,9 @@ export class AuthService {
 
   async logout(): Promise<void> {
     try {
-      await signOut(this.auth);
+      if (this.auth) {
+        await signOut(this.auth);
+      }
       this.ngZone.run(() => {
         this.currentUser.set(null);
       });
@@ -107,6 +145,11 @@ export class AuthService {
   async loginAsDemo(): Promise<boolean> {
     this.error.set(null);
     this.isLoading.set(true);
+
+    if (!this.auth) {
+      this.setLocalDemoUser();
+      return true;
+    }
 
     try {
       const result = await signInAnonymously(this.auth);
@@ -121,6 +164,13 @@ export class AuthService {
     } catch (err: any) {
       console.error('Error en acceso demo:', err);
       // Fallback: usuario local si Firebase falla
+      this.setLocalDemoUser();
+      return true;
+    }
+  }
+
+  private setLocalDemoUser(): void {
+    this.ngZone.run(() => {
       this.currentUser.set({
         uid: 'demo-user-local',
         email: 'demo@assetguard.com',
@@ -128,8 +178,7 @@ export class AuthService {
         photoURL: null
       });
       this.isLoading.set(false);
-      return true;
-    }
+    });
   }
 
   private handleAuthError(err: any): void {
