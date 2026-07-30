@@ -21,14 +21,30 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 0
+      - name: Check Qodana token
+        id: qodana-token
+        shell: bash
+        env:
+          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
+        run: |
+          if [[ -n "$QODANA_TOKEN" ]]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::QODANA_TOKEN is not configured; skipping Qodana scan."
+          fi
       - name: 'Qodana Scan'
-        uses: JetBrains/qodana-action@v2025.3
+        if: steps.qodana-token.outputs.available == 'true'
+        uses: JetBrains/qodana-action@v2026.1
         env:
           QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
         with:
-          args: --baseline,qodana.sarif.json
+          args: |
+            --baseline qodana.sarif.json
+            --linter qodana-js
+            --within-docker false
           # When pr-mode is set to true, Qodana analyzes only the files that have been changed
           pr-mode: false
           use-caches: true

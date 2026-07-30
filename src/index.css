@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+app-root {
+  display: block;
+  min-height: 100vh;
+}
+
 /* Custom scrollbar styles for the application */
 ::-webkit-scrollbar {
   width: 10px;
