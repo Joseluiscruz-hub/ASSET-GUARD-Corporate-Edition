@@ -15,7 +15,7 @@
   "dependencies": {
     "@angular/animations": "22.1.0",
     "@angular/common": "22.1.0",
-    "@angular/compiler": "20.3.25",
+    "@angular/compiler": "22.1.0",
     "@angular/core": "22.1.0",
     "@angular/forms": "22.1.0",
     "@angular/platform-browser": "22.1.0",
@@ -37,7 +37,7 @@
     "@analogjs/vite-plugin-angular": "^2.6.4",
     "@angular-devkit/build-angular": "22.1.0",
     "@angular/cli": "22.1.0",
-    "@angular/compiler-cli": "19.2.25",
+    "@angular/compiler-cli": "22.1.0",
     "@playwright/test": "^1.54.2",
     "@eslint/js": "^10.0.1",
     "@types/node": "^18.18.0",
